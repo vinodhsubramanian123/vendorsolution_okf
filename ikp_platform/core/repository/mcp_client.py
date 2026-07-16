@@ -55,12 +55,11 @@ class ObsidianMCPClient:
                                                             results.append(fm["id"])
                                                             continue
                                                 except Exception:
-                                                    pass
+                                                    logger.debug(f"Failed to parse frontmatter for {file_path}")
                                                 # Fallback to filename
                                                 results.append(item["path"].split("/")[-1].replace(".md", ""))
                                 except json.JSONDecodeError:
-                                    # Fallback if it's just raw text with paths
-                                    pass
+                                    logger.debug("Failed to decode JSON from MCP response")
         except Exception as e:
             logger.error(f"MCP Search failed: {e}")
             

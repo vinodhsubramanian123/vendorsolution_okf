@@ -195,9 +195,21 @@ class PDFExtractor:
         first_lines = text[:1500].split('\n')
         title_found = False
         
+        joined_lines = []
+        current_block = []
         for line in first_lines:
             line = line.strip()
-            if re.search(r'\b(HPE|Dell|Cisco|Lenovo|IBM|Supermicro)\b', line, re.IGNORECASE) and 5 < len(line) < 100:
+            if line:
+                current_block.append(line)
+            else:
+                if current_block:
+                    joined_lines.append(" ".join(current_block))
+                    current_block = []
+        if current_block:
+            joined_lines.append(" ".join(current_block))
+            
+        for line in joined_lines:
+            if re.search(r'\b(HPE|Dell|Cisco|Lenovo|IBM|Supermicro)\b', line, re.IGNORECASE) and 5 < len(line) < 200:
                 clean_title = re.sub(r'(?i)\b(QuickSpecs|Technical Guide|Data Sheet|Datasheet|Spec Sheet)\b.*$', '', line).strip()
                 if clean_title:
                     title = clean_title

@@ -13,8 +13,8 @@ class TestFuzzyMatching(unittest.TestCase):
         sku1 = SKU(id="sku1", part_number="P51174-B21", title="Frame")
         sku2 = SKU(id="sku2", part_number="872957-B21", title="Composer")
         
-        self.graph_builder.add_node(sku1)
-        self.graph_builder.add_node(sku2)
+        self.graph_builder.add_concept(sku1)
+        self.graph_builder.add_concept(sku2)
         
         self.validator = BOQValidator(self.graph_builder)
 

@@ -46,6 +46,19 @@ class GraphBuilder:
 
         if hasattr(obj, "component_category") and obj.component_category:
             node_attrs["component_category"] = obj.component_category
+            node_attrs["attr_component_category"] = obj.component_category
+            
+        if hasattr(obj, "component_subcategory") and obj.component_subcategory:
+            node_attrs["attr_component_subcategory"] = obj.component_subcategory
+            
+        if hasattr(obj, "inclusive_qty") and obj.inclusive_qty is not None:
+            node_attrs["attr_inclusive_qty"] = obj.inclusive_qty
+            
+        if hasattr(obj, "target_category") and obj.target_category:
+            node_attrs["attr_target_category"] = obj.target_category
+            
+        if hasattr(obj, "target_subcategory") and obj.target_subcategory:
+            node_attrs["attr_target_subcategory"] = obj.target_subcategory
 
         if hasattr(obj, "performance_requirements") and obj.performance_requirements:
             for k, v in obj.performance_requirements.items():
@@ -67,6 +80,9 @@ class GraphBuilder:
         if hasattr(obj, "limit_name") and obj.limit_name:
             node_attrs["limit_name"] = obj.limit_name
             node_attrs["limit_value"] = obj.limit_value
+            
+        if hasattr(obj, "part_number") and obj.part_number:
+            node_attrs["attr_part_number"] = obj.part_number
 
         # Add structured attributes
         for attr in obj.attributes:

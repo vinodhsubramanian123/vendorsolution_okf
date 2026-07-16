@@ -42,6 +42,9 @@ class SearchRequest(BaseModel):
     query: str
     limit: int = 10
 
+import functools
+
+@functools.lru_cache(maxsize=1)
 def get_repo() -> RepoManager:
     repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
     repo.bootstrap()
@@ -69,7 +72,7 @@ async def get_status():
                 obj_type = data.get("type")
                 if obj_type == EngineeringObjectType.SKU.value:
                     platforms[plat_id]["skus"] += 1
-                elif obj_type == EngineeringObjectType.CATEGORY.value:
+                elif obj_type == EngineeringObjectType.SOLUTION_CATEGORY.value:
                     platforms[plat_id]["categories"] += 1
                 elif obj_type == EngineeringObjectType.RULE.value:
                     platforms[plat_id]["rules"] += 1

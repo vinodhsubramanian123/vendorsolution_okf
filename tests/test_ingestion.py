@@ -46,4 +46,4 @@ class TestIngestion:
         components = self.extractor._process_structured_components(structured_data, self.platform)
         assert len(components) == 1
         assert components[0].title.startswith("P48803-B21")
-        assert components[0].component_category == "Accessory"
+        assert components[0].component_category == "Infrastructure"

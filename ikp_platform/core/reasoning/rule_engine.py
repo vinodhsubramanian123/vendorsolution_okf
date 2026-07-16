@@ -105,10 +105,12 @@ class RuleEngine:
         errors = []
         
         # Get all constraints attached to the platform
-        platform_constraints = [
-            r["target"] for r in self.graph.traverse_relationships(platform_id, "Contains", "outbound")
-            if self.graph.graph.nodes[r["target"]].get("type") in (EngineeringObjectType.CONSTRAINT.value, EngineeringObjectType.CATEGORY_LIMIT.value)
-        ]
+        platform_constraints = set()
+        for r in self.graph.traverse_relationships(platform_id, "Contains", "both"):
+            other_id = r["target"] if r["source"] == platform_id else r["source"]
+            if self.graph.graph.nodes[other_id].get("type") in (EngineeringObjectType.CONSTRAINT.value, EngineeringObjectType.CATEGORY_LIMIT.value):
+                platform_constraints.add(other_id)
+        platform_constraints = list(platform_constraints)
         
         if not platform_constraints:
             reasoning_chain.append("No explicit constraints found for platform.")
@@ -135,8 +137,8 @@ class RuleEngine:
         # Evaluate each constraint
         for constraint_id in platform_constraints:
             c_data = self.graph.graph.nodes[constraint_id]
-            limit_name = c_data.get("attr_limit_name", "").lower()
-            limit_value = c_data.get("attr_limit_value")
+            limit_name = c_data.get("limit_name", "").lower()
+            limit_value = c_data.get("limit_value")
             c_type = c_data.get("type")
             
             if c_type == EngineeringObjectType.CATEGORY_LIMIT.value:

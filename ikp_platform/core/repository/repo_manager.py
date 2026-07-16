@@ -73,6 +73,14 @@ class RepoManager:
         Add a new engineering concept to both layers.
         Returns the relative path of the written OKF file.
         """
+        # Deduplication Check
+        if obj.id in self.graph.graph:
+            # We already have this concept. We could merge, but for now we just skip duplicating it in LOG.md
+            # We still overwrite the OKF file to allow updates.
+            is_new = False
+        else:
+            is_new = True
+
         # Persist to OKF Markdown
         relative_path = self.writer.write_concept(obj)
 
@@ -82,20 +90,21 @@ class RepoManager:
         # Add to Vector Store for semantic search
         self.vector_store.index_object(obj)
 
-        # Update log
-        self.writer.append_log_entry(
-            action="Creation",
-            description=f"Added {obj.type.value}: {obj.title or obj.id}",
-            concept_path=relative_path,
-        )
+        if is_new:
+            # Update log
+            self.writer.append_log_entry(
+                action="Creation",
+                description=f"Added {obj.type.value}: {obj.title or obj.id}",
+                concept_path=relative_path,
+            )
+
+            # Update managed files
+            self._update_state_file()
+            self._append_root_log(f"Added {obj.type.value}: {obj.title or obj.id}")
 
         # Regenerate index for parent directory
         file_path = self.repository_path / relative_path
         self.writer.generate_index(file_path.parent)
-
-        # Update managed files
-        self._update_state_file()
-        self._append_root_log(f"Added {obj.type.value}: {obj.title or obj.id}")
 
         return relative_path
 
