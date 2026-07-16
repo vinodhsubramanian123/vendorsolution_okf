@@ -1,0 +1,1994 @@
+[
+  {
+    "id": "dl380-gen12/processors/xeon-6710e",
+    "title": "Intel Xeon 6 6710E",
+    "description": "Intel Xeon 6 6710E - 64 E-Cores, 2.4GHz, 205W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.4
+      },
+      {
+        "name": "Cores",
+        "value": 64
+      },
+      {
+        "name": "L3 Cache",
+        "value": 96
+      },
+      {
+        "name": "TDP",
+        "value": 205
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 5600
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HDCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "E-Core"
+      }
+    ],
+    "capabilities": [
+      "E-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6731e",
+    "title": "Intel Xeon 6 6731E",
+    "description": "Intel Xeon 6 6731E - 96 E-Cores, 2.2GHz, 250W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.2
+      },
+      {
+        "name": "Cores",
+        "value": 96
+      },
+      {
+        "name": "L3 Cache",
+        "value": 96
+      },
+      {
+        "name": "TDP",
+        "value": 250
+      },
+      {
+        "name": "UPI Links",
+        "value": 0
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 5600
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HDCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "E-Core"
+      }
+    ],
+    "capabilities": [
+      "E-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6740e",
+    "title": "Intel Xeon 6 6740E",
+    "description": "Intel Xeon 6 6740E - 96 E-Cores, 2.4GHz, 250W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.4
+      },
+      {
+        "name": "Cores",
+        "value": 96
+      },
+      {
+        "name": "L3 Cache",
+        "value": 96
+      },
+      {
+        "name": "TDP",
+        "value": 250
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HDCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "E-Core"
+      }
+    ],
+    "capabilities": [
+      "E-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6746e",
+    "title": "Intel Xeon 6 6746E",
+    "description": "Intel Xeon 6 6746E - 112 E-Cores, 2.0GHz, 250W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.0
+      },
+      {
+        "name": "Cores",
+        "value": 112
+      },
+      {
+        "name": "L3 Cache",
+        "value": 96
+      },
+      {
+        "name": "TDP",
+        "value": 250
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 5600
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HDCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "E-Core"
+      }
+    ],
+    "capabilities": [
+      "E-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6756e",
+    "title": "Intel Xeon 6 6756E",
+    "description": "Intel Xeon 6 6756E - 128 E-Cores, 1.8GHz, 225W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 1.8
+      },
+      {
+        "name": "Cores",
+        "value": 128
+      },
+      {
+        "name": "L3 Cache",
+        "value": 96
+      },
+      {
+        "name": "TDP",
+        "value": 225
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HDCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "E-Core"
+      }
+    ],
+    "capabilities": [
+      "E-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6766e",
+    "title": "Intel Xeon 6 6766E",
+    "description": "Intel Xeon 6 6766E - 144 E-Cores, 1.9GHz, 250W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 1.9
+      },
+      {
+        "name": "Cores",
+        "value": 144
+      },
+      {
+        "name": "L3 Cache",
+        "value": 108
+      },
+      {
+        "name": "TDP",
+        "value": 250
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HDCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "E-Core"
+      }
+    ],
+    "capabilities": [
+      "E-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6780e",
+    "title": "Intel Xeon 6 6780E",
+    "description": "Intel Xeon 6 6780E - 144 E-Cores, 2.2GHz, 330W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.2
+      },
+      {
+        "name": "Cores",
+        "value": 144
+      },
+      {
+        "name": "L3 Cache",
+        "value": 108
+      },
+      {
+        "name": "TDP",
+        "value": 330
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HDCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "E-Core"
+      }
+    ],
+    "capabilities": [
+      "E-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6507p",
+    "title": "Intel Xeon 6 6507P",
+    "description": "Intel Xeon 6 6507P - 8 P-Cores, 3.5GHz, 150W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 3.5
+      },
+      {
+        "name": "Cores",
+        "value": 8
+      },
+      {
+        "name": "L3 Cache",
+        "value": 48
+      },
+      {
+        "name": "TDP",
+        "value": 150
+      },
+      {
+        "name": "UPI Links",
+        "value": 3
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "LCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6517p",
+    "title": "Intel Xeon 6 6517P",
+    "description": "Intel Xeon 6 6517P - 16 P-Cores, 3.2GHz, 190W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 3.2
+      },
+      {
+        "name": "Cores",
+        "value": 16
+      },
+      {
+        "name": "L3 Cache",
+        "value": 72
+      },
+      {
+        "name": "TDP",
+        "value": 190
+      },
+      {
+        "name": "UPI Links",
+        "value": 3
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "LCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6527p",
+    "title": "Intel Xeon 6 6527P",
+    "description": "Intel Xeon 6 6527P - 24 P-Cores, 3.0GHz, 255W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 3.0
+      },
+      {
+        "name": "Cores",
+        "value": 24
+      },
+      {
+        "name": "L3 Cache",
+        "value": 144
+      },
+      {
+        "name": "TDP",
+        "value": 255
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6725p",
+    "title": "Intel Xeon 6 6725P",
+    "description": "Intel Xeon 6 6725P - 16 P-Cores, 3.7GHz, 235W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 3.7
+      },
+      {
+        "name": "Cores",
+        "value": 16
+      },
+      {
+        "name": "L3 Cache",
+        "value": 192
+      },
+      {
+        "name": "TDP",
+        "value": 235
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6730p",
+    "title": "Intel Xeon 6 6730P",
+    "description": "Intel Xeon 6 6730P - 32 P-Cores, 2.5GHz, 250W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.5
+      },
+      {
+        "name": "Cores",
+        "value": 32
+      },
+      {
+        "name": "L3 Cache",
+        "value": 288
+      },
+      {
+        "name": "TDP",
+        "value": 250
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6732p",
+    "title": "Intel Xeon 6 6732P",
+    "description": "Intel Xeon 6 6732P - 32 P-Cores, 3.8GHz, 350W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 3.8
+      },
+      {
+        "name": "Cores",
+        "value": 32
+      },
+      {
+        "name": "L3 Cache",
+        "value": 144
+      },
+      {
+        "name": "TDP",
+        "value": 350
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6736p",
+    "title": "Intel Xeon 6 6736P",
+    "description": "Intel Xeon 6 6736P - 36 P-Cores, 2.0GHz, 205W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.0
+      },
+      {
+        "name": "Cores",
+        "value": 36
+      },
+      {
+        "name": "L3 Cache",
+        "value": 144
+      },
+      {
+        "name": "TDP",
+        "value": 205
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6737p",
+    "title": "Intel Xeon 6 6737P",
+    "description": "Intel Xeon 6 6737P - 32 P-Cores, 2.9GHz, 270W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.9
+      },
+      {
+        "name": "Cores",
+        "value": 32
+      },
+      {
+        "name": "L3 Cache",
+        "value": 144
+      },
+      {
+        "name": "TDP",
+        "value": 270
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6745p",
+    "title": "Intel Xeon 6 6745P",
+    "description": "Intel Xeon 6 6745P - 32 P-Cores, 3.1GHz, 300W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 3.1
+      },
+      {
+        "name": "Cores",
+        "value": 32
+      },
+      {
+        "name": "L3 Cache",
+        "value": 336
+      },
+      {
+        "name": "TDP",
+        "value": 300
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6747p",
+    "title": "Intel Xeon 6 6747P",
+    "description": "Intel Xeon 6 6747P - 48 P-Cores, 2.7GHz, 330W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.7
+      },
+      {
+        "name": "Cores",
+        "value": 48
+      },
+      {
+        "name": "L3 Cache",
+        "value": 288
+      },
+      {
+        "name": "TDP",
+        "value": 330
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6762p",
+    "title": "Intel Xeon 6 6762P",
+    "description": "Intel Xeon 6 6762P - 64 P-Cores, 2.9GHz, 350W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.9
+      },
+      {
+        "name": "Cores",
+        "value": 64
+      },
+      {
+        "name": "L3 Cache",
+        "value": 320
+      },
+      {
+        "name": "TDP",
+        "value": 350
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6767p",
+    "title": "Intel Xeon 6 6767P",
+    "description": "Intel Xeon 6 6767P - 64 P-Cores, 2.4GHz, 350W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.4
+      },
+      {
+        "name": "Cores",
+        "value": 64
+      },
+      {
+        "name": "L3 Cache",
+        "value": 336
+      },
+      {
+        "name": "TDP",
+        "value": 350
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6787p",
+    "title": "Intel Xeon 6 6787P",
+    "description": "Intel Xeon 6 6787P - 86 P-Cores, 2.0GHz, 350W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.0
+      },
+      {
+        "name": "Cores",
+        "value": 86
+      },
+      {
+        "name": "L3 Cache",
+        "value": 336
+      },
+      {
+        "name": "TDP",
+        "value": 350
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6505p",
+    "title": "Intel Xeon 6 6505P",
+    "description": "Intel Xeon 6 6505P - 12 P-Cores, 2.2GHz, 150W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.2
+      },
+      {
+        "name": "Cores",
+        "value": 12
+      },
+      {
+        "name": "L3 Cache",
+        "value": 48
+      },
+      {
+        "name": "TDP",
+        "value": 150
+      },
+      {
+        "name": "UPI Links",
+        "value": 3
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 128
+      },
+      {
+        "name": "Die Type",
+        "value": "LCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6515p",
+    "title": "Intel Xeon 6 6515P",
+    "description": "Intel Xeon 6 6515P - 16 P-Cores, 2.3GHz, 150W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.3
+      },
+      {
+        "name": "Cores",
+        "value": 16
+      },
+      {
+        "name": "L3 Cache",
+        "value": 72
+      },
+      {
+        "name": "TDP",
+        "value": 150
+      },
+      {
+        "name": "UPI Links",
+        "value": 3
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 128
+      },
+      {
+        "name": "Die Type",
+        "value": "LCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6520p",
+    "title": "Intel Xeon 6 6520P",
+    "description": "Intel Xeon 6 6520P - 24 P-Cores, 2.4GHz, 210W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.4
+      },
+      {
+        "name": "Cores",
+        "value": 24
+      },
+      {
+        "name": "L3 Cache",
+        "value": 144
+      },
+      {
+        "name": "TDP",
+        "value": 210
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 128
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6530p",
+    "title": "Intel Xeon 6 6530P",
+    "description": "Intel Xeon 6 6530P - 32 P-Cores, 2.3GHz, 225W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.3
+      },
+      {
+        "name": "Cores",
+        "value": 32
+      },
+      {
+        "name": "L3 Cache",
+        "value": 144
+      },
+      {
+        "name": "TDP",
+        "value": 225
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 128
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6740p",
+    "title": "Intel Xeon 6 6740P",
+    "description": "Intel Xeon 6 6740P - 48 P-Cores, 2.1GHz, 270W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.1
+      },
+      {
+        "name": "Cores",
+        "value": 48
+      },
+      {
+        "name": "L3 Cache",
+        "value": 288
+      },
+      {
+        "name": "TDP",
+        "value": 270
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 128
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6760p",
+    "title": "Intel Xeon 6 6760P",
+    "description": "Intel Xeon 6 6760P - 64 P-Cores, 2.2GHz, 330W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.2
+      },
+      {
+        "name": "Cores",
+        "value": 64
+      },
+      {
+        "name": "L3 Cache",
+        "value": 320
+      },
+      {
+        "name": "TDP",
+        "value": 330
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 128
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6714p",
+    "title": "Intel Xeon 6 6714P",
+    "description": "Intel Xeon 6 6714P - 8 P-Cores, 4.0GHz, 195W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 4.0
+      },
+      {
+        "name": "Cores",
+        "value": 8
+      },
+      {
+        "name": "L3 Cache",
+        "value": 48
+      },
+      {
+        "name": "TDP",
+        "value": 195
+      },
+      {
+        "name": "UPI Links",
+        "value": 3
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "LCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6724p",
+    "title": "Intel Xeon 6 6724P",
+    "description": "Intel Xeon 6 6724P - 16 P-Cores, 3.6GHz, 210W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 3.6
+      },
+      {
+        "name": "Cores",
+        "value": 16
+      },
+      {
+        "name": "L3 Cache",
+        "value": 72
+      },
+      {
+        "name": "TDP",
+        "value": 210
+      },
+      {
+        "name": "UPI Links",
+        "value": 3
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "LCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6728p",
+    "title": "Intel Xeon 6 6728P",
+    "description": "Intel Xeon 6 6728P - 24 P-Cores, 2.7GHz, 210W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.7
+      },
+      {
+        "name": "Cores",
+        "value": 24
+      },
+      {
+        "name": "L3 Cache",
+        "value": 144
+      },
+      {
+        "name": "TDP",
+        "value": 210
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6738p",
+    "title": "Intel Xeon 6 6738P",
+    "description": "Intel Xeon 6 6738P - 32 P-Cores, 2.9GHz, 270W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.9
+      },
+      {
+        "name": "Cores",
+        "value": 32
+      },
+      {
+        "name": "L3 Cache",
+        "value": 144
+      },
+      {
+        "name": "TDP",
+        "value": 270
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6748p",
+    "title": "Intel Xeon 6 6748P",
+    "description": "Intel Xeon 6 6748P - 48 P-Cores, 2.5GHz, 300W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.5
+      },
+      {
+        "name": "Cores",
+        "value": 48
+      },
+      {
+        "name": "L3 Cache",
+        "value": 192
+      },
+      {
+        "name": "TDP",
+        "value": 300
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "HCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6768p",
+    "title": "Intel Xeon 6 6768P",
+    "description": "Intel Xeon 6 6768P - 64 P-Cores, 2.4GHz, 330W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.4
+      },
+      {
+        "name": "Cores",
+        "value": 64
+      },
+      {
+        "name": "L3 Cache",
+        "value": 336
+      },
+      {
+        "name": "TDP",
+        "value": 330
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/processors/xeon-6788p",
+    "title": "Intel Xeon 6 6788P",
+    "description": "Intel Xeon 6 6788P - 86 P-Cores, 2.0GHz, 350W TDP",
+    "attributes": [
+      {
+        "name": "Base Speed",
+        "value": 2.0
+      },
+      {
+        "name": "Cores",
+        "value": 86
+      },
+      {
+        "name": "L3 Cache",
+        "value": 336
+      },
+      {
+        "name": "TDP",
+        "value": 350
+      },
+      {
+        "name": "UPI Links",
+        "value": 4
+      },
+      {
+        "name": "DDR5 Speed",
+        "value": 6400
+      },
+      {
+        "name": "SGX Enclave",
+        "value": 512
+      },
+      {
+        "name": "Die Type",
+        "value": "XCC"
+      },
+      {
+        "name": "Core Type",
+        "value": "P-Core"
+      }
+    ],
+    "capabilities": [
+      "P-Core",
+      "DDR5",
+      "PCIe Gen5"
+    ],
+    "category": "CPU"
+  },
+  {
+    "id": "dl380-gen12/components/ocp-3.0",
+    "title": "OCP 3.0 Network Adapter Slot",
+    "description": "OCP 3.0 compliant network adapter slot",
+    "attributes": [],
+    "capabilities": [
+      "OCP 3.0",
+      "Ethernet"
+    ],
+    "category": "NIC"
+  },
+  {
+    "id": "dl380-gen12/components/gpu-h200-nvl",
+    "title": "NVIDIA H200 NVL 141GB",
+    "description": "NVIDIA H200 NVL with 141GB memory",
+    "attributes": [
+      {
+        "name": "GPU Memory",
+        "value": 141
+      }
+    ],
+    "capabilities": [
+      "GPU",
+      "AI",
+      "PCIe Gen5"
+    ],
+    "category": "GPU"
+  },
+  {
+    "id": "dl380-gen12/components/gpu-rtx-pro-6000",
+    "title": "NVIDIA RTX PRO 6000 96GB",
+    "description": "NVIDIA RTX PRO 6000 with 96GB memory",
+    "attributes": [
+      {
+        "name": "GPU Memory",
+        "value": 96
+      }
+    ],
+    "capabilities": [
+      "GPU",
+      "AI",
+      "PCIe Gen5"
+    ],
+    "category": "GPU"
+  },
+  {
+    "id": "dl380-gen12/components/gpu-rtx-pro-6000-blackwell-server-edition",
+    "title": "NVIDIA RTX PRO 6000 Blackwell Server Edition 96GB",
+    "description": "NVIDIA RTX PRO 6000 Blackwell Server Edition with 96GB memory",
+    "attributes": [
+      {
+        "name": "GPU Memory",
+        "value": 96
+      }
+    ],
+    "capabilities": [
+      "GPU",
+      "AI",
+      "PCIe Gen5"
+    ],
+    "category": "GPU"
+  },
+  {
+    "id": "dl380-gen12/components/gpu-rtx-pro-6000d",
+    "title": "NVIDIA RTX PRO 6000D 84GB",
+    "description": "NVIDIA RTX PRO 6000D with 84GB memory",
+    "attributes": [
+      {
+        "name": "GPU Memory",
+        "value": 84
+      }
+    ],
+    "capabilities": [
+      "GPU",
+      "AI",
+      "PCIe Gen5"
+    ],
+    "category": "GPU"
+  },
+  {
+    "id": "dl380-gen12/components/gpu-l40s",
+    "title": "NVIDIA L40S 48GB",
+    "description": "NVIDIA L40S with 48GB memory",
+    "attributes": [
+      {
+        "name": "GPU Memory",
+        "value": 48
+      }
+    ],
+    "capabilities": [
+      "GPU",
+      "AI",
+      "PCIe Gen5"
+    ],
+    "category": "GPU"
+  },
+  {
+    "id": "dl380-gen12/components/gpu-rtx-pro-4500-blackwell-server-edition",
+    "title": "NVIDIA RTX PRO 4500 Blackwell Server Edition 32GB",
+    "description": "NVIDIA RTX PRO 4500 Blackwell Server Edition with 32GB memory",
+    "attributes": [
+      {
+        "name": "GPU Memory",
+        "value": 32
+      }
+    ],
+    "capabilities": [
+      "GPU",
+      "AI",
+      "PCIe Gen5"
+    ],
+    "category": "GPU"
+  },
+  {
+    "id": "dl380-gen12/components/gpu-l4",
+    "title": "NVIDIA L4 24GB",
+    "description": "NVIDIA L4 with 24GB memory",
+    "attributes": [
+      {
+        "name": "GPU Memory",
+        "value": 24
+      }
+    ],
+    "capabilities": [
+      "GPU",
+      "AI",
+      "PCIe Gen5"
+    ],
+    "category": "GPU"
+  },
+  {
+    "id": "dl380-gen12/components/gpu-rtx-a1000",
+    "title": "NVIDIA RTX A1000 8GB",
+    "description": "NVIDIA RTX A1000 with 8GB memory",
+    "attributes": [
+      {
+        "name": "GPU Memory",
+        "value": 8
+      }
+    ],
+    "capabilities": [
+      "GPU",
+      "AI",
+      "PCIe Gen5"
+    ],
+    "category": "GPU"
+  },
+  {
+    "id": "dl380-gen12/components/p72201-b21",
+    "title": "P72201-B21 - Default &...",
+    "description": "Default &",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p72203-b21",
+    "title": "P72203-B21 - P72205-B21 & P72207-B21...",
+    "description": "P72205-B21 & P72207-B21",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p74757-b21",
+    "title": "P74757-B21 - 1 Front Primary OCP2 (OCP3.0) ...",
+    "description": "1 Front Primary OCP2 (OCP3.0) (Box 2, Bay 9)",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p74758-b21",
+    "title": "P74758-B21 - 1 Front Secondary OCP (OCP3.0)...",
+    "description": "1 Front Secondary OCP (OCP3.0) (Box 2, Bay 11)",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p73282-b21",
+    "title": "P73282-B21 - SKU Number...",
+    "description": "SKU Number",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p36394-b21",
+    "title": "P36394-B21 - \u2013 Optional....",
+    "description": "\u2013 Optional.",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p75740-b21",
+    "title": "P75740-B21 - \u2212 DL3XX Gen12 8SFF x1 U.3 TM K...",
+    "description": "\u2212 DL3XX Gen12 8SFF x1 U.3 TM Kit () or/and \u2212 DL3XX Gen12 8SFF x4 U.3 TM Kit  or/and \u2212 DL3XX Gen12 Multipurpose Drive Cage Kit",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Storage"
+  },
+  {
+    "id": "dl380-gen12/components/p75807-b21",
+    "title": "P75807-B21 - \u2212 DL3XX Gen12 Front SFF for 2S...",
+    "description": "\u2212 DL3XX Gen12 Front SFF for 2SFF Enablement U.3 HDD Front Cage Kit ()",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Storage"
+  },
+  {
+    "id": "dl380-gen12/components/p74734-b21",
+    "title": "P74734-B21 - Up to 6 SFF in rear \u2212 DL380 Ge...",
+    "description": "Up to 6 SFF in rear \u2212 DL380 Gen12 2SFF Rear Primary/Secondary Riser Cage Kit () \u2212 DL3XX Gen12 Rear 2SFF U.3 HDD Stacking Drive Cage Kit",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Storage"
+  },
+  {
+    "id": "dl380-gen12/components/p74741-b21",
+    "title": "P74741-B21 - 4LFF Midplane drive cage () ca...",
+    "description": "4LFF Midplane drive cage () can be selected with 225W or below Processors",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p48803-b21",
+    "title": "P48803-B21 - ....",
+    "description": ".",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p48802-b21",
+    "title": "P48802-B21 - ....",
+    "description": ".",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p25527-b21",
+    "title": "P25527-B21 - ....",
+    "description": ".",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p77492-b21",
+    "title": "P77492-B21 - (HPE ProLiant Compute DL380 Ge...",
+    "description": "(HPE ProLiant Compute DL380 Gen12 16SFF x4 1x Gen4 Retimer Card Box 1/3 Direct Attach Cable",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p76462-b21",
+    "title": "P76462-B21 - ....",
+    "description": ".",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p76463-b21",
+    "title": "P76463-B21 - ....",
+    "description": ".",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p72207-b21",
+    "title": "P72207-B21 - ...",
+    "description": "",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p77486-b21",
+    "title": "P77486-B21 - ....",
+    "description": ".",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p80997-b21",
+    "title": "P80997-B21 - ...",
+    "description": "",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p83356-b21",
+    "title": "P83356-B21 - ...",
+    "description": "",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p03178-b21",
+    "title": "P03178-B21 - B21, , and P44712-B21 are 96% ...",
+    "description": "B21, , and P44712-B21 are 96% efficient, thus meeting requirements.",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/p48922-b21",
+    "title": "P48922-B21 - This option requires the selec...",
+    "description": "This option requires the selection of HPE Intrusion Detection Kit ()",
+    "attributes": [],
+    "capabilities": [],
+    "category": "Accessory"
+  },
+  {
+    "id": "dl380-gen12/components/psu-1600w",
+    "title": "1600W Power Supply",
+    "description": null,
+    "attributes": [
+      {
+        "name": "Wattage",
+        "value": 1600
+      }
+    ],
+    "capabilities": [],
+    "category": "PSU"
+  },
+  {
+    "id": "dl380-gen12/components/psu-800w",
+    "title": "800W Power Supply",
+    "description": null,
+    "attributes": [
+      {
+        "name": "Wattage",
+        "value": 800
+      }
+    ],
+    "capabilities": [],
+    "category": "PSU"
+  },
+  {
+    "id": "dl380-gen12/components/psu-1000w",
+    "title": "1000W Power Supply",
+    "description": null,
+    "attributes": [
+      {
+        "name": "Wattage",
+        "value": 1000
+      }
+    ],
+    "capabilities": [],
+    "category": "PSU"
+  },
+  {
+    "id": "dl380-gen12/components/psu-2200w",
+    "title": "2200W Power Supply",
+    "description": null,
+    "attributes": [
+      {
+        "name": "Wattage",
+        "value": 2200
+      }
+    ],
+    "capabilities": [],
+    "category": "PSU"
+  }
+]
