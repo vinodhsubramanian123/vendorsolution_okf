@@ -51,14 +51,20 @@ class OKFWriter:
             parts.append(self._slugify(obj.product_family))
         if obj.generation:
             parts.append(self._slugify(obj.generation))
+        if obj.platform_id:
+            parts.append(self._slugify(obj.platform_id))
 
-        # Use object type as a subdirectory for non-platform objects
-        # within a platform context
-        type_slug = self._slugify(obj.type.value)
-
-        if not parts:
-            # Objects without hierarchy go under their type directory
-            parts.append(type_slug)
+        # Group by object type inside the hierarchy
+        if obj.type.value != "Platform":
+            # Pluralize type for directory name (e.g. 'rules', 'components')
+            type_dir = self._slugify(obj.type.value)
+            if not type_dir.endswith("s"):
+                type_dir += "s"
+            parts.append(type_dir)
+            
+            # Sub-group components by their specific category (cpu, memory, etc.)
+            if obj.type.value == "Component" and hasattr(obj, "component_category") and obj.component_category:
+                parts.append(self._slugify(obj.component_category))
 
         # Filename is the slugified id to prevent collisions across platforms
         filename = self._slugify(obj.id)

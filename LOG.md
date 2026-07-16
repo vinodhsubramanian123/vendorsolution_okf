@@ -1,6 +1,1310 @@
 # IKP Operations Log
 
 ## 2026-07-16
+* `17:40:03 UTC` — Added Component: 2200W Power Supply
+
+* `17:40:03 UTC` — Added Component: 1000W Power Supply
+
+* `17:40:03 UTC` — Added Component: 800W Power Supply
+
+* `17:40:02 UTC` — Added Component: 1600W Power Supply
+
+* `17:40:02 UTC` — Added Component: P48922-B21 - This option requires the selec...
+
+* `17:40:02 UTC` — Added Component: P03178-B21 - B21, , and P44712-B21 are 96% ...
+
+* `17:40:02 UTC` — Added Component: P83356-B21 - ...
+
+* `17:40:01 UTC` — Added Component: P80997-B21 - ...
+
+* `17:40:01 UTC` — Added Component: P77486-B21 - ....
+
+* `17:40:01 UTC` — Added Component: P72207-B21 - ...
+
+* `17:40:01 UTC` — Added Component: P76463-B21 - ....
+
+* `17:40:01 UTC` — Added Component: P76462-B21 - ....
+
+* `17:40:00 UTC` — Added Component: P77492-B21 - (HPE ProLiant Compute DL380 Ge...
+
+* `17:40:00 UTC` — Added Component: P25527-B21 - ....
+
+* `17:40:00 UTC` — Added Component: P48802-B21 - ....
+
+* `17:40:00 UTC` — Added Component: P48803-B21 - ....
+
+* `17:40:00 UTC` — Added Component: P74741-B21 - 4LFF Midplane drive cage () ca...
+
+* `17:39:59 UTC` — Added Component: P74734-B21 - Up to 6 SFF in rear − DL380 Ge...
+
+* `17:39:59 UTC` — Added Component: P75807-B21 - − DL3XX Gen12 Front SFF for 2S...
+
+* `17:39:59 UTC` — Added Component: P75740-B21 - − DL3XX Gen12 8SFF x1 U.3 TM K...
+
+* `17:39:59 UTC` — Added Component: P36394-B21 - – Optional....
+
+* `17:39:59 UTC` — Added Component: P73282-B21 - SKU Number...
+
+* `17:39:58 UTC` — Added Component: P74758-B21 - 1 Front Secondary OCP (OCP3.0)...
+
+* `17:39:58 UTC` — Added Component: P74757-B21 - 1 Front Primary OCP2 (OCP3.0) ...
+
+* `17:39:58 UTC` — Added Component: P72203-B21 - P72205-B21 & P72207-B21...
+
+* `17:39:58 UTC` — Added Component: P72201-B21 - Default &...
+
+* `17:39:57 UTC` — Added Rule: Engineering Rule 88
+
+* `17:39:57 UTC` — Added Rule: Engineering Rule 87
+
+* `17:39:57 UTC` — Added Rule: Engineering Rule 86
+
+* `17:39:57 UTC` — Added Rule: Engineering Rule 85
+
+* `17:39:57 UTC` — Added Rule: Engineering Rule 84
+
+* `17:39:56 UTC` — Added Rule: Engineering Rule 83
+
+* `17:39:56 UTC` — Added Rule: Engineering Rule 82
+
+* `17:39:56 UTC` — Added Rule: Engineering Rule 81
+
+* `17:39:56 UTC` — Added Rule: Engineering Rule 80
+
+* `17:39:56 UTC` — Added Rule: Engineering Rule 79
+
+* `17:39:55 UTC` — Added Rule: Engineering Rule 78
+
+* `17:39:55 UTC` — Added Rule: Engineering Rule 77
+
+* `17:39:55 UTC` — Added Rule: Engineering Rule 76
+
+* `17:39:55 UTC` — Added Rule: Engineering Rule 75
+
+* `17:39:55 UTC` — Added Rule: Engineering Rule 74
+
+* `17:39:54 UTC` — Added Rule: Engineering Rule 73
+
+* `17:39:54 UTC` — Added Rule: Engineering Rule 72
+
+* `17:39:54 UTC` — Added Rule: Engineering Rule 71
+
+* `17:39:54 UTC` — Added Rule: Engineering Rule 70
+
+* `17:39:54 UTC` — Added Rule: Engineering Rule 69
+
+* `17:39:54 UTC` — Added Rule: Engineering Rule 68
+
+* `17:39:53 UTC` — Added Rule: Engineering Rule 67
+
+* `17:39:53 UTC` — Added Rule: Engineering Rule 66
+
+* `17:39:53 UTC` — Added Rule: Engineering Rule 65
+
+* `17:39:53 UTC` — Added Rule: Engineering Rule 64
+
+* `17:39:53 UTC` — Added Rule: Engineering Rule 63
+
+* `17:39:53 UTC` — Added Rule: Engineering Rule 62
+
+* `17:39:52 UTC` — Added Rule: Engineering Rule 61
+
+* `17:39:52 UTC` — Added Rule: Engineering Rule 60
+
+* `17:39:52 UTC` — Added Rule: Engineering Rule 59
+
+* `17:39:52 UTC` — Added Rule: Engineering Rule 58
+
+* `17:39:52 UTC` — Added Rule: Engineering Rule 57
+
+* `17:39:52 UTC` — Added Rule: Engineering Rule 56
+
+* `17:39:52 UTC` — Added Rule: Engineering Rule 55
+
+* `17:39:51 UTC` — Added Rule: Engineering Rule 54
+
+* `17:39:51 UTC` — Added Rule: Engineering Rule 53
+
+* `17:39:51 UTC` — Added Rule: Engineering Rule 52
+
+* `17:39:51 UTC` — Added Rule: Engineering Rule 51
+
+* `17:39:51 UTC` — Added Rule: Engineering Rule 50
+
+* `17:39:51 UTC` — Added Rule: Engineering Rule 49
+
+* `17:39:51 UTC` — Added Rule: Engineering Rule 48
+
+* `17:39:51 UTC` — Added Rule: Engineering Rule 47
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 46
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 45
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 44
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 43
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 42
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 41
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 40
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 39
+
+* `17:39:50 UTC` — Added Rule: Engineering Rule 38
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 37
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 36
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 35
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 34
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 33
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 32
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 31
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 30
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 29
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 28
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 27
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 26
+
+* `17:39:49 UTC` — Added Rule: Engineering Rule 25
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 24
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 23
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 22
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 21
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 20
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 19
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 18
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 17
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 16
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 15
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 14
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 13
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 12
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 11
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 10
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 9
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 8
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 7
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 6
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 5
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 4
+
+* `17:39:48 UTC` — Added Rule: Engineering Rule 3
+
+* `17:39:47 UTC` — Added Rule: Engineering Rule 2
+
+* `17:39:47 UTC` — Added Rule: Engineering Rule 1
+
+* `17:39:47 UTC` — Added Component: NVIDIA RTX A1000 8GB
+
+* `17:39:47 UTC` — Added Component: NVIDIA L4 24GB
+
+* `17:39:47 UTC` — Added Component: NVIDIA RTX PRO 4500 Blackwell Server Edition 32GB
+
+* `17:39:47 UTC` — Added Component: NVIDIA L40S 48GB
+
+* `17:39:47 UTC` — Added Component: NVIDIA RTX PRO 6000D 84GB
+
+* `17:39:46 UTC` — Added Component: NVIDIA RTX PRO 6000 Blackwell Server Edition 96GB
+
+* `17:39:46 UTC` — Added Component: NVIDIA RTX PRO 6000 96GB
+
+* `17:39:46 UTC` — Added Component: NVIDIA H200 NVL 141GB
+
+* `17:39:46 UTC` — Added Component: OCP 3.0 Network Adapter Slot
+
+* `17:39:46 UTC` — Added Constraint: Maximum EDSFF Drives
+
+* `17:39:46 UTC` — Added Constraint: Maximum LFF Drives
+
+* `17:39:46 UTC` — Added Constraint: Maximum SFF Drives
+
+* `17:39:46 UTC` — Added Constraint: DIMM Slot Count
+
+* `17:39:46 UTC` — Added Constraint: Maximum Memory Capacity
+
+* `17:39:45 UTC` — Added Component: Intel Xeon 6 6788P
+
+* `17:39:45 UTC` — Added Component: Intel Xeon 6 6768P
+
+* `17:39:45 UTC` — Added Component: Intel Xeon 6 6748P
+
+* `17:39:44 UTC` — Added Component: Intel Xeon 6 6738P
+
+* `17:39:44 UTC` — Added Component: Intel Xeon 6 6728P
+
+* `17:39:44 UTC` — Added Component: Intel Xeon 6 6724P
+
+* `17:39:43 UTC` — Added Component: Intel Xeon 6 6714P
+
+* `17:39:43 UTC` — Added Component: Intel Xeon 6 6760P
+
+* `17:39:43 UTC` — Added Component: Intel Xeon 6 6740P
+
+* `17:39:43 UTC` — Added Component: Intel Xeon 6 6530P
+
+* `17:39:42 UTC` — Added Component: Intel Xeon 6 6520P
+
+* `17:39:42 UTC` — Added Component: Intel Xeon 6 6515P
+
+* `17:39:42 UTC` — Added Component: Intel Xeon 6 6505P
+
+* `17:39:41 UTC` — Added Component: Intel Xeon 6 6787P
+
+* `17:39:41 UTC` — Added Component: Intel Xeon 6 6767P
+
+* `17:39:41 UTC` — Added Component: Intel Xeon 6 6762P
+
+* `17:39:41 UTC` — Added Component: Intel Xeon 6 6747P
+
+* `17:39:40 UTC` — Added Component: Intel Xeon 6 6745P
+
+* `17:39:40 UTC` — Added Component: Intel Xeon 6 6737P
+
+* `17:39:40 UTC` — Added Component: Intel Xeon 6 6736P
+
+* `17:39:40 UTC` — Added Component: Intel Xeon 6 6732P
+
+* `17:39:39 UTC` — Added Component: Intel Xeon 6 6730P
+
+* `17:39:39 UTC` — Added Component: Intel Xeon 6 6725P
+
+* `17:39:39 UTC` — Added Component: Intel Xeon 6 6527P
+
+* `17:39:39 UTC` — Added Component: Intel Xeon 6 6517P
+
+* `17:39:38 UTC` — Added Component: Intel Xeon 6 6507P
+
+* `17:39:38 UTC` — Added Component: Intel Xeon 6 6780E
+
+* `17:39:38 UTC` — Added Component: Intel Xeon 6 6766E
+
+* `17:39:38 UTC` — Added Component: Intel Xeon 6 6756E
+
+* `17:39:37 UTC` — Added Component: Intel Xeon 6 6746E
+
+* `17:39:37 UTC` — Added Component: Intel Xeon 6 6740E
+
+* `17:39:37 UTC` — Added Component: Intel Xeon 6 6731E
+
+* `17:39:37 UTC` — Added Component: Intel Xeon 6 6710E
+
+* `17:39:36 UTC` — Added Workload: AI and Machine Learning
+
+* `17:39:36 UTC` — Added Platform: HPE ProLiant DL380 Gen12
+
+* `17:14:35 UTC` — Added Component: 2200W Power Supply
+
+* `17:14:35 UTC` — Added Component: 1000W Power Supply
+
+* `17:14:34 UTC` — Added Component: 800W Power Supply
+
+* `17:14:34 UTC` — Added Component: 1600W Power Supply
+
+* `17:14:34 UTC` — Added Component: P48922-B21 - This option requires the selec...
+
+* `17:14:34 UTC` — Added Component: P03178-B21 - B21, , and P44712-B21 are 96% ...
+
+* `17:14:34 UTC` — Added Component: P83356-B21 - ...
+
+* `17:14:33 UTC` — Added Component: P80997-B21 - ...
+
+* `17:14:33 UTC` — Added Component: P77486-B21 - ....
+
+* `17:14:33 UTC` — Added Component: P72207-B21 - ...
+
+* `17:14:33 UTC` — Added Component: P76463-B21 - ....
+
+* `17:14:33 UTC` — Added Component: P76462-B21 - ....
+
+* `17:14:32 UTC` — Added Component: P77492-B21 - (HPE ProLiant Compute DL380 Ge...
+
+* `17:14:32 UTC` — Added Component: P25527-B21 - ....
+
+* `17:14:32 UTC` — Added Component: P48802-B21 - ....
+
+* `17:14:32 UTC` — Added Component: P48803-B21 - ....
+
+* `17:14:31 UTC` — Added Component: P74741-B21 - 4LFF Midplane drive cage () ca...
+
+* `17:14:31 UTC` — Added Component: P74734-B21 - Up to 6 SFF in rear − DL380 Ge...
+
+* `17:14:31 UTC` — Added Component: P75807-B21 - − DL3XX Gen12 Front SFF for 2S...
+
+* `17:14:31 UTC` — Added Component: P75740-B21 - − DL3XX Gen12 8SFF x1 U.3 TM K...
+
+* `17:14:31 UTC` — Added Component: P36394-B21 - – Optional....
+
+* `17:14:30 UTC` — Added Component: P73282-B21 - SKU Number...
+
+* `17:14:30 UTC` — Added Component: P74758-B21 - 1 Front Secondary OCP (OCP3.0)...
+
+* `17:14:30 UTC` — Added Component: P74757-B21 - 1 Front Primary OCP2 (OCP3.0) ...
+
+* `17:14:30 UTC` — Added Component: P72203-B21 - P72205-B21 & P72207-B21...
+
+* `17:14:30 UTC` — Added Component: P72201-B21 - Default &...
+
+* `17:14:29 UTC` — Added Rule: Engineering Rule 88
+
+* `17:14:29 UTC` — Added Rule: Engineering Rule 87
+
+* `17:14:29 UTC` — Added Rule: Engineering Rule 86
+
+* `17:14:29 UTC` — Added Rule: Engineering Rule 85
+
+* `17:14:28 UTC` — Added Rule: Engineering Rule 84
+
+* `17:14:28 UTC` — Added Rule: Engineering Rule 83
+
+* `17:14:28 UTC` — Added Rule: Engineering Rule 82
+
+* `17:14:28 UTC` — Added Rule: Engineering Rule 81
+
+* `17:14:28 UTC` — Added Rule: Engineering Rule 80
+
+* `17:14:27 UTC` — Added Rule: Engineering Rule 79
+
+* `17:14:27 UTC` — Added Rule: Engineering Rule 78
+
+* `17:14:27 UTC` — Added Rule: Engineering Rule 77
+
+* `17:14:27 UTC` — Added Rule: Engineering Rule 76
+
+* `17:14:27 UTC` — Added Rule: Engineering Rule 75
+
+* `17:14:26 UTC` — Added Rule: Engineering Rule 74
+
+* `17:14:26 UTC` — Added Rule: Engineering Rule 73
+
+* `17:14:26 UTC` — Added Rule: Engineering Rule 72
+
+* `17:14:26 UTC` — Added Rule: Engineering Rule 71
+
+* `17:14:26 UTC` — Added Rule: Engineering Rule 70
+
+* `17:14:26 UTC` — Added Rule: Engineering Rule 69
+
+* `17:14:25 UTC` — Added Rule: Engineering Rule 68
+
+* `17:14:25 UTC` — Added Rule: Engineering Rule 67
+
+* `17:14:25 UTC` — Added Rule: Engineering Rule 66
+
+* `17:14:25 UTC` — Added Rule: Engineering Rule 65
+
+* `17:14:25 UTC` — Added Rule: Engineering Rule 64
+
+* `17:14:25 UTC` — Added Rule: Engineering Rule 63
+
+* `17:14:25 UTC` — Added Rule: Engineering Rule 62
+
+* `17:14:24 UTC` — Added Rule: Engineering Rule 61
+
+* `17:14:24 UTC` — Added Rule: Engineering Rule 60
+
+* `17:14:24 UTC` — Added Rule: Engineering Rule 59
+
+* `17:14:24 UTC` — Added Rule: Engineering Rule 58
+
+* `17:14:24 UTC` — Added Rule: Engineering Rule 57
+
+* `17:14:24 UTC` — Added Rule: Engineering Rule 56
+
+* `17:14:24 UTC` — Added Rule: Engineering Rule 55
+
+* `17:14:23 UTC` — Added Rule: Engineering Rule 54
+
+* `17:14:23 UTC` — Added Rule: Engineering Rule 53
+
+* `17:14:23 UTC` — Added Rule: Engineering Rule 52
+
+* `17:14:23 UTC` — Added Rule: Engineering Rule 51
+
+* `17:14:23 UTC` — Added Rule: Engineering Rule 50
+
+* `17:14:23 UTC` — Added Rule: Engineering Rule 49
+
+* `17:14:23 UTC` — Added Rule: Engineering Rule 48
+
+* `17:14:23 UTC` — Added Rule: Engineering Rule 47
+
+* `17:14:22 UTC` — Added Rule: Engineering Rule 46
+
+* `17:14:22 UTC` — Added Rule: Engineering Rule 45
+
+* `17:14:22 UTC` — Added Rule: Engineering Rule 44
+
+* `17:14:22 UTC` — Added Rule: Engineering Rule 43
+
+* `17:14:22 UTC` — Added Rule: Engineering Rule 42
+
+* `17:14:22 UTC` — Added Rule: Engineering Rule 41
+
+* `17:14:21 UTC` — Added Rule: Engineering Rule 40
+
+* `17:14:21 UTC` — Added Rule: Engineering Rule 39
+
+* `17:14:21 UTC` — Added Rule: Engineering Rule 38
+
+* `17:14:21 UTC` — Added Rule: Engineering Rule 37
+
+* `17:14:21 UTC` — Added Rule: Engineering Rule 36
+
+* `17:14:21 UTC` — Added Rule: Engineering Rule 35
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 34
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 33
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 32
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 31
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 30
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 29
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 28
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 27
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 26
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 25
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 24
+
+* `17:14:20 UTC` — Added Rule: Engineering Rule 23
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 22
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 21
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 20
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 19
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 18
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 17
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 16
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 15
+
+* `17:14:19 UTC` — Added Rule: Engineering Rule 14
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 13
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 12
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 11
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 10
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 9
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 8
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 7
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 6
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 5
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 4
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 3
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 2
+
+* `17:14:18 UTC` — Added Rule: Engineering Rule 1
+
+* `17:14:18 UTC` — Added Component: NVIDIA RTX A1000 8GB
+
+* `17:14:18 UTC` — Added Component: NVIDIA L4 24GB
+
+* `17:14:17 UTC` — Added Component: NVIDIA RTX PRO 4500 Blackwell Server Edition 32GB
+
+* `17:14:17 UTC` — Added Component: NVIDIA L40S 48GB
+
+* `17:14:17 UTC` — Added Component: NVIDIA RTX PRO 6000D 84GB
+
+* `17:14:17 UTC` — Added Component: NVIDIA RTX PRO 6000 Blackwell Server Edition 96GB
+
+* `17:14:16 UTC` — Added Component: NVIDIA RTX PRO 6000 96GB
+
+* `17:14:16 UTC` — Added Component: NVIDIA H200 NVL 141GB
+
+* `17:14:16 UTC` — Added Component: OCP 3.0 Network Adapter Slot
+
+* `17:14:16 UTC` — Added Constraint: Maximum EDSFF Drives
+
+* `17:14:16 UTC` — Added Constraint: Maximum LFF Drives
+
+* `17:14:16 UTC` — Added Constraint: Maximum SFF Drives
+
+* `17:14:16 UTC` — Added Constraint: DIMM Slot Count
+
+* `17:14:16 UTC` — Added Constraint: Maximum Memory Capacity
+
+* `17:14:16 UTC` — Added Component: Intel Xeon 6 6788P
+
+* `17:14:15 UTC` — Added Component: Intel Xeon 6 6768P
+
+* `17:14:15 UTC` — Added Component: Intel Xeon 6 6748P
+
+* `17:14:15 UTC` — Added Component: Intel Xeon 6 6738P
+
+* `17:14:14 UTC` — Added Component: Intel Xeon 6 6728P
+
+* `17:14:14 UTC` — Added Component: Intel Xeon 6 6724P
+
+* `17:14:13 UTC` — Added Component: Intel Xeon 6 6714P
+
+* `17:14:13 UTC` — Added Component: Intel Xeon 6 6760P
+
+* `17:14:13 UTC` — Added Component: Intel Xeon 6 6740P
+
+* `17:14:13 UTC` — Added Component: Intel Xeon 6 6530P
+
+* `17:14:12 UTC` — Added Component: Intel Xeon 6 6520P
+
+* `17:14:12 UTC` — Added Component: Intel Xeon 6 6515P
+
+* `17:14:12 UTC` — Added Component: Intel Xeon 6 6505P
+
+* `17:14:11 UTC` — Added Component: Intel Xeon 6 6787P
+
+* `17:14:11 UTC` — Added Component: Intel Xeon 6 6767P
+
+* `17:14:11 UTC` — Added Component: Intel Xeon 6 6762P
+
+* `17:14:11 UTC` — Added Component: Intel Xeon 6 6747P
+
+* `17:14:10 UTC` — Added Component: Intel Xeon 6 6745P
+
+* `17:14:10 UTC` — Added Component: Intel Xeon 6 6737P
+
+* `17:14:10 UTC` — Added Component: Intel Xeon 6 6736P
+
+* `17:14:10 UTC` — Added Component: Intel Xeon 6 6732P
+
+* `17:14:09 UTC` — Added Component: Intel Xeon 6 6730P
+
+* `17:14:09 UTC` — Added Component: Intel Xeon 6 6725P
+
+* `17:14:09 UTC` — Added Component: Intel Xeon 6 6527P
+
+* `17:14:08 UTC` — Added Component: Intel Xeon 6 6517P
+
+* `17:14:08 UTC` — Added Component: Intel Xeon 6 6507P
+
+* `17:14:08 UTC` — Added Component: Intel Xeon 6 6780E
+
+* `17:14:08 UTC` — Added Component: Intel Xeon 6 6766E
+
+* `17:14:07 UTC` — Added Component: Intel Xeon 6 6756E
+
+* `17:14:07 UTC` — Added Component: Intel Xeon 6 6746E
+
+* `17:14:07 UTC` — Added Component: Intel Xeon 6 6740E
+
+* `17:14:07 UTC` — Added Component: Intel Xeon 6 6731E
+
+* `17:14:07 UTC` — Added Component: Intel Xeon 6 6710E
+
+* `17:14:06 UTC` — Added Workload: AI and Machine Learning
+
+* `17:14:06 UTC` — Added Platform: HPE ProLiant DL380 Gen12
+
+* `17:05:57 UTC` — Added Component: 2200W Power Supply
+
+* `17:05:57 UTC` — Added Component: 1000W Power Supply
+
+* `17:05:57 UTC` — Added Component: 800W Power Supply
+
+* `17:05:56 UTC` — Added Component: 1600W Power Supply
+
+* `17:05:55 UTC` — Added Component: P48922-B21 - This option requires the selec...
+
+* `17:05:55 UTC` — Added Component: P03178-B21 - B21, , and P44712-B21 are 96% ...
+
+* `17:05:54 UTC` — Added Component: P83356-B21 - ...
+
+* `17:05:54 UTC` — Added Component: P80997-B21 - ...
+
+* `17:05:53 UTC` — Added Component: P77486-B21 - ....
+
+* `17:05:53 UTC` — Added Component: P72207-B21 - ...
+
+* `17:05:52 UTC` — Added Component: P76463-B21 - ....
+
+* `17:05:52 UTC` — Added Component: P76462-B21 - ....
+
+* `17:05:52 UTC` — Added Component: P77492-B21 - (HPE ProLiant Compute DL380 Ge...
+
+* `17:05:51 UTC` — Added Component: P25527-B21 - ....
+
+* `17:05:51 UTC` — Added Component: P48802-B21 - ....
+
+* `17:05:50 UTC` — Added Component: P48803-B21 - ....
+
+* `17:05:50 UTC` — Added Component: P74741-B21 - 4LFF Midplane drive cage () ca...
+
+* `17:05:49 UTC` — Added Component: P74734-B21 - Up to 6 SFF in rear − DL380 Ge...
+
+* `17:05:49 UTC` — Added Component: P75807-B21 - − DL3XX Gen12 Front SFF for 2S...
+
+* `17:05:49 UTC` — Added Component: P75740-B21 - − DL3XX Gen12 8SFF x1 U.3 TM K...
+
+* `17:05:48 UTC` — Added Component: P36394-B21 - – Optional....
+
+* `17:05:48 UTC` — Added Component: P73282-B21 - SKU Number...
+
+* `17:05:47 UTC` — Added Component: P74758-B21 - 1 Front Secondary OCP (OCP3.0)...
+
+* `17:05:47 UTC` — Added Component: P74757-B21 - 1 Front Primary OCP2 (OCP3.0) ...
+
+* `17:05:46 UTC` — Added Component: P72203-B21 - P72205-B21 & P72207-B21...
+
+* `17:05:46 UTC` — Added Component: P72201-B21 - Default &...
+
+* `17:05:45 UTC` — Added Rule: Engineering Rule 88
+
+* `17:05:45 UTC` — Added Rule: Engineering Rule 87
+
+* `17:05:45 UTC` — Added Rule: Engineering Rule 86
+
+* `17:05:44 UTC` — Added Rule: Engineering Rule 85
+
+* `17:05:44 UTC` — Added Rule: Engineering Rule 84
+
+* `17:05:44 UTC` — Added Rule: Engineering Rule 83
+
+* `17:05:44 UTC` — Added Rule: Engineering Rule 82
+
+* `17:05:44 UTC` — Added Rule: Engineering Rule 81
+
+* `17:05:43 UTC` — Added Rule: Engineering Rule 80
+
+* `17:05:43 UTC` — Added Rule: Engineering Rule 79
+
+* `17:05:43 UTC` — Added Rule: Engineering Rule 78
+
+* `17:05:43 UTC` — Added Rule: Engineering Rule 77
+
+* `17:05:42 UTC` — Added Rule: Engineering Rule 76
+
+* `17:05:42 UTC` — Added Rule: Engineering Rule 75
+
+* `17:05:42 UTC` — Added Rule: Engineering Rule 74
+
+* `17:05:42 UTC` — Added Rule: Engineering Rule 73
+
+* `17:05:42 UTC` — Added Rule: Engineering Rule 72
+
+* `17:05:41 UTC` — Added Rule: Engineering Rule 71
+
+* `17:05:41 UTC` — Added Rule: Engineering Rule 70
+
+* `17:05:41 UTC` — Added Rule: Engineering Rule 69
+
+* `17:05:41 UTC` — Added Rule: Engineering Rule 68
+
+* `17:05:40 UTC` — Added Rule: Engineering Rule 67
+
+* `17:05:40 UTC` — Added Rule: Engineering Rule 66
+
+* `17:05:39 UTC` — Added Rule: Engineering Rule 65
+
+* `17:05:39 UTC` — Added Rule: Engineering Rule 64
+
+* `17:05:39 UTC` — Added Rule: Engineering Rule 63
+
+* `17:05:39 UTC` — Added Rule: Engineering Rule 62
+
+* `17:05:38 UTC` — Added Rule: Engineering Rule 61
+
+* `17:05:38 UTC` — Added Rule: Engineering Rule 60
+
+* `17:05:38 UTC` — Added Rule: Engineering Rule 59
+
+* `17:05:38 UTC` — Added Rule: Engineering Rule 58
+
+* `17:05:37 UTC` — Added Rule: Engineering Rule 57
+
+* `17:05:37 UTC` — Added Rule: Engineering Rule 56
+
+* `17:05:37 UTC` — Added Rule: Engineering Rule 55
+
+* `17:05:37 UTC` — Added Rule: Engineering Rule 54
+
+* `17:05:37 UTC` — Added Rule: Engineering Rule 53
+
+* `17:05:37 UTC` — Added Rule: Engineering Rule 52
+
+* `17:05:36 UTC` — Added Rule: Engineering Rule 51
+
+* `17:05:36 UTC` — Added Rule: Engineering Rule 50
+
+* `17:05:36 UTC` — Added Rule: Engineering Rule 49
+
+* `17:05:36 UTC` — Added Rule: Engineering Rule 48
+
+* `17:05:36 UTC` — Added Rule: Engineering Rule 47
+
+* `17:05:36 UTC` — Added Rule: Engineering Rule 46
+
+* `17:05:35 UTC` — Added Rule: Engineering Rule 45
+
+* `17:05:35 UTC` — Added Rule: Engineering Rule 44
+
+* `17:05:35 UTC` — Added Rule: Engineering Rule 43
+
+* `17:05:35 UTC` — Added Rule: Engineering Rule 42
+
+* `17:05:35 UTC` — Added Rule: Engineering Rule 41
+
+* `17:05:35 UTC` — Added Rule: Engineering Rule 40
+
+* `17:05:35 UTC` — Added Rule: Engineering Rule 39
+
+* `17:05:34 UTC` — Added Rule: Engineering Rule 38
+
+* `17:05:34 UTC` — Added Rule: Engineering Rule 37
+
+* `17:05:34 UTC` — Added Rule: Engineering Rule 36
+
+* `17:05:34 UTC` — Added Rule: Engineering Rule 35
+
+* `17:05:34 UTC` — Added Rule: Engineering Rule 34
+
+* `17:05:34 UTC` — Added Rule: Engineering Rule 33
+
+* `17:05:33 UTC` — Added Rule: Engineering Rule 32
+
+* `17:05:33 UTC` — Added Rule: Engineering Rule 31
+
+* `17:05:33 UTC` — Added Rule: Engineering Rule 30
+
+* `17:05:33 UTC` — Added Rule: Engineering Rule 29
+
+* `17:05:33 UTC` — Added Rule: Engineering Rule 28
+
+* `17:05:33 UTC` — Added Rule: Engineering Rule 27
+
+* `17:05:32 UTC` — Added Rule: Engineering Rule 26
+
+* `17:05:32 UTC` — Added Rule: Engineering Rule 25
+
+* `17:05:32 UTC` — Added Rule: Engineering Rule 24
+
+* `17:05:32 UTC` — Added Rule: Engineering Rule 23
+
+* `17:05:32 UTC` — Added Rule: Engineering Rule 22
+
+* `17:05:32 UTC` — Added Rule: Engineering Rule 21
+
+* `17:05:32 UTC` — Added Rule: Engineering Rule 20
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 19
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 18
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 17
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 16
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 15
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 14
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 13
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 12
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 11
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 10
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 9
+
+* `17:05:31 UTC` — Added Rule: Engineering Rule 8
+
+* `17:05:30 UTC` — Added Rule: Engineering Rule 7
+
+* `17:05:30 UTC` — Added Rule: Engineering Rule 6
+
+* `17:05:30 UTC` — Added Rule: Engineering Rule 5
+
+* `17:05:30 UTC` — Added Rule: Engineering Rule 4
+
+* `17:05:30 UTC` — Added Rule: Engineering Rule 3
+
+* `17:05:30 UTC` — Added Rule: Engineering Rule 2
+
+* `17:05:30 UTC` — Added Rule: Engineering Rule 1
+
+* `17:05:30 UTC` — Added Component: NVIDIA RTX A1000 8GB
+
+* `17:05:30 UTC` — Added Component: NVIDIA L4 24GB
+
+* `17:05:30 UTC` — Added Component: NVIDIA RTX PRO 4500 Blackwell Server Edition 32GB
+
+* `17:05:29 UTC` — Added Component: NVIDIA L40S 48GB
+
+* `17:05:29 UTC` — Added Component: NVIDIA RTX PRO 6000D 84GB
+
+* `17:05:29 UTC` — Added Component: NVIDIA RTX PRO 6000 Blackwell Server Edition 96GB
+
+* `17:05:29 UTC` — Added Component: NVIDIA RTX PRO 6000 96GB
+
+* `17:05:29 UTC` — Added Component: NVIDIA H200 NVL 141GB
+
+* `17:05:28 UTC` — Added Component: OCP 3.0 Network Adapter Slot
+
+* `17:05:28 UTC` — Added Constraint: Maximum EDSFF Drives
+
+* `17:05:28 UTC` — Added Constraint: Maximum LFF Drives
+
+* `17:05:28 UTC` — Added Constraint: Maximum SFF Drives
+
+* `17:05:28 UTC` — Added Constraint: DIMM Slot Count
+
+* `17:05:28 UTC` — Added Constraint: Maximum Memory Capacity
+
+* `17:05:28 UTC` — Added Component: Intel Xeon 6 6788P
+
+* `17:05:28 UTC` — Added Component: Intel Xeon 6 6768P
+
+* `17:05:27 UTC` — Added Component: Intel Xeon 6 6748P
+
+* `17:05:27 UTC` — Added Component: Intel Xeon 6 6738P
+
+* `17:05:27 UTC` — Added Component: Intel Xeon 6 6728P
+
+* `17:05:26 UTC` — Added Component: Intel Xeon 6 6724P
+
+* `17:05:26 UTC` — Added Component: Intel Xeon 6 6714P
+
+* `17:05:26 UTC` — Added Component: Intel Xeon 6 6760P
+
+* `17:05:25 UTC` — Added Component: Intel Xeon 6 6740P
+
+* `17:05:25 UTC` — Added Component: Intel Xeon 6 6530P
+
+* `17:05:25 UTC` — Added Component: Intel Xeon 6 6520P
+
+* `17:05:24 UTC` — Added Component: Intel Xeon 6 6515P
+
+* `17:05:24 UTC` — Added Component: Intel Xeon 6 6505P
+
+* `17:05:24 UTC` — Added Component: Intel Xeon 6 6787P
+
+* `17:05:24 UTC` — Added Component: Intel Xeon 6 6767P
+
+* `17:05:23 UTC` — Added Component: Intel Xeon 6 6762P
+
+* `17:05:23 UTC` — Added Component: Intel Xeon 6 6747P
+
+* `17:05:23 UTC` — Added Component: Intel Xeon 6 6745P
+
+* `17:05:23 UTC` — Added Component: Intel Xeon 6 6737P
+
+* `17:05:22 UTC` — Added Component: Intel Xeon 6 6736P
+
+* `17:05:22 UTC` — Added Component: Intel Xeon 6 6732P
+
+* `17:05:22 UTC` — Added Component: Intel Xeon 6 6730P
+
+* `17:05:22 UTC` — Added Component: Intel Xeon 6 6725P
+
+* `17:05:21 UTC` — Added Component: Intel Xeon 6 6527P
+
+* `17:05:21 UTC` — Added Component: Intel Xeon 6 6517P
+
+* `17:05:21 UTC` — Added Component: Intel Xeon 6 6507P
+
+* `17:05:21 UTC` — Added Component: Intel Xeon 6 6780E
+
+* `17:05:20 UTC` — Added Component: Intel Xeon 6 6766E
+
+* `17:05:20 UTC` — Added Component: Intel Xeon 6 6756E
+
+* `17:05:20 UTC` — Added Component: Intel Xeon 6 6746E
+
+* `17:05:20 UTC` — Added Component: Intel Xeon 6 6740E
+
+* `17:05:20 UTC` — Added Component: Intel Xeon 6 6731E
+
+* `17:05:19 UTC` — Added Component: Intel Xeon 6 6710E
+
+* `17:05:19 UTC` — Added Workload: AI and Machine Learning
+
+* `17:05:19 UTC` — Added Platform: HPE ProLiant DL380 Gen12
+
+* `17:02:57 UTC` — Added Component: 2200W Power Supply
+
+* `17:02:57 UTC` — Added Component: 1000W Power Supply
+
+* `17:02:56 UTC` — Added Component: 800W Power Supply
+
+* `17:02:56 UTC` — Added Component: 1600W Power Supply
+
+* `17:02:55 UTC` — Added Component: P48922-B21 - This option requires the selec...
+
+* `17:02:55 UTC` — Added Component: P03178-B21 - B21, , and P44712-B21 are 96% ...
+
+* `17:02:54 UTC` — Added Component: P83356-B21 - ...
+
+* `17:02:54 UTC` — Added Component: P80997-B21 - ...
+
+* `17:02:53 UTC` — Added Component: P77486-B21 - ....
+
+* `17:02:53 UTC` — Added Component: P72207-B21 - ...
+
+* `17:02:52 UTC` — Added Component: P76463-B21 - ....
+
+* `17:02:52 UTC` — Added Component: P76462-B21 - ....
+
+* `17:02:52 UTC` — Added Component: P77492-B21 - (HPE ProLiant Compute DL380 Ge...
+
+* `17:02:51 UTC` — Added Component: P25527-B21 - ....
+
+* `17:02:51 UTC` — Added Component: P48802-B21 - ....
+
+* `17:02:50 UTC` — Added Component: P48803-B21 - ....
+
+* `17:02:50 UTC` — Added Component: P74741-B21 - 4LFF Midplane drive cage () ca...
+
+* `17:02:49 UTC` — Added Component: P74734-B21 - Up to 6 SFF in rear − DL380 Ge...
+
+* `17:02:49 UTC` — Added Component: P75807-B21 - − DL3XX Gen12 Front SFF for 2S...
+
+* `17:02:49 UTC` — Added Component: P75740-B21 - − DL3XX Gen12 8SFF x1 U.3 TM K...
+
+* `17:02:48 UTC` — Added Component: P36394-B21 - – Optional....
+
+* `17:02:48 UTC` — Added Component: P73282-B21 - SKU Number...
+
+* `17:02:47 UTC` — Added Component: P74758-B21 - 1 Front Secondary OCP (OCP3.0)...
+
+* `17:02:47 UTC` — Added Component: P74757-B21 - 1 Front Primary OCP2 (OCP3.0) ...
+
+* `17:02:46 UTC` — Added Component: P72203-B21 - P72205-B21 & P72207-B21...
+
+* `17:02:46 UTC` — Added Component: P72201-B21 - Default &...
+
+* `17:02:45 UTC` — Added Rule: Engineering Rule 88
+
+* `17:02:45 UTC` — Added Rule: Engineering Rule 87
+
+* `17:02:45 UTC` — Added Rule: Engineering Rule 86
+
+* `17:02:44 UTC` — Added Rule: Engineering Rule 85
+
+* `17:02:44 UTC` — Added Rule: Engineering Rule 84
+
+* `17:02:44 UTC` — Added Rule: Engineering Rule 83
+
+* `17:02:43 UTC` — Added Rule: Engineering Rule 82
+
+* `17:02:43 UTC` — Added Rule: Engineering Rule 81
+
+* `17:02:43 UTC` — Added Rule: Engineering Rule 80
+
+* `17:02:42 UTC` — Added Rule: Engineering Rule 79
+
+* `17:02:42 UTC` — Added Rule: Engineering Rule 78
+
+* `17:02:42 UTC` — Added Rule: Engineering Rule 77
+
+* `17:02:42 UTC` — Added Rule: Engineering Rule 76
+
+* `17:02:42 UTC` — Added Rule: Engineering Rule 75
+
+* `17:02:41 UTC` — Added Rule: Engineering Rule 74
+
+* `17:02:41 UTC` — Added Rule: Engineering Rule 73
+
+* `17:02:41 UTC` — Added Rule: Engineering Rule 72
+
+* `17:02:41 UTC` — Added Rule: Engineering Rule 71
+
+* `17:02:40 UTC` — Added Rule: Engineering Rule 70
+
+* `17:02:40 UTC` — Added Rule: Engineering Rule 69
+
+* `17:02:40 UTC` — Added Rule: Engineering Rule 68
+
+* `17:02:40 UTC` — Added Rule: Engineering Rule 67
+
+* `17:02:40 UTC` — Added Rule: Engineering Rule 66
+
+* `17:02:39 UTC` — Added Rule: Engineering Rule 65
+
+* `17:02:39 UTC` — Added Rule: Engineering Rule 64
+
+* `17:02:39 UTC` — Added Rule: Engineering Rule 63
+
+* `17:02:38 UTC` — Added Rule: Engineering Rule 62
+
+* `17:02:38 UTC` — Added Rule: Engineering Rule 61
+
+* `17:02:38 UTC` — Added Rule: Engineering Rule 60
+
+* `17:02:38 UTC` — Added Rule: Engineering Rule 59
+
+* `17:02:38 UTC` — Added Rule: Engineering Rule 58
+
+* `17:02:37 UTC` — Added Rule: Engineering Rule 57
+
+* `17:02:37 UTC` — Added Rule: Engineering Rule 56
+
+* `17:02:37 UTC` — Added Rule: Engineering Rule 55
+
+* `17:02:37 UTC` — Added Rule: Engineering Rule 54
+
+* `17:02:37 UTC` — Added Rule: Engineering Rule 53
+
+* `17:02:37 UTC` — Added Rule: Engineering Rule 52
+
+* `17:02:36 UTC` — Added Rule: Engineering Rule 51
+
+* `17:02:36 UTC` — Added Rule: Engineering Rule 50
+
+* `17:02:36 UTC` — Added Rule: Engineering Rule 49
+
+* `17:02:36 UTC` — Added Rule: Engineering Rule 48
+
+* `17:02:36 UTC` — Added Rule: Engineering Rule 47
+
+* `17:02:36 UTC` — Added Rule: Engineering Rule 46
+
+* `17:02:36 UTC` — Added Rule: Engineering Rule 45
+
+* `17:02:35 UTC` — Added Rule: Engineering Rule 44
+
+* `17:02:35 UTC` — Added Rule: Engineering Rule 43
+
+* `17:02:35 UTC` — Added Rule: Engineering Rule 42
+
+* `17:02:35 UTC` — Added Rule: Engineering Rule 41
+
+* `17:02:35 UTC` — Added Rule: Engineering Rule 40
+
+* `17:02:35 UTC` — Added Rule: Engineering Rule 39
+
+* `17:02:34 UTC` — Added Rule: Engineering Rule 38
+
+* `17:02:34 UTC` — Added Rule: Engineering Rule 37
+
+* `17:02:34 UTC` — Added Rule: Engineering Rule 36
+
+* `17:02:34 UTC` — Added Rule: Engineering Rule 35
+
+* `17:02:34 UTC` — Added Rule: Engineering Rule 34
+
+* `17:02:33 UTC` — Added Rule: Engineering Rule 33
+
+* `17:02:33 UTC` — Added Rule: Engineering Rule 32
+
+* `17:02:33 UTC` — Added Rule: Engineering Rule 31
+
+* `17:02:33 UTC` — Added Rule: Engineering Rule 30
+
+* `17:02:33 UTC` — Added Rule: Engineering Rule 29
+
+* `17:02:33 UTC` — Added Rule: Engineering Rule 28
+
+* `17:02:33 UTC` — Added Rule: Engineering Rule 27
+
+* `17:02:32 UTC` — Added Rule: Engineering Rule 26
+
+* `17:02:32 UTC` — Added Rule: Engineering Rule 25
+
+* `17:02:32 UTC` — Added Rule: Engineering Rule 24
+
+* `17:02:32 UTC` — Added Rule: Engineering Rule 23
+
+* `17:02:32 UTC` — Added Rule: Engineering Rule 22
+
+* `17:02:32 UTC` — Added Rule: Engineering Rule 21
+
+* `17:02:32 UTC` — Added Rule: Engineering Rule 20
+
+* `17:02:32 UTC` — Added Rule: Engineering Rule 19
+
+* `17:02:31 UTC` — Added Rule: Engineering Rule 18
+
+* `17:02:31 UTC` — Added Rule: Engineering Rule 17
+
+* `17:02:31 UTC` — Added Rule: Engineering Rule 16
+
+* `17:02:31 UTC` — Added Rule: Engineering Rule 15
+
+* `17:02:31 UTC` — Added Rule: Engineering Rule 14
+
+* `17:02:31 UTC` — Added Rule: Engineering Rule 13
+
+* `17:02:31 UTC` — Added Rule: Engineering Rule 12
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 11
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 10
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 9
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 8
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 7
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 6
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 5
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 4
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 3
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 2
+
+* `17:02:30 UTC` — Added Rule: Engineering Rule 1
+
+* `17:02:30 UTC` — Added Component: NVIDIA RTX A1000 8GB
+
+* `17:02:30 UTC` — Added Component: NVIDIA L4 24GB
+
+* `17:02:29 UTC` — Added Component: NVIDIA RTX PRO 4500 Blackwell Server Edition 32GB
+
+* `17:02:29 UTC` — Added Component: NVIDIA L40S 48GB
+
+* `17:02:29 UTC` — Added Component: NVIDIA RTX PRO 6000D 84GB
+
+* `17:02:29 UTC` — Added Component: NVIDIA RTX PRO 6000 Blackwell Server Edition 96GB
+
+* `17:02:29 UTC` — Added Component: NVIDIA RTX PRO 6000 96GB
+
+* `17:02:28 UTC` — Added Component: NVIDIA H200 NVL 141GB
+
+* `17:02:28 UTC` — Added Component: OCP 3.0 Network Adapter Slot
+
+* `17:02:28 UTC` — Added Constraint: Maximum EDSFF Drives
+
+* `17:02:28 UTC` — Added Constraint: Maximum LFF Drives
+
+* `17:02:28 UTC` — Added Constraint: Maximum SFF Drives
+
+* `17:02:28 UTC` — Added Constraint: DIMM Slot Count
+
+* `17:02:28 UTC` — Added Constraint: Maximum Memory Capacity
+
+* `17:02:28 UTC` — Added Component: Intel Xeon 6 6788P
+
+* `17:02:27 UTC` — Added Component: Intel Xeon 6 6768P
+
+* `17:02:27 UTC` — Added Component: Intel Xeon 6 6748P
+
+* `17:02:27 UTC` — Added Component: Intel Xeon 6 6738P
+
+* `17:02:26 UTC` — Added Component: Intel Xeon 6 6728P
+
+* `17:02:26 UTC` — Added Component: Intel Xeon 6 6724P
+
+* `17:02:26 UTC` — Added Component: Intel Xeon 6 6714P
+
+* `17:02:26 UTC` — Added Component: Intel Xeon 6 6760P
+
+* `17:02:25 UTC` — Added Component: Intel Xeon 6 6740P
+
+* `17:02:25 UTC` — Added Component: Intel Xeon 6 6530P
+
+* `17:02:25 UTC` — Added Component: Intel Xeon 6 6520P
+
+* `17:02:24 UTC` — Added Component: Intel Xeon 6 6515P
+
+* `17:02:24 UTC` — Added Component: Intel Xeon 6 6505P
+
+* `17:02:24 UTC` — Added Component: Intel Xeon 6 6787P
+
+* `17:02:23 UTC` — Added Component: Intel Xeon 6 6767P
+
+* `17:02:23 UTC` — Added Component: Intel Xeon 6 6762P
+
+* `17:02:23 UTC` — Added Component: Intel Xeon 6 6747P
+
+* `17:02:23 UTC` — Added Component: Intel Xeon 6 6745P
+
+* `17:02:22 UTC` — Added Component: Intel Xeon 6 6737P
+
+* `17:02:22 UTC` — Added Component: Intel Xeon 6 6736P
+
+* `17:02:22 UTC` — Added Component: Intel Xeon 6 6732P
+
+* `17:02:22 UTC` — Added Component: Intel Xeon 6 6730P
+
+* `17:02:21 UTC` — Added Component: Intel Xeon 6 6725P
+
+* `17:02:21 UTC` — Added Component: Intel Xeon 6 6527P
+
+* `17:02:21 UTC` — Added Component: Intel Xeon 6 6517P
+
+* `17:02:21 UTC` — Added Component: Intel Xeon 6 6507P
+
+* `17:02:20 UTC` — Added Component: Intel Xeon 6 6780E
+
+* `17:02:20 UTC` — Added Component: Intel Xeon 6 6766E
+
+* `17:02:20 UTC` — Added Component: Intel Xeon 6 6756E
+
+* `17:02:20 UTC` — Added Component: Intel Xeon 6 6746E
+
+* `17:02:19 UTC` — Added Component: Intel Xeon 6 6740E
+
+* `17:02:19 UTC` — Added Component: Intel Xeon 6 6731E
+
+* `17:02:19 UTC` — Added Component: Intel Xeon 6 6710E
+
+* `17:02:19 UTC` — Added Workload: AI and Machine Learning
+
+* `17:02:19 UTC` — Added Platform: HPE ProLiant DL380 Gen12
+
 * `08:35:59 UTC` — Added Component: 2200W Power Supply
 
 * `08:35:58 UTC` — Added Component: 1000W Power Supply

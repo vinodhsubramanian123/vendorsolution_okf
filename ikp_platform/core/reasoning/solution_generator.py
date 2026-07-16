@@ -21,7 +21,7 @@ logger = logging.getLogger("ikp.reasoning.solution_generator")
 class SolutionGenerator:
     """Generates explainable solution candidates based on customer intent."""
 
-    def __init__(self, graph: GraphBuilder, vector_store=None, mcp_client=None):
+    def __init__(self, graph: GraphBuilder, vector_store: Optional[Any] = None, mcp_client: Optional[Any] = None):
         self.graph = graph
         self.vector_store = vector_store
         self.mcp_client = mcp_client
@@ -162,42 +162,31 @@ class SolutionGenerator:
                 logger.info("LLM returned empty or failed. Falling back to heuristic component selection.")
                 for req in request.requirements:
                     logger.info(f"Fallback processing requirement: {req.name} = {req.value}")
-                    if req.value == "GPU":
-                        gpus = self.graph.filter_by_metadata({"component_category": "GPU"})
-                        compatible = self.graph.get_compatible(platform_id)
-                        valid_gpus = list(set(gpus).intersection(set(compatible)))
-                        
-                        if valid_gpus:
-                            selected_gpu = valid_gpus[0]
-                            components.append(selected_gpu)
-                            satisfied_reqs.append(req.name)
-                            reasoning_chain.append(f"Added {selected_gpu} to satisfy {req.name} requirement")
-                            logger.info(f"Added {selected_gpu}")
-                        else:
-                            reasoning_chain.append(f"Could not satisfy requirement {req.name}: No compatible GPU found")
-                            logger.info("No compatible GPU found")
+                    # Generic fallback: match requirement name or value against component metadata
+                    compatible = self.graph.get_compatible(platform_id)
+                    matches = []
+                    search_term = str(req.value).lower()
+                    cat_term = req.name.lower()
                     
-                    elif "NVMe" in str(req.value) or "Storage" in req.name:
-                        logger.info(f"Processing NVMe fallback for {req.name}")
-                        # Fallback for NVMe storage
-                        # Find compatible components that have NVMe in their description or title
-                        compatible = self.graph.get_compatible(platform_id)
-                        nvme_comps = []
-                        for cid in compatible:
-                            if cid in self.graph.graph:
-                                node_data = self.graph.graph.nodes[cid]
-                                text_repr = str(node_data.get("title", "")) + " " + str(node_data.get("description", ""))
-                                if "NVMe" in text_repr or "Drive Cage" in text_repr or "storage" in text_repr.lower():
-                                    nvme_comps.append(cid)
-                        
-                        logger.info(f"Found NVMe components: {nvme_comps}")
-                        if nvme_comps:
-                            selected_storage = nvme_comps[0]
-                            components.append(selected_storage)
-                            satisfied_reqs.append(req.name)
-                            reasoning_chain.append(f"Added {selected_storage} to satisfy {req.name} requirement")
-                        else:
-                            reasoning_chain.append(f"Could not satisfy requirement {req.name}: No compatible NVMe/Storage found")
+                    for cid in compatible:
+                        if cid in self.graph.graph:
+                            node_data = self.graph.graph.nodes[cid]
+                            text_repr = (str(node_data.get("title", "")) + " " + str(node_data.get("description", ""))).lower()
+                            cat = str(node_data.get("attr_component_category", "")).lower()
+                            
+                            # Check for keyword matches in text or category
+                            if search_term == cat or search_term in text_repr or cat_term in text_repr or cat_term in cat:
+                                matches.append(cid)
+                    
+                    if matches:
+                        selected = matches[0]
+                        components.append(selected)
+                        satisfied_reqs.append(req.name)
+                        reasoning_chain.append(f"Added {selected} to satisfy {req.name} requirement")
+                        logger.info(f"Added {selected} via generic fallback for {req.name}")
+                    else:
+                        reasoning_chain.append(f"Could not satisfy requirement {req.name}: No compatible component found")
+                        logger.info(f"No compatible component found for {req.name}")
         
         # Validate the solution using Rule Engine
         is_valid, validation_chain, errors = self.rule_engine.evaluate_solution(platform_id, components)

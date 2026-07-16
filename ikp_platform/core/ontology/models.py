@@ -221,6 +221,7 @@ class BaseEngineeringObject(BaseModel):
     solution_domain: Optional[str] = None
     product_family: Optional[str] = None
     generation: Optional[str] = None
+    platform_id: Optional[str] = None
     lifecycle_status: LifecycleStatus = LifecycleStatus.UNKNOWN
     
     attributes: List[EngineeringAttribute] = []

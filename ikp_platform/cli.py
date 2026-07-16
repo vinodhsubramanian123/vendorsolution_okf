@@ -92,12 +92,10 @@ def cmd_ingest(file_path: str):
         registry.update_status(source.source_id, ProcessingStatus.EXTRACTING)
 
         extractor = ExcelExtractor()
-        # Mocking an empty delta since ExcelExtractor doesn't currently return one
-        from ikp_platform.core.ontology.models import KnowledgeDelta
-        objects = extractor.extract(source, file_path)
-        delta = KnowledgeDelta(source_id=source.source_id)
+        objects, delta = extractor.extract(source, file_path)
 
         logger.info(f"Extracted {len(objects)} engineering objects")
+        logger.info(f"Knowledge Delta: {delta.delta_id} with {len(delta.changes)} changes")
 
         registry.update_status(source.source_id, ProcessingStatus.NORMALIZING)
 

@@ -200,6 +200,26 @@ class TestOKFWriter:
         assert "alletra" in path
         assert "6000" in path
 
+    def test_hierarchical_path_component(self, temp_dir):
+        writer = OKFWriter(temp_dir)
+        obj = Component(
+            id="xeon-6527p",
+            title="Xeon 6527P",
+            vendor="Intel",
+            solution_domain="Compute",
+            product_family="ProLiant",
+            generation="Gen12",
+            platform_id="hpe-proliant-dl380-gen12",
+            component_category="CPU",
+        )
+        path = writer.write_concept(obj)
+        assert "compute" in path
+        assert "proliant" in path
+        assert "gen12" in path
+        assert "hpe-proliant-dl380-gen12" in path
+        assert "components" in path
+        assert "cpu" in path
+
     def test_generates_index(self, temp_dir):
         writer = OKFWriter(temp_dir)
         obj = Platform(

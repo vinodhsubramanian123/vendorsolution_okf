@@ -1,20 +1,20 @@
 # IKP Platform State
 
-**Last Updated**: 2026-07-16 13:44:49 UTC
+**Last Updated**: 2026-07-16 17:42:45 UTC
 
 ## Knowledge Graph Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Nodes | 238 |
-| Total Edges | 124 |
+| Total Nodes | 163 |
+| Total Edges | 73 |
 
 ## Objects by Type
 
 | Type | Count |
 |------|-------|
-| Component | 112 |
-| Constraint | 6 |
-| Platform | 3 |
-| Rule | 112 |
-| Workload | 5 |
+| Component | 68 |
+| Constraint | 5 |
+| Platform | 1 |
+| Rule | 88 |
+| Workload | 1 |

@@ -8,7 +8,7 @@ and structured configuration rules. This parser converts rows into Pydantic mode
 """
 
 import pandas as pd
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime
 import logging
 
@@ -19,6 +19,11 @@ from ikp_platform.core.ontology.models import (
     SKU,
     EngineeringObjectType,
     Source,
+    KnowledgeDelta,
+    DeltaChange,
+    DeltaChangeType,
+    EvidenceRecord,
+    ConfidenceLevel,
 )
 
 logger = logging.getLogger("ikp.ingestion.excel")
@@ -27,12 +32,9 @@ logger = logging.getLogger("ikp.ingestion.excel")
 class ExcelExtractor:
     """Parses Excel spreadsheets into IKP canonical objects."""
 
-    def __init__(self):
-        pass
-
-    def extract(self, source: Source, file_path: str) -> List[BaseEngineeringObject]:
+    def extract(self, source: Source, file_path: str) -> Tuple[List[BaseEngineeringObject], KnowledgeDelta]:
         """
-        Parse the Excel file and return a list of extracted objects.
+        Parse the Excel file and return a tuple of (extracted objects, KnowledgeDelta).
         Currently handles 'Components' and 'SKUs' sheets if they exist.
         """
         objects = []
@@ -40,7 +42,7 @@ class ExcelExtractor:
             excel = pd.ExcelFile(file_path)
         except Exception as e:
             logger.error(f"Failed to open Excel file {file_path}: {e}")
-            return objects
+            return objects, KnowledgeDelta(source_id=source.source_id)
 
         sheet_names = excel.sheet_names
 
@@ -54,8 +56,29 @@ class ExcelExtractor:
             df = excel.parse("SKUs")
             objects.extend(self._parse_skus(df, source))
 
+        # Create delta records for the extracted objects
+        changes = []
+        for obj in objects:
+            ctype = DeltaChangeType.NEW_COMPONENT if obj.type == EngineeringObjectType.COMPONENT else DeltaChangeType.NEW_SKU
+            changes.append(
+                DeltaChange(
+                    change_type=ctype,
+                    object_id=obj.id,
+                    evidence=EvidenceRecord(
+                        source_id=source.source_id,
+                        confidence=ConfidenceLevel.HIGH,
+                        description=f"Extracted {obj.type.value} from Excel {source.source_id}"
+                    )
+                )
+            )
+            
+        delta = KnowledgeDelta(
+            source_id=source.source_id,
+            changes=changes
+        )
+
         logger.info(f"ExcelExtractor extracted {len(objects)} objects from {file_path}")
-        return objects
+        return objects, delta
 
     def _parse_components(self, df: pd.DataFrame, source: Source) -> List[Component]:
         """Parse a dataframe of components."""

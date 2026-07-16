@@ -172,10 +172,10 @@ class PDFExtractor:
         raise ValueError("HITL_REQUIRED: The pipeline could not confidently determine Vendor, Product Family, or Solution Domain. Please map these properties manually for this datasource.")
 
     def _infer_solution_domain(self, text: str) -> str:
-        text_lower = text.lower()[:5000]
-        compute_score = text_lower.count("processor") + text_lower.count("memory") + text_lower.count("dimm") + text_lower.count("compute")
-        storage_score = text_lower.count("storage") * 2 + text_lower.count("drive") + text_lower.count("nvme") + text_lower.count("san") + text_lower.count("array")
-        networking_score = text_lower.count("switch") * 2 + text_lower.count("router") + text_lower.count("port") + text_lower.count("fabric")
+        text = text[:5000].lower()
+        compute_score = text.count("processor") + text.count("memory") + text.count("dimm") + text.count("server") + text.count("proliant") * 10 + text.count("compute") * 5
+        storage_score = text.count("storage") + text.count("nvme") + text.count("ssd") + text.count("drive") + text.count("alletra") * 10
+        networking_score = text.count("switch") + text.count("transceiver") + text.count("port") + text.count("bandwidth") + text.count("aruba") * 10
         
         scores = {"Compute": compute_score, "Storage": storage_score, "Networking": networking_score}
         best_domain = max(scores, key=scores.get)
@@ -209,7 +209,7 @@ class PDFExtractor:
             joined_lines.append(" ".join(current_block))
             
         for line in joined_lines:
-            if re.search(r'\b(HPE|Dell|Cisco|Lenovo|IBM|Supermicro)\b', line, re.IGNORECASE) and 5 < len(line) < 200:
+            if re.search(r'\b(HPE|Dell|Cisco|Lenovo|IBM|Supermicro)\b', line, re.IGNORECASE) and 5 < len(line) < 1000:
                 clean_title = re.sub(r'(?i)\b(QuickSpecs|Technical Guide|Data Sheet|Datasheet|Spec Sheet)\b.*$', '', line).strip()
                 if clean_title:
                     title = clean_title
@@ -385,8 +385,9 @@ class PDFExtractor:
                 description=f"Intel Xeon 6 {model} - {cores} {core_type}s, {base_speed}GHz, {power}W TDP",
                 vendor="Intel",
                 solution_domain=platform.solution_domain if platform else "Unknown",
-                product_family="Xeon 6",
-                generation="Xeon 6",
+                product_family=platform.product_family if platform else "Xeon 6",
+                generation=platform.generation if platform else "Xeon 6",
+                platform_id=platform.id if platform else None,
                 component_category="CPU",
                 lifecycle_status=LifecycleStatus.ACTIVE,
                 capabilities=[core_type, "DDR5", f"PCIe Gen5"],
@@ -449,6 +450,7 @@ class PDFExtractor:
                 solution_domain=platform.solution_domain if platform else "Unknown",
                 product_family=platform.product_family if platform else None,
                 generation=platform.generation if platform else None,
+                platform_id=platform.id if platform else None,
                 limit_name="Maximum Memory",
                 limit_value=int(max_mem),
                 limit_unit=unit,
@@ -484,6 +486,7 @@ class PDFExtractor:
                 solution_domain=platform.solution_domain if platform else "Unknown",
                 product_family=platform.product_family if platform else None,
                 generation=platform.generation if platform else None,
+                platform_id=platform.id if platform else None,
                 limit_name="DIMM Slots",
                 limit_value=dimm_count,
                 limit_unit="slots",
@@ -507,6 +510,7 @@ class PDFExtractor:
                 solution_domain=platform.solution_domain if platform else "Unknown",
                 product_family=platform.product_family if platform else None,
                 generation=platform.generation if platform else None,
+                platform_id=platform.id if platform else None,
                 component_category="Memory",
                 capabilities=[f"DDR{ddr_gen}"],
                 relationships=[
@@ -553,6 +557,7 @@ class PDFExtractor:
                     solution_domain=platform.solution_domain if platform else "Unknown",
                     product_family=platform.product_family if platform else None,
                     generation=platform.generation if platform else None,
+                    platform_id=platform.id if platform else None,
                     limit_name=f"Maximum {name}",
                     limit_value=count,
                     limit_unit="drives",
@@ -598,6 +603,7 @@ class PDFExtractor:
                 solution_domain=platform.solution_domain if platform else "Unknown",
                 product_family=platform.product_family if platform else None,
                 generation=platform.generation if platform else None,
+                platform_id=platform.id if platform else None,
                 component_category="NIC",
                 capabilities=[f"OCP {ocp_ver}", "Ethernet"],
                 relationships=[
@@ -652,6 +658,7 @@ class PDFExtractor:
                     solution_domain=platform.solution_domain if platform else "Unknown",
                     product_family=platform.product_family if platform else None,
                     generation=platform.generation if platform else None,
+                    platform_id=platform.id if platform else None,
                     component_category="GPU",
                     capabilities=["GPU", "AI", "PCIe Gen5"],
                     attributes=[
@@ -728,6 +735,7 @@ class PDFExtractor:
                     solution_domain=platform.solution_domain if platform else "Unknown",
                     product_family=platform.product_family if platform else None,
                     generation=platform.generation if platform else None,
+                    platform_id=platform.id if platform else None,
                     scope="Platform",
                     severity=severity,
                     confidence=ConfidenceLevel.HIGH,
@@ -753,7 +761,8 @@ class PDFExtractor:
         # Analyze first 15000 chars for rules to save tokens while capturing key constraints
         chunk = text[:15000]
         
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        # Sequential extraction for AI rules to prevent OAuth browser race conditions
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             future_primary = executor.submit(self.llm_client.extract_rules, chunk)
             future_critic = executor.submit(self.llm_client.critic_review_rules, chunk)
             
@@ -813,6 +822,7 @@ class PDFExtractor:
                 solution_domain=platform.solution_domain if platform else "Unknown",
                 product_family=platform.product_family if platform else None,
                 generation=platform.generation if platform else None,
+                platform_id=platform.id if platform else None,
                 scope="Platform",
                 severity=severity,
                 confidence=ConfidenceLevel.MEDIUM,
@@ -848,8 +858,12 @@ class PDFExtractor:
             psu = Component(
                 id=f"{platform_id}/components/psu-{watts}w",
                 title=f"{watts}W Power Supply",
+                description=f"{watts}W Flex Slot Power Supply",
                 vendor=platform.vendor if platform else "Unknown",
                 solution_domain=platform.solution_domain if platform else "Unknown",
+                product_family=platform.product_family if platform else None,
+                generation=platform.generation if platform else None,
+                platform_id=platform.id if platform else None,
                 component_category="PSU",
                 attributes=[
                     EngineeringAttribute(name="Wattage", value=int(watts), unit="W"),
@@ -921,6 +935,7 @@ class PDFExtractor:
                         solution_domain=platform.solution_domain if platform else "Unknown",
                         product_family=platform.product_family if platform else None,
                         generation=platform.generation if platform else None,
+                        platform_id=platform.id if platform else None,
                         relationships=[EngineeringRelationship(target_id=platform_id, relationship_type=RelationshipType.CONTAINS)]
                     )
                     objects.append(cl)
@@ -948,6 +963,7 @@ class PDFExtractor:
                 solution_domain=platform.solution_domain if platform else "Unknown",
                 product_family=platform.product_family if platform else None,
                 generation=platform.generation if platform else None,
+                platform_id=platform.id if platform else None,
                 component_category=cat,
                 component_subcategory=subcat,
                 packaging_type=pkg_type,

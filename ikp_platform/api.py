@@ -149,6 +149,35 @@ async def validate_boq(request: BOQValidationRequest):
     boq_validator = BOQValidator(repo.graph)
     boq_result = boq_validator.validate(request.components, {})
     
+    # Record any fuzzy match corrections as a KnowledgeDelta to "learn" typos
+    corrections = [m for m in boq_result.messages if m.severity == "Info"]
+    if corrections:
+        from ikp_platform.core.ontology.models import KnowledgeDelta, DeltaChange, DeltaChangeType, EvidenceRecord, ConfidenceLevel
+        import uuid
+        
+        changes = []
+        for msg in corrections:
+            # message format from boq_validator: "Auto-corrected requested SKU 'foo' to 'bar'"
+            changes.append(
+                DeltaChange(
+                    change_type=DeltaChangeType.UPDATE_COMPONENT,
+                    object_id=msg.affected_object or "unknown",
+                    field_name="alias",
+                    new_value=msg.message,
+                    evidence=EvidenceRecord(
+                        source_id="boq_validator",
+                        confidence=ConfidenceLevel.MEDIUM,
+                        description=msg.message
+                    )
+                )
+            )
+        delta = KnowledgeDelta(
+            delta_id=f"DELTA-{str(uuid.uuid4())[:8]}",
+            source_id="api_boq_validate", 
+            changes=changes
+        )
+        repo._record_delta(delta)
+    
     # Extract the corrected component IDs
     corrected_components = []
     for comp in request.components:

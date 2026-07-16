@@ -145,6 +145,10 @@ Output ONLY valid JSON in the following format:
     def extract_rules(self, text_chunk: str) -> List[Dict[str, Any]]:
         """
         Ask Gemini via local Antigravity CLI to extract explicit engineering rules from a text chunk.
+        
+        NOTE: We intentionally use the `antigravity-cli` here instead of the `google-genai`
+        SDK to leverage specialized local extraction prompts and parallel processing configurations
+        that the CLI provides for rule mining.
         """
         prompt = f"""
 You are an expert systems engineer. Extract any explicit engineering rules, constraints, or dependencies from the text.
@@ -190,8 +194,12 @@ Text:
             if json_start != -1 and json_end != -1:
                 text = text[json_start:json_end+1]
                 
-            parsed = json.loads(text)
-            return parsed.get("rules", [])
+            try:
+                parsed = json.loads(text)
+                return parsed.get("rules", [])
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse JSON from antigravity-cli output: {e}\nOutput was: {text[:200]}")
+                return []
         except subprocess.TimeoutExpired:
             logger.error("LLM extract_rules timed out calling antigravity-cli")
             return []
@@ -202,6 +210,9 @@ Text:
     def critic_review_rules(self, text_chunk: str) -> List[Dict[str, Any]]:
         """
         Ask Gemini via local Antigravity CLI to find edge-case constraints or subtle dependencies in the text chunk.
+        
+        NOTE: Similar to extract_rules, we intentionally shell out to `antigravity-cli` 
+        to leverage specialized critic prompts and local execution options.
         """
         prompt = f"""
 You are an expert systems engineering critic. Your job is to find subtle, easily missed edge-case constraints, mutual exclusions, or hidden dependencies in the text. Ignore obvious rules.
@@ -245,8 +256,12 @@ Text:
             if json_start != -1 and json_end != -1:
                 text = text[json_start:json_end+1]
             
-            parsed = json.loads(text)
-            return parsed.get("rules", [])
+            try:
+                parsed = json.loads(text)
+                return parsed.get("rules", [])
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse JSON from antigravity-cli output: {e}\nOutput was: {text[:200]}")
+                return []
         except subprocess.TimeoutExpired:
             logger.error("LLM critic_review_rules timed out calling antigravity-cli")
             return []
