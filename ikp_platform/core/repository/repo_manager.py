@@ -1,0 +1,236 @@
+"""
+Repository Manager — Orchestrates bidirectional sync between OKF files and the in-memory graph.
+
+Governs: Blueprint 06 (Canonical Repository), Blueprint 02 §4 (Repository Responsibilities)
+
+Responsibilities:
+- On startup: OKF Reader → Graph Builder (bootstrap)
+- On change: Graph Builder + OKF Writer (persist)
+- Updates CONTEXT.md, STATE.md, LOG.md
+"""
+
+from pathlib import Path
+from datetime import datetime
+from typing import List, Optional
+
+from ikp_platform.core.ontology.models import (
+    BaseEngineeringObject,
+    KnowledgeDelta,
+    DeltaStatus,
+)
+from ikp_platform.core.repository.okf_reader import OKFReader
+from ikp_platform.core.repository.okf_writer import OKFWriter
+from ikp_platform.core.repository.graph_builder import GraphBuilder
+from ikp_platform.core.repository.vector_store import VectorStore
+from ikp_platform.core.repository.mcp_client import ObsidianMCPClient
+
+
+class RepoManager:
+    """
+    Central orchestrator for the dual-layer architecture.
+
+    - Persistence layer: OKF Markdown files on disk
+    - Active layer: NetworkX DiGraph in memory
+    """
+
+    def __init__(self, repository_path: str, project_root: str):
+        self.repository_path = Path(repository_path)
+        self.project_root = Path(project_root)
+        self.reader = OKFReader(repository_path)
+        self.writer = OKFWriter(repository_path)
+        self.graph = GraphBuilder()
+        
+        # Initialize Vector Store
+        vector_db_path = self.project_root / ".chroma"
+        vector_db_path.mkdir(exist_ok=True)
+        self.vector_store = VectorStore(str(vector_db_path))
+
+        # Initialize MCP Client
+        self.mcp_client = ObsidianMCPClient(str(self.repository_path))
+
+    # -------------------------------------------------------------------
+    # Bootstrap — load existing repository into graph
+    # -------------------------------------------------------------------
+
+    def bootstrap(self) -> int:
+        """
+        Load all existing OKF files into the in-memory graph.
+        Returns the number of concepts loaded.
+        """
+        objects = self.reader.load_all()
+        for obj in objects:
+            self.graph.add_concept(obj)
+
+        self._update_state_file()
+        return len(objects)
+
+    # -------------------------------------------------------------------
+    # Add / update concepts
+    # -------------------------------------------------------------------
+
+    def add_concept(self, obj: BaseEngineeringObject) -> str:
+        """
+        Add a new engineering concept to both layers.
+        Returns the relative path of the written OKF file.
+        """
+        # Persist to OKF Markdown
+        relative_path = self.writer.write_concept(obj)
+
+        # Add to in-memory graph
+        self.graph.add_concept(obj)
+        
+        # Add to Vector Store for semantic search
+        self.vector_store.index_object(obj)
+
+        # Update log
+        self.writer.append_log_entry(
+            action="Creation",
+            description=f"Added {obj.type.value}: {obj.title or obj.id}",
+            concept_path=relative_path,
+        )
+
+        # Regenerate index for parent directory
+        file_path = self.repository_path / relative_path
+        self.writer.generate_index(file_path.parent)
+
+        # Update managed files
+        self._update_state_file()
+        self._append_root_log(f"Added {obj.type.value}: {obj.title or obj.id}")
+
+        return relative_path
+
+    def apply_delta(self, delta: KnowledgeDelta, objects: List[BaseEngineeringObject]) -> None:
+        """
+        Apply a validated Knowledge Delta — persist all objects and record the delta.
+
+        Blueprint 02 §7: Knowledge Deltas SHALL be merged into canonical
+        knowledge while preserving history.
+        """
+        for obj in objects:
+            self.add_concept(obj)
+
+        # Record the delta in history/
+        self._record_delta(delta)
+
+        delta.status = DeltaStatus.MERGED
+
+    # -------------------------------------------------------------------
+    # Managed files — Blueprint 02 §4
+    # -------------------------------------------------------------------
+
+    def _update_state_file(self) -> None:
+        """Update STATE.md with current platform statistics."""
+        stats = self.graph.get_stats()
+        state_path = self.project_root / "STATE.md"
+
+        lines = [
+            "# IKP Platform State\n",
+            f"**Last Updated**: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n",
+            "## Knowledge Graph Statistics\n",
+            f"| Metric | Value |",
+            f"|--------|-------|",
+            f"| Total Nodes | {stats['total_nodes']} |",
+            f"| Total Edges | {stats['total_edges']} |",
+        ]
+
+        type_counts = stats.get("type_counts", {})
+        if type_counts:
+            lines.append("\n## Objects by Type\n")
+            lines.append("| Type | Count |")
+            lines.append("|------|-------|")
+            for obj_type, count in sorted(type_counts.items()):
+                lines.append(f"| {obj_type} | {count} |")
+
+        with open(state_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+
+    def _append_root_log(self, description: str) -> None:
+        """Append an entry to the project root LOG.md."""
+        log_path = self.project_root / "LOG.md"
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+        time_str = datetime.utcnow().strftime("%H:%M:%S UTC")
+
+        entry = f"* `{time_str}` — {description}\n"
+
+        existing = ""
+        if log_path.exists():
+            with open(log_path, "r", encoding="utf-8") as f:
+                existing = f.read()
+
+        date_heading = f"## {today}"
+        if date_heading in existing:
+            parts = existing.split(date_heading, 1)
+            updated = parts[0] + date_heading + "\n" + entry + parts[1]
+        else:
+            if existing.startswith("# "):
+                title_end = existing.index("\n") + 1
+                updated = (
+                    existing[:title_end]
+                    + f"\n{date_heading}\n{entry}\n"
+                    + existing[title_end:]
+                )
+            else:
+                updated = f"# IKP Operations Log\n\n{date_heading}\n{entry}\n"
+
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(updated)
+
+    def _record_delta(self, delta: KnowledgeDelta) -> None:
+        """Record a Knowledge Delta in the history/ directory."""
+        history_dir = self.project_root / "history"
+        history_dir.mkdir(exist_ok=True)
+
+        date_str = delta.timestamp.strftime("%Y-%m-%d")
+        filename = f"{date_str}_{delta.delta_id}.md"
+        delta_path = history_dir / filename
+
+        lines = [
+            "---",
+            f"type: Knowledge Delta",
+            f"title: {delta.delta_id}",
+            f"description: Delta from source {delta.source_id}",
+            f"timestamp: {delta.timestamp.isoformat()}Z",
+            f"tags: [delta, {delta.status.value.lower()}]",
+            "---\n",
+            f"# Knowledge Delta: {delta.delta_id}\n",
+            f"**Source**: {delta.source_id}",
+            f"**Status**: {delta.status.value}",
+            f"**Changes**: {len(delta.changes)}\n",
+        ]
+
+        if delta.changes:
+            lines.append("## Changes\n")
+            lines.append("| Type | Object | Field | New Value |")
+            lines.append("|------|--------|-------|-----------|")
+            for change in delta.changes:
+                lines.append(
+                    f"| {change.change_type.value} | {change.object_id} | "
+                    f"{change.field_name or '-'} | {change.new_value or '-'} |"
+                )
+
+        if delta.review_notes:
+            lines.append(f"\n## Review Notes\n\n{delta.review_notes}")
+
+        with open(delta_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+
+    def update_context(self, domains: List[str], source_count: int) -> None:
+        """Update CONTEXT.md with current engineering coverage."""
+        context_path = self.project_root / "CONTEXT.md"
+
+        lines = [
+            "# IKP Engineering Context\n",
+            f"**Last Updated**: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n",
+            "## Coverage\n",
+        ]
+
+        if domains:
+            lines.append("### Solution Domains\n")
+            for domain in domains:
+                lines.append(f"- {domain}")
+            lines.append("")
+
+        lines.append(f"### Sources Ingested: {source_count}\n")
+
+        with open(context_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
