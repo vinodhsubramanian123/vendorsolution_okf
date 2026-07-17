@@ -27,3 +27,6 @@ Do not invoke `python`, `python3`, or `py` directly, as this leads to virtual en
 ## Package Management
 - For python packages: Use `uv pip install <package>` or `uv add <package>` instead of `pip install`.
 - For node packages: Use `npm install` inside the `ikp_web` directory.
+
+## The `tools/` Directory
+The `tools/` folder in the project root contains wrappers for `python`, `pip`, `agy`, and `graphify` that automatically implement the rules above. The user has this directory in their `PATH`, meaning the commands are natively intercepted and corrected. Do not remove or alter these scripts.
