@@ -1,0 +1,417 @@
+{
+  "ikp_platform/__init__.py": {
+    "mtime": 1784139916.6128798,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "ikp_platform/api.py": {
+    "mtime": 1784279858.7987008,
+    "ast_hash": "5f9cfe66ca75b233b2eb0af492c73985",
+    "semantic_hash": ""
+  },
+  "ikp_platform/cli.py": {
+    "mtime": 1784282604.9751701,
+    "ast_hash": "dfa872b1a67db8f7f0893e7a960de397",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/__init__.py": {
+    "mtime": 1784139916.6128798,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/ingestion/__init__.py": {
+    "mtime": 1784139916.6128798,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/ingestion/excel_parser.py": {
+    "mtime": 1784219764.1466255,
+    "ast_hash": "e49e07fe0018d47051dc786416c7818f",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/ingestion/pdf_extractor.py": {
+    "mtime": 1784317744.681902,
+    "ast_hash": "b43189b3c5cca2df267660e645cf97f4",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/ingestion/source_registry.py": {
+    "mtime": 1784140666.696972,
+    "ast_hash": "ccf980ec00806a04d6e48c841bdf552d",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/ingestion/source_watcher.py": {
+    "mtime": 1784140680.7013028,
+    "ast_hash": "dd33091fd1c2782978ec05390e5049a2",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/ingestion/table_parser.py": {
+    "mtime": 1784318187.7039428,
+    "ast_hash": "c308bf01a3756dac27ca0397f3d8faec",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/learning/__init__.py": {
+    "mtime": 1784140493.3487892,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/learning/learning_engine.py": {
+    "mtime": 1784140542.453992,
+    "ast_hash": "16860a10bdbbe25d8277f0a3b4f72194",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/observability/__init__.py": {
+    "mtime": 1784140493.3487892,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/ontology/__init__.py": {
+    "mtime": 1784139916.6128798,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/ontology/models.py": {
+    "mtime": 1784301861.5487435,
+    "ast_hash": "be00ea9bb895e5db801a64e7d784255c",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/reasoning/__init__.py": {
+    "mtime": 1784141130.3155515,
+    "ast_hash": "c06b78d84ae645e50630d17e9c394229",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/reasoning/intent_parser.py": {
+    "mtime": 1784190349.6663327,
+    "ast_hash": "93a4abc2896db67cca99115cf0f2c0f3",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/reasoning/llm_client.py": {
+    "mtime": 1784282697.2404099,
+    "ast_hash": "4784a5d18c0a24311c68eba38674a9c4",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/reasoning/rule_engine.py": {
+    "mtime": 1784277050.5239627,
+    "ast_hash": "eeb724b5229521fd3676feea5fac205f",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/reasoning/solution_generator.py": {
+    "mtime": 1784278101.5551493,
+    "ast_hash": "a6a4b68026021d154c108bbad69faa39",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/repository/__init__.py": {
+    "mtime": 1784139916.6128798,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/repository/graph_builder.py": {
+    "mtime": 1784209299.37482,
+    "ast_hash": "207f5e1fc26408d0d934bca55527e7bd",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/repository/mcp_client.py": {
+    "mtime": 1784276277.498295,
+    "ast_hash": "247f8d7f882cbd5fcb5d23f2030b1619",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/repository/okf_reader.py": {
+    "mtime": 1784317666.3694448,
+    "ast_hash": "df933978527b6c680761573e51b6e61a",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/repository/okf_writer.py": {
+    "mtime": 1784301955.6271563,
+    "ast_hash": "f61f859d300a5bfbaffe81ce6e758cb5",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/repository/repo_manager.py": {
+    "mtime": 1784275940.9471064,
+    "ast_hash": "81cb3ff4f8d81d2b4947c790c00c0591",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/repository/vector_store.py": {
+    "mtime": 1784189633.0932133,
+    "ast_hash": "9335ae579b9398b6410925aa9052b838",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/validation/__init__.py": {
+    "mtime": 1784140493.3487892,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/validation/boq_validator.py": {
+    "mtime": 1784185179.3798451,
+    "ast_hash": "caf1f403a97d51bb42d8d2ea5f274b4b",
+    "semantic_hash": ""
+  },
+  "ikp_platform/core/validation/validator.py": {
+    "mtime": 1784276987.866927,
+    "ast_hash": "5ba9c3c51c0e53fd60950254e62bb290",
+    "semantic_hash": ""
+  },
+  "ikp_platform/mcp_server.py": {
+    "mtime": 1784143736.8509052,
+    "ast_hash": "6e31cd0b0ceb57c2c2c9d4e6e10e271d",
+    "semantic_hash": ""
+  },
+  "ikp_platform/scripts/ingest_catalog.py": {
+    "mtime": 1784189350.1537485,
+    "ast_hash": "aaf9fff23deb95028e2ee6a948c33477",
+    "semantic_hash": ""
+  },
+  "ikp_platform/utils/logger.py": {
+    "mtime": 1784141589.9924967,
+    "ast_hash": "272aa4c6f81bb72a7a6e9fae6dead78e",
+    "semantic_hash": ""
+  },
+  "ikp_web/.oxlintrc.json": {
+    "mtime": 1784143794.4437492,
+    "ast_hash": "029f4905006c1fffd96bc863e2d98d3e",
+    "semantic_hash": ""
+  },
+  "ikp_web/package.json": {
+    "mtime": 1784143831.0843384,
+    "ast_hash": "54fa21977ad66b932f3d62779ddc89e2",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/App.tsx": {
+    "mtime": 1784278185.085373,
+    "ast_hash": "a749f7dd113a57e1a86530cb11100755",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/main.tsx": {
+    "mtime": 1784143794.4757495,
+    "ast_hash": "787e5a07efeb2bf6209d5937195f2f68",
+    "semantic_hash": ""
+  },
+  "ikp_web/tsconfig.app.json": {
+    "mtime": 1784143794.4757495,
+    "ast_hash": "5f2dafd737dea8a4ddcbb10f5113ac5a",
+    "semantic_hash": ""
+  },
+  "ikp_web/tsconfig.json": {
+    "mtime": 1784143794.4757495,
+    "ast_hash": "a3d39fa780ebff65444de257f291ce6c",
+    "semantic_hash": ""
+  },
+  "ikp_web/tsconfig.node.json": {
+    "mtime": 1784143794.4757495,
+    "ast_hash": "f9cb81ddcea69ffdab672fc8c48dca66",
+    "semantic_hash": ""
+  },
+  "ikp_web/vite.config.ts": {
+    "mtime": 1784143794.4757495,
+    "ast_hash": "88439104b3c207f17d33ef3160e3b080",
+    "semantic_hash": ""
+  },
+  "tests/__init__.py": {
+    "mtime": 1784139916.6128798,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "tests/test_api_endpoints.py": {
+    "mtime": 1784183073.8993874,
+    "ast_hash": "d513d1aa26112616951d30c3e9da22af",
+    "semantic_hash": ""
+  },
+  "tests/test_category_limits.py": {
+    "mtime": 1784208989.2757015,
+    "ast_hash": "302fa3318b6cf85a7ab3ccf618b69fc7",
+    "semantic_hash": ""
+  },
+  "tests/test_foundation.py": {
+    "mtime": 1784222390.1165378,
+    "ast_hash": "0874497c3210b07485a0e6fe6523adec",
+    "semantic_hash": ""
+  },
+  "tests/test_fuzzy_matching.py": {
+    "mtime": 1784208886.728464,
+    "ast_hash": "732ee591ef3b4a9e273b8d68b975fc3e",
+    "semantic_hash": ""
+  },
+  "tests/test_ingestion.py": {
+    "mtime": 1784222545.34872,
+    "ast_hash": "f110b1200efb73985a56a72447e881bb",
+    "semantic_hash": ""
+  },
+  "tests/test_mcp_integration.py": {
+    "mtime": 1784182910.0308638,
+    "ast_hash": "a568a26a51da6a34c751cc0bdfcba428",
+    "semantic_hash": ""
+  },
+  "tests/test_reasoning.py": {
+    "mtime": 1784182897.1332395,
+    "ast_hash": "cb864729e63e51197c0abb0504ca1e72",
+    "semantic_hash": ""
+  },
+  "tests/test_topology.py": {
+    "mtime": 1784208888.7604444,
+    "ast_hash": "5fce92791e7a0bfefec0b10a4e9598d7",
+    "semantic_hash": ""
+  },
+  "tools/agy": {
+    "mtime": 1784274582.1461194,
+    "ast_hash": "e5e1d2440bddfee3099523001f39addb",
+    "semantic_hash": ""
+  },
+  "tools/pip": {
+    "mtime": 1784274594.8743305,
+    "ast_hash": "6b98eba76e440a99e01d6463e466a79f",
+    "semantic_hash": ""
+  },
+  "tools/python": {
+    "mtime": 1784274594.1383185,
+    "ast_hash": "fa6cf5dc8764fb64a5e2fa18cb41a003",
+    "semantic_hash": ""
+  },
+  "CONTEXT.md": {
+    "mtime": 1784319188.1654806,
+    "ast_hash": "2b07b696e04b798568db3b8f9aba360e",
+    "semantic_hash": ""
+  },
+  "LOG.md": {
+    "mtime": 1784319188.1374812,
+    "ast_hash": "340cd0afd8925bc4138258d1a71e8245",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1784274606.918529,
+    "ast_hash": "14c17cceb47bfbc1d63ced5134dafd6d",
+    "semantic_hash": ""
+  },
+  "STATE.md": {
+    "mtime": 1784319188.1334813,
+    "ast_hash": "7110230e6a387b61f72b4a5f5abbd1ad",
+    "semantic_hash": ""
+  },
+  "ikp_web/index.html": {
+    "mtime": 1784143794.4437492,
+    "ast_hash": "ece9ff0fcf36ea9e06937d06208e510f",
+    "semantic_hash": ""
+  },
+  "requirements.txt": {
+    "mtime": 1784208684.043501,
+    "ast_hash": "db66a39c4dda9015b9b495483918ba94",
+    "semantic_hash": ""
+  },
+  "sources/pdfs/DL580_Gen12_QuickSpecs.pdf": {
+    "mtime": 1784188654.6069992,
+    "ast_hash": "22cd5a7cefb363a9ac951acf04c6f3d8",
+    "semantic_hash": ""
+  },
+  "sources/pdfs/HPE Alletra Storage MP B10000 QuickSpecs-a50006985enw.pdf": {
+    "mtime": 1784188654.6910005,
+    "ast_hash": "a56ab3356c17774b517c73068052e81b",
+    "semantic_hash": ""
+  },
+  "sources/pdfs/HPE ProLiant Compute DL380 Gen12 QuickSpecs-a00073551enw.pdf": {
+    "mtime": 1784140609.6396136,
+    "ast_hash": "a90dd5dca334554a2498d125194578c6",
+    "semantic_hash": ""
+  },
+  "ikp_web/public/favicon.svg": {
+    "mtime": 1784143794.4477491,
+    "ast_hash": "7e840862161341271697daa99a40d76b",
+    "semantic_hash": ""
+  },
+  "ikp_web/public/icons.svg": {
+    "mtime": 1784143794.4477491,
+    "ast_hash": "3b4fcfcf393eca4d264dca4a4663bc37",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/assets/hero.png": {
+    "mtime": 1784143794.4477491,
+    "ast_hash": "aead493361b27e7510691c5d7072dfc1",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/assets/react.svg": {
+    "mtime": 1784143794.4477491,
+    "ast_hash": "f0402b67b6ce880f65666bb49e841696",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/assets/vite.svg": {
+    "mtime": 1784143794.4757495,
+    "ast_hash": "9960a24288958394ac50e57ff638b036",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/components/BoqValidation.tsx": {
+    "mtime": 1784278181.0412674,
+    "ast_hash": "6361dd07ad9b3f192ca42153fac001ee",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/components/PlatformDashboard.tsx": {
+    "mtime": 1784278154.5845714,
+    "ast_hash": "c7d27e88258e555968750bd9c2b440f8",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/components/SemanticSearch.tsx": {
+    "mtime": 1784278183.05732,
+    "ast_hash": "73e4178440069ce024fd52edb237ecda",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/components/Sidebar.tsx": {
+    "mtime": 1784278150.456462,
+    "ast_hash": "f50e8fe97f4170b9723fe6db12d81950",
+    "semantic_hash": ""
+  },
+  "ikp_web/src/components/SolutionSynthesis.tsx": {
+    "mtime": 1784278152.5445173,
+    "ast_hash": "b8e90819172dcf291d8d2e491df93e5f",
+    "semantic_hash": ""
+  },
+  "pyproject.toml": {
+    "mtime": 1784276147.0156553,
+    "ast_hash": "7c3e119f0b92739ab75587d7615132e9",
+    "semantic_hash": ""
+  },
+  "tests/conftest.py": {
+    "mtime": 1784277255.3113036,
+    "ast_hash": "cbe14a295cdab2f884643d8604089141",
+    "semantic_hash": ""
+  },
+  "tests/integration/test_domain_isolation.py": {
+    "mtime": 1784187591.144508,
+    "ast_hash": "72ab199ac9b4a524318aa8dda35d905e",
+    "semantic_hash": ""
+  },
+  "tests/integration/test_gen12_ingestion.py": {
+    "mtime": 1784185759.8655312,
+    "ast_hash": "d63a6e588e29ac5fefcf828467771dde",
+    "semantic_hash": ""
+  },
+  "tests/integration/test_real_boq.py": {
+    "mtime": 1784188864.8946066,
+    "ast_hash": "f56a47677cb143565fad239b00a9c707",
+    "semantic_hash": ""
+  },
+  "tests/integration/test_storage_ingestion.py": {
+    "mtime": 1784186272.587525,
+    "ast_hash": "cace20f22d802a2c8a0d8e650c327ff5",
+    "semantic_hash": ""
+  },
+  "tests/test_limit.py": {
+    "mtime": 1784209430.5339696,
+    "ast_hash": "f7d74c4c43cf68c554af63c632e35e05",
+    "semantic_hash": ""
+  },
+  "tests/test_limit_engine.py": {
+    "mtime": 1784209502.8191445,
+    "ast_hash": "ff76c362bc344c71f9aeb06ca2e0de90",
+    "semantic_hash": ""
+  },
+  "tests/test_script.py": {
+    "mtime": 1784201289.7276483,
+    "ast_hash": "bc61fdcc6c0fd59f1c9d1be6d6248735",
+    "semantic_hash": ""
+  },
+  "verify_all.py": {
+    "mtime": 1784318110.9099321,
+    "ast_hash": "d7019bfee6765bc0f6412fbc8df5e84a",
+    "semantic_hash": ""
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1784277276.6400332,
+    "ast_hash": "5532ad2db3d2484a5fccfaa987c58623",
+    "semantic_hash": ""
+  }
+}
