@@ -1,0 +1,332 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme",
+      "community": 1,
+      "community_name": "Vendorsolution OKF",
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "Vendorsolution OKF",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme_vendorsolution_okf",
+      "community": 1,
+      "community_name": "Vendorsolution OKF",
+      "norm_label": "vendorsolution okf"
+    },
+    {
+      "label": "Cross-Platform Toolchain Setup",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "readme_cross_platform_toolchain_setup",
+      "community": 2,
+      "community_name": "Cross-Platform Toolchain Setup",
+      "norm_label": "cross-platform toolchain setup"
+    },
+    {
+      "label": "1. Add `tools/` to your PATH",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "readme_1_add_tools_to_your_path",
+      "community": 2,
+      "community_name": "Cross-Platform Toolchain Setup",
+      "norm_label": "1. add `tools/` to your path"
+    },
+    {
+      "label": "2. Frontend (ikp_web)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "readme_2_frontend_ikp_web",
+      "community": 2,
+      "community_name": "Cross-Platform Toolchain Setup",
+      "norm_label": "2. frontend (ikp_web)"
+    },
+    {
+      "label": "Agent Configuration",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "readme_agent_configuration",
+      "community": 1,
+      "community_name": "Vendorsolution OKF",
+      "norm_label": "agent configuration"
+    },
+    {
+      "label": "STATE.md",
+      "file_type": "document",
+      "source_file": "STATE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "state",
+      "community": 0,
+      "community_name": "IKP Platform State",
+      "norm_label": "state.md"
+    },
+    {
+      "label": "IKP Platform State",
+      "file_type": "document",
+      "source_file": "STATE.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "state_ikp_platform_state",
+      "community": 0,
+      "community_name": "IKP Platform State",
+      "norm_label": "ikp platform state"
+    },
+    {
+      "label": "Knowledge Graph Statistics",
+      "file_type": "document",
+      "source_file": "STATE.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "state_knowledge_graph_statistics",
+      "community": 0,
+      "community_name": "IKP Platform State",
+      "norm_label": "knowledge graph statistics"
+    },
+    {
+      "label": "Objects by Type",
+      "file_type": "document",
+      "source_file": "STATE.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "state_objects_by_type",
+      "community": 0,
+      "community_name": "IKP Platform State",
+      "norm_label": "objects by type"
+    },
+    {
+      "label": "agy",
+      "file_type": "code",
+      "source_file": "tools/agy",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "id": "tools_agy",
+      "community": 3,
+      "community_name": "agy",
+      "norm_label": "agy"
+    },
+    {
+      "label": "agy script",
+      "file_type": "code",
+      "source_file": "tools/agy",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "id": "tools_agy__entry",
+      "community": 3,
+      "community_name": "agy",
+      "norm_label": "agy script"
+    },
+    {
+      "label": "pip",
+      "file_type": "code",
+      "source_file": "tools/pip",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "id": "tools_pip",
+      "community": 4,
+      "community_name": "pip",
+      "norm_label": "pip"
+    },
+    {
+      "label": "pip script",
+      "file_type": "code",
+      "source_file": "tools/pip",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "id": "tools_pip__entry",
+      "community": 4,
+      "community_name": "pip",
+      "norm_label": "pip script"
+    },
+    {
+      "label": "python",
+      "file_type": "code",
+      "source_file": "tools/python",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "id": "tools_python",
+      "community": 5,
+      "community_name": "python",
+      "norm_label": "python"
+    },
+    {
+      "label": "python script",
+      "file_type": "code",
+      "source_file": "tools/python",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "id": "tools_python__entry",
+      "community": 5,
+      "community_name": "python",
+      "norm_label": "python script"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme",
+      "target": "readme_vendorsolution_okf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_vendorsolution_okf",
+      "target": "readme_agent_configuration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_vendorsolution_okf",
+      "target": "readme_cross_platform_toolchain_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_cross_platform_toolchain_setup",
+      "target": "readme_1_add_tools_to_your_path",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "readme_cross_platform_toolchain_setup",
+      "target": "readme_2_frontend_ikp_web",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "STATE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "state",
+      "target": "state_ikp_platform_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "STATE.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "state_ikp_platform_state",
+      "target": "state_knowledge_graph_statistics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "STATE.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "state_ikp_platform_state",
+      "target": "state_objects_by_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/agy",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_agy",
+      "target": "tools_agy__entry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/pip",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_pip",
+      "target": "tools_pip__entry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tools/python",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tools_python",
+      "target": "tools_python__entry",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "52ac255d3b483c473701f48055e73c397d99dfe4"
+}
