@@ -230,8 +230,8 @@
     "semantic_hash": ""
   },
   "tests/test_ingestion.py": {
-    "mtime": 1784319552.8889704,
-    "ast_hash": "839a1fcf9ecc4ad337e5b0a1b31fe431",
+    "mtime": 1784319629.1686816,
+    "ast_hash": "b4ff1b4ac27ce914606ec8cb778510a7",
     "semantic_hash": ""
   },
   "tests/test_mcp_integration.py": {
@@ -280,8 +280,8 @@
     "semantic_hash": ""
   },
   "STATE.md": {
-    "mtime": 1784319569.0938182,
-    "ast_hash": "91efda569931f0d6263e02ca7ec35e39",
+    "mtime": 1784319617.0041358,
+    "ast_hash": "be7c312a19281c08354f1097da5185da",
     "semantic_hash": ""
   },
   "ikp_web/index.html": {
