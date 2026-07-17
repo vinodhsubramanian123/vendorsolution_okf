@@ -34,7 +34,7 @@ tmp/
 .temp/
 
 # Graphify
-graphify-out/cost.json
+graphify-out/
 
 # Obsidian Vault Artifacts
 .obsidian/
