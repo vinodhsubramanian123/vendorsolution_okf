@@ -62,4 +62,4 @@ class TestIngestion:
         comp = [c for c in components if c.type.value == "Component"][0]
         sku = [c for c in components if c.type.value == "SKU"][0]
         assert comp.title.startswith("P48803-B21")
-        assert sku.title == "P48803-B21"
+        assert sku.title == "SKU P48803-B21"
