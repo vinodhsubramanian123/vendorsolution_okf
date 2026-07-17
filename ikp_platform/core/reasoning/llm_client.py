@@ -76,7 +76,7 @@ Output ONLY valid JSON.
             # Fallback to empty if LLM fails
             return {"workloads": [], "vendor_preference": None, "target_platform": None, "budget": None, "requirements": []}
 
-    def select_components(self, platform_id: str, available_nodes: Dict[str, Any], requirements: List[Dict[str, Any]]) -> List[str]:
+    def select_components(self, platform_id: str, available_nodes: Dict[str, Any], requirements: List[Dict[str, Any]], profile: str = "Balanced") -> List[str]:
         """
         Ask Gemini to select the optimal subset of components from a given list that satisfies the requirements.
         """
@@ -88,6 +88,10 @@ Rules:
 1. You MUST include components that satisfy requirements with priority "required".
 2. You MUST include components that satisfy requirements with priority "preferred" if a suitable component is available in the list.
 3. Minimize the total number of components selected while meeting these goals.
+4. Optimize component selection for the following profile: "{profile}".
+   - If "Lowest Cost", heavily prefer components that are cheaper, base models, or lower capacity.
+   - If "Performance Optimized", heavily prefer components that are faster, high-end, or enterprise-grade.
+   - If "Balanced", balance cost and performance reasonably.
 
 Customer Requirements:
 {json.dumps(requirements, indent=2)}
@@ -132,7 +136,7 @@ Output ONLY valid JSON in the following format:
                 raise ValueError("No Gemini API client configured")
                 
             response = self.client.models.embed_content(
-                model='text-embedding-004',
+                model='text-embedding-005',
                 contents=texts
             )
             # The response from google.genai has an 'embeddings' attribute which is a list of objects 

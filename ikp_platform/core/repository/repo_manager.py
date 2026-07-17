@@ -10,7 +10,7 @@ Responsibilities:
 """
 
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from ikp_platform.core.ontology.models import (
@@ -134,7 +134,7 @@ class RepoManager:
 
         lines = [
             "# IKP Platform State\n",
-            f"**Last Updated**: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n",
+            f"**Last Updated**: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n",
             "## Knowledge Graph Statistics\n",
             f"| Metric | Value |",
             f"|--------|-------|",
@@ -156,8 +156,8 @@ class RepoManager:
     def _append_root_log(self, description: str) -> None:
         """Append an entry to the project root LOG.md."""
         log_path = self.project_root / "LOG.md"
-        today = datetime.utcnow().strftime("%Y-%m-%d")
-        time_str = datetime.utcnow().strftime("%H:%M:%S UTC")
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        time_str = datetime.now(timezone.utc).strftime("%H:%M:%S UTC")
 
         entry = f"* `{time_str}` — {description}\n"
 
@@ -229,7 +229,7 @@ class RepoManager:
 
         lines = [
             "# IKP Engineering Context\n",
-            f"**Last Updated**: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n",
+            f"**Last Updated**: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n",
             "## Coverage\n",
         ]
 

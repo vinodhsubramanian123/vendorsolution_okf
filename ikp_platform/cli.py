@@ -152,8 +152,16 @@ def cmd_scan():
         return
 
     logger.info(f"Found {len(new_files)} new source file(s)")
+    success = 0
+    failed = 0
     for f in new_files:
-        cmd_ingest(f)
+        try:
+            cmd_ingest(f)
+            success += 1
+        except Exception as e:
+            logger.error(f"Failed to ingest {f}: {e}")
+            failed += 1
+    logger.info(f"Scan complete: {success} succeeded, {failed} failed out of {len(new_files)} files")
 
 
 def cmd_query(query_text: str):

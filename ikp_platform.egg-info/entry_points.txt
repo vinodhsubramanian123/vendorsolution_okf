@@ -1,0 +1,2 @@
+[console_scripts]
+ikp = ikp_platform.cli:main

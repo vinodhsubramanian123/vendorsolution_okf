@@ -11,7 +11,7 @@ clear interface for future portal API integration.
 
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 
 from ikp_platform.core.ontology.models import (
@@ -45,7 +45,7 @@ class ValidationResult(BaseModel):
     validation_id: str = Field(default_factory=lambda: f"VAL-{str(uuid.uuid4())[:8]}")
     solution_id: str
     validator_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_valid: bool = False
     messages: List[ValidationMessage] = []
     configuration_errors: List[str] = []

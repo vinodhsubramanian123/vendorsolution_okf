@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ikp_platform"
+version = "0.1.0"
+description = "IKP (Intelligent Knowledge Platform) Core System"
+authors = [
+    {name = "IKP Team"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "pydantic>=2.0.0",
+    "networkx>=3.1",
+    "pyyaml>=6.0.1",
+    "pdfplumber>=0.10.2",
+    "pandas>=2.0.0",
+    "pymupdf>=1.23.0",
+    "mcp>=1.2.0",
+    "chromadb>=0.4.22",
+    "google-genai>=0.2.0",
+    "typing-extensions>=4.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+ikp = "ikp_platform.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ikp_platform*"]

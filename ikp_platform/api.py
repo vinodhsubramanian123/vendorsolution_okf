@@ -89,34 +89,11 @@ async def query_solution(request: QueryRequest):
     parser = IntentParser()
     try:
         parsed_request = parser.parse_request(request.query)
-        generator = SolutionGenerator(repo.graph, repo.vector_store)
+        generator = SolutionGenerator(repo.graph, repo.vector_store, repo.mcp_client)
         candidates = generator.generate(parsed_request)
         
-        # Format candidate rules for UI clarity
-        formatted_candidates = []
-        for c in candidates:
-            c_dict = c.model_dump()
-            formatted_evals = []
-            if "rule_evaluations" in c_dict:
-                for ev in c_dict["rule_evaluations"]:
-                    # Try to fetch actual rule text from graph if available
-                    rule_text = "Unknown Rule"
-                    if "rule_id" in ev and ev["rule_id"] in repo.graph.graph:
-                        rule_data = repo.graph.graph.nodes[ev["rule_id"]]
-                        rule_text = rule_data.get("description") or rule_data.get("title") or ev["rule_id"]
-                    
-                    # Instead of generic title, use the text
-                    formatted_evals.append({
-                        "rule_id": ev.get("rule_id"),
-                        "title": rule_text,
-                        "status": ev.get("status"),
-                        "severity": ev.get("severity"),
-                        "message": ev.get("message", ""),
-                        "confidence": ev.get("confidence", "UNKNOWN"),
-                        "trace": ev.get("trace", "")
-                    })
-                c_dict["rule_evaluations"] = formatted_evals
-            formatted_candidates.append(c_dict)
+        # Format candidate output for UI
+        formatted_candidates = [c.model_dump() for c in candidates]
             
         return {
             "request_id": parsed_request.request_id,
@@ -226,7 +203,7 @@ async def validate_boq(request: BOQValidationRequest):
         
     return {
         "status": "success",
-        "is_valid": is_valid and boq_result.is_valid,
+        "is_valid": is_valid,
         "fuzzy_matches": [m.model_dump() for m in boq_result.messages if m.severity == "Info"],
         "invalid_skus": [m.model_dump() for m in boq_result.messages if m.severity == "Error"],
         "corrected_components": corrected_components,
@@ -258,3 +235,7 @@ async def semantic_search(request: SearchRequest):
         "query": request.query,
         "results": formatted_results
     }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("ikp_platform.api:app", host="0.0.0.0", port=8000, reload=True)

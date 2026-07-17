@@ -1,5 +1,1145 @@
 # IKP Operations Log
 
+## 2026-07-17
+* `20:12:48 UTC` — Added Rule: Engineering Rule 63
+
+* `20:12:48 UTC` — Added Rule: Engineering Rule 62
+
+* `20:12:47 UTC` — Added Rule: Engineering Rule 61
+
+* `20:12:47 UTC` — Added Rule: Engineering Rule 60
+
+* `20:12:47 UTC` — Added Rule: Engineering Rule 59
+
+* `20:12:47 UTC` — Added Rule: Engineering Rule 58
+
+* `20:12:47 UTC` — Added Rule: Engineering Rule 57
+
+* `20:12:47 UTC` — Added Rule: Engineering Rule 56
+
+* `20:12:47 UTC` — Added Rule: Engineering Rule 55
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 54
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 53
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 52
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 51
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 50
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 49
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 48
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 47
+
+* `20:12:46 UTC` — Added Rule: Engineering Rule 46
+
+* `20:12:45 UTC` — Added Rule: Engineering Rule 45
+
+* `20:12:45 UTC` — Added Rule: Engineering Rule 44
+
+* `20:12:45 UTC` — Added Rule: Engineering Rule 43
+
+* `20:12:45 UTC` — Added Rule: Engineering Rule 42
+
+* `20:12:45 UTC` — Added Rule: Engineering Rule 41
+
+* `20:12:45 UTC` — Added Rule: Engineering Rule 40
+
+* `20:12:45 UTC` — Added Rule: Engineering Rule 39
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 38
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 37
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 36
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 35
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 34
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 33
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 32
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 31
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 30
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 29
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 28
+
+* `20:12:44 UTC` — Added Rule: Engineering Rule 27
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 26
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 25
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 24
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 23
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 22
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 21
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 20
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 19
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 18
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 17
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 16
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 15
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 14
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 13
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 12
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 11
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 10
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 9
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 8
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 7
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 6
+
+* `20:12:43 UTC` — Added Rule: Engineering Rule 5
+
+* `20:12:42 UTC` — Added Rule: Engineering Rule 4
+
+* `20:12:42 UTC` — Added Rule: Engineering Rule 3
+
+* `20:12:42 UTC` — Added Rule: Engineering Rule 2
+
+* `20:12:42 UTC` — Added Rule: Engineering Rule 1
+
+* `20:12:42 UTC` — Added Component: NVIDIA RTX A1000 8GB
+
+* `20:12:42 UTC` — Added Component: NVIDIA L4 24GB
+
+* `20:12:42 UTC` — Added Component: NVIDIA RTX PRO 4500 Blackwell Server Edition 32GB
+
+* `20:12:42 UTC` — Added Component: NVIDIA L40S 48GB
+
+* `20:12:42 UTC` — Added Component: NVIDIA RTX PRO 6000D 84GB
+
+* `20:12:41 UTC` — Added Component: NVIDIA RTX PRO 6000 Blackwell Server Edition 96GB
+
+* `20:12:41 UTC` — Added Component: NVIDIA RTX PRO 6000 96GB
+
+* `20:12:41 UTC` — Added Component: NVIDIA H200 NVL 141GB
+
+* `20:12:41 UTC` — Added Component: OCP 3.0 Network Adapter Slot
+
+* `20:12:41 UTC` — Added Category Limit: Maximum EDSFF Drives
+
+* `20:12:41 UTC` — Added Category Limit: Maximum LFF Drives
+
+* `20:12:41 UTC` — Added Category Limit: Maximum SFF Drives
+
+* `20:12:41 UTC` — Added Category Limit: DIMM Slot Count
+
+* `20:12:41 UTC` — Added Category Limit: Maximum Memory Capacity
+
+* `20:12:40 UTC` — Added Component: Intel Xeon 6 6788P
+
+* `20:12:40 UTC` — Added Component: Intel Xeon 6 6768P
+
+* `20:12:40 UTC` — Added Component: Intel Xeon 6 6748P
+
+* `20:12:39 UTC` — Added Component: Intel Xeon 6 6738P
+
+* `20:12:39 UTC` — Added Component: Intel Xeon 6 6728P
+
+* `20:12:39 UTC` — Added Component: Intel Xeon 6 6724P
+
+* `20:12:39 UTC` — Added Component: Intel Xeon 6 6714P
+
+* `20:12:38 UTC` — Added Component: Intel Xeon 6 6760P
+
+* `20:12:38 UTC` — Added Component: Intel Xeon 6 6740P
+
+* `20:12:38 UTC` — Added Component: Intel Xeon 6 6530P
+
+* `20:12:38 UTC` — Added Component: Intel Xeon 6 6520P
+
+* `20:12:37 UTC` — Added Component: Intel Xeon 6 6515P
+
+* `20:12:37 UTC` — Added Component: Intel Xeon 6 6505P
+
+* `20:12:37 UTC` — Added Component: Intel Xeon 6 6787P
+
+* `20:12:36 UTC` — Added Component: Intel Xeon 6 6767P
+
+* `20:12:36 UTC` — Added Component: Intel Xeon 6 6762P
+
+* `20:12:36 UTC` — Added Component: Intel Xeon 6 6747P
+
+* `20:12:36 UTC` — Added Component: Intel Xeon 6 6745P
+
+* `20:12:35 UTC` — Added Component: Intel Xeon 6 6737P
+
+* `20:12:35 UTC` — Added Component: Intel Xeon 6 6736P
+
+* `20:12:35 UTC` — Added Component: Intel Xeon 6 6732P
+
+* `20:12:34 UTC` — Added Component: Intel Xeon 6 6730P
+
+* `20:12:34 UTC` — Added Component: Intel Xeon 6 6725P
+
+* `20:12:34 UTC` — Added Component: Intel Xeon 6 6527P
+
+* `20:12:34 UTC` — Added Component: Intel Xeon 6 6517P
+
+* `20:12:34 UTC` — Added Component: Intel Xeon 6 6507P
+
+* `20:12:33 UTC` — Added Component: Intel Xeon 6 6780E
+
+* `20:12:33 UTC` — Added Component: Intel Xeon 6 6766E
+
+* `20:12:33 UTC` — Added Component: Intel Xeon 6 6756E
+
+* `20:12:33 UTC` — Added Component: Intel Xeon 6 6746E
+
+* `20:12:32 UTC` — Added Component: Intel Xeon 6 6740E
+
+* `20:12:32 UTC` — Added Component: Intel Xeon 6 6731E
+
+* `20:12:32 UTC` — Added Component: Intel Xeon 6 6710E
+
+* `20:12:32 UTC` — Added Platform: HPE ProLiant DL380 Gen12
+
+* `20:10:41 UTC` — Added SKU: SKU P69728-B21
+
+* `20:10:41 UTC` — Added Component: P69728-B21 - 
+
+* `20:10:41 UTC` — Added SKU: SKU P74508-B21
+
+* `20:10:40 UTC` — Added Component: P74508-B21 - 
+
+* `20:10:40 UTC` — Added SKU: SKU H49SXE
+
+* `20:10:40 UTC` — Added Component: H49SXE - 
+
+* `20:10:40 UTC` — Added SKU: SKU H49SWE
+
+* `20:10:40 UTC` — Added Component: H49SWE - 
+
+* `20:10:40 UTC` — Added SKU: SKU H49RSE
+
+* `20:10:40 UTC` — Added Component: H49RSE - 
+
+* `20:10:39 UTC` — Added SKU: SKU U4555E
+
+* `20:10:39 UTC` — Added Component: U4555E - 
+
+* `20:10:39 UTC` — Added SKU: SKU R7N87A
+
+* `20:10:39 UTC` — Added Component: R7N87A - 
+
+* `20:10:39 UTC` — Added SKU: SKU SN1700Q
+
+* `20:10:39 UTC` — Added Component: SN1700Q - HPE  64Gb 1-port Fibre Channel Host Bus Adapter
+
+* `20:10:38 UTC` — Added SKU: SKU SN1610Q
+
+* `20:10:38 UTC` — Added Component: SN1610Q - HPE  32Gb 1-port Fibre Channel Host Bus Adapter
+
+* `20:10:38 UTC` — Added SKU: SKU 726537-B21
+
+* `20:10:38 UTC` — Added Component: 726537-B21 - 
+
+* `20:10:38 UTC` — Added SKU: SKU A0K02A
+
+* `20:10:38 UTC` — Added Component: A0K02A - A standard 6-foot IEC C-13/C-14 jumper cord () is ...
+
+* `20:10:37 UTC` — Added SKU: SKU P03178-B21
+
+* `20:10:37 UTC` — Added Component: P03178-B21 - for single-output. HPE Flexible Slot power supplie...
+
+* `20:10:37 UTC` — Added SKU: SKU S0V52A
+
+* `20:10:37 UTC` — Added Component: S0V52A - With over 75,000 server deployments, HPE is a worl...
+
+* `20:10:37 UTC` — Added SKU: SKU P83540-B21
+
+* `20:10:37 UTC` — Added Component: P83540-B21 - SKU Number
+
+* `20:10:37 UTC` — Added SKU: SKU P36394-B21
+
+* `20:10:36 UTC` — Added Component: P36394-B21 - – Optional.
+
+* `20:10:36 UTC` — Added SKU: SKU P75399-B21
+
+* `20:10:36 UTC` — Added Component: P75399-B21 - SKU Number
+
+* `20:10:36 UTC` — Added SKU: SKU 32EDSFF
+
+* `20:10:36 UTC` — Added Component: 32EDSFF - 
+
+* `20:10:36 UTC` — Added SKU: SKU P80421-B21
+
+* `20:10:36 UTC` — Added Component: P80421-B21 - 4
+
+* `20:10:35 UTC` — Added SKU: SKU P80399-B21
+
+* `20:10:35 UTC` — Added Component: P80399-B21 - N/A
+
+* `20:10:35 UTC` — Added SKU: SKU 24EDSFF
+
+* `20:10:35 UTC` — Added Component: 24EDSFF - 
+
+* `20:10:35 UTC` — Added SKU: SKU P80419-B21
+
+* `20:10:35 UTC` — Added Component: P80419-B21 - 3
+
+* `20:10:34 UTC` — Added SKU: SKU P80398-B21
+
+* `20:10:34 UTC` — Added Component: P80398-B21 - N/A
+
+* `20:10:34 UTC` — Added SKU: SKU 16EDSFF
+
+* `20:10:34 UTC` — Added Component: 16EDSFF - 
+
+* `20:10:34 UTC` — Added SKU: SKU P81003-B21
+
+* `20:10:34 UTC` — Added Component: P81003-B21 - 4
+
+* `20:10:33 UTC` — Added SKU: SKU P80418-B21
+
+* `20:10:33 UTC` — Added Component: P80418-B21 - 2
+
+* `20:10:33 UTC` — Added SKU: SKU P80397-B21
+
+* `20:10:33 UTC` — Added Component: P80397-B21 - N/A
+
+* `20:10:33 UTC` — Added SKU: SKU 8EDSFF
+
+* `20:10:33 UTC` — Added Component: 8EDSFF - 
+
+* `20:10:33 UTC` — Added SKU: SKU P81001-B21
+
+* `20:10:33 UTC` — Added Component: P81001-B21 - 2
+
+* `20:10:32 UTC` — Added SKU: SKU P80417-B21
+
+* `20:10:32 UTC` — Added Component: P80417-B21 - 1
+
+* `20:10:32 UTC` — Added SKU: SKU P80396-B21
+
+* `20:10:32 UTC` — Added Component: P80396-B21 - N/A
+
+* `20:10:32 UTC` — Added SKU: SKU P80395-B21
+
+* `20:10:32 UTC` — Added Component: P80395-B21 - 2
+
+* `20:10:32 UTC` — Added SKU: SKU P80390-B21
+
+* `20:10:32 UTC` — Added Component: P80390-B21 - 2
+
+* `20:10:31 UTC` — Added SKU: SKU P80394-B21
+
+* `20:10:31 UTC` — Added Component: P80394-B21 - 2
+
+* `20:10:31 UTC` — Added SKU: SKU P80389-B21
+
+* `20:10:31 UTC` — Added Component: P80389-B21 - 2
+
+* `20:10:31 UTC` — Added SKU: SKU P80409-B21
+
+* `20:10:31 UTC` — Added Component: P80409-B21 - 2
+
+* `20:10:31 UTC` — Added SKU: SKU P80393-B21
+
+* `20:10:31 UTC` — Added Component: P80393-B21 - 1
+
+* `20:10:30 UTC` — Added SKU: SKU P80388-B21
+
+* `20:10:30 UTC` — Added Component: P80388-B21 - 1
+
+* `20:10:30 UTC` — Added SKU: SKU P80408-B21
+
+* `20:10:30 UTC` — Added Component: P80408-B21 - 2
+
+* `20:10:30 UTC` — Added SKU: SKU P80391-B21
+
+* `20:10:30 UTC` — Added Component: P80391-B21 - 1
+
+* `20:10:30 UTC` — Added SKU: SKU P80387-B21
+
+* `20:10:30 UTC` — Added Component: P80387-B21 - 1
+
+* `20:10:29 UTC` — Added SKU: SKU P80380-B21
+
+* `20:10:29 UTC` — Added Component: P80380-B21 - Full-height, ¾ length slot
+
+* `20:10:29 UTC` — Added SKU: SKU P811004
+
+* `20:10:29 UTC` — Added Component: P811004 - Full-height, ¾ length slot
+
+* `20:10:29 UTC` — Added SKU: SKU P81004-B21
+
+* `20:10:29 UTC` — Added Component: P81004-B21 - Full-height, ¾ length slot
+
+* `20:10:29 UTC` — Added SKU: SKU P80381-B21
+
+* `20:10:29 UTC` — Added Component: P80381-B21 - Full-height, ¾ length slot
+
+* `20:10:28 UTC` — Added SKU: SKU 5200MT
+
+* `20:10:28 UTC` — Added Component: 5200MT - 16.0 TB 64 x 256 GB RDIMM 6400 MT/s @ 1DPC and /s ...
+
+* `20:10:28 UTC` — Added SKU: SKU 12EDSFF
+
+* `20:10:28 UTC` — Added Component: 12EDSFF - Box-6 ( shown)
+
+* `20:10:28 UTC` — Added Rule: Engineering Rule 42
+
+* `20:10:28 UTC` — Added Rule: Engineering Rule 41
+
+* `20:10:28 UTC` — Added Rule: Engineering Rule 40
+
+* `20:10:28 UTC` — Added Rule: Engineering Rule 39
+
+* `20:10:28 UTC` — Added Rule: Engineering Rule 38
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 37
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 36
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 35
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 34
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 33
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 32
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 31
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 30
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 29
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 28
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 27
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 26
+
+* `20:10:27 UTC` — Added Rule: Engineering Rule 25
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 24
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 23
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 22
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 21
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 20
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 19
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 18
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 17
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 16
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 15
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 14
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 13
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 12
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 11
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 10
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 9
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 8
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 7
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 6
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 5
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 4
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 3
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 2
+
+* `20:10:26 UTC` — Added Rule: Engineering Rule 1
+
+* `20:10:26 UTC` — Added Component: DDR5 Memory
+
+* `20:10:25 UTC` — Added Category Limit: DIMM Slot Count
+
+* `20:10:25 UTC` — Added Component: Intel Xeon 6 6788P
+
+* `20:10:25 UTC` — Added Component: Intel Xeon 6 6768P
+
+* `20:10:25 UTC` — Added Component: Intel Xeon 6 6748P
+
+* `20:10:25 UTC` — Added Component: Intel Xeon 6 6738P
+
+* `20:10:25 UTC` — Added Component: Intel Xeon 6 6728P
+
+* `20:10:24 UTC` — Added Component: Intel Xeon 6 6724P
+
+* `20:10:24 UTC` — Added Component: Intel Xeon 6 6714P
+
+* `20:10:24 UTC` — Added Workload: Virtualization
+
+* `20:10:24 UTC` — Added Platform: HPE ProLiant Compute DL580 Gen12
+
+* `20:08:14 UTC` — Added SKU: SKU S0R21B
+
+* `20:08:14 UTC` — Added Component: S0R21B - S0S41B, S4V66B, S4V67B, R7D02B, S0S42B, R7D03B, S0...
+
+* `20:08:14 UTC` — Added SKU: SKU R9S02A
+
+* `20:08:14 UTC` — Added Component: R9S02A - R9R66A, R9S03A, R9R67A.
+
+* `20:08:14 UTC` — Added SKU: SKU S0S39A
+
+* `20:08:14 UTC` — Added Component: S0S39A - Obsolete SKUs were removed - , S0S43A.
+
+* `20:08:14 UTC` — Added SKU: SKU B10240
+
+* `20:08:14 UTC` — Added Component: B10240 - controller nodes
+
+* `20:08:13 UTC` — Added SKU: SKU B10010
+
+* `20:08:13 UTC` — Added Component: B10010 - expansion shelf nodes
+
+* `20:08:13 UTC` — Added SKU: SKU B10140
+
+* `20:08:13 UTC` — Added Component: B10140 - controller nodes
+
+* `20:08:13 UTC` — Added SKU: SKU B10130
+
+* `20:08:13 UTC` — Added Component: B10130 - controller nodes
+
+* `20:08:13 UTC` — Added SKU: SKU B10230
+
+* `20:08:13 UTC` — Added Component: B10230 - 
+
+* `20:08:13 UTC` — Added SKU: SKU B10120
+
+* `20:08:13 UTC` — Added Component: B10120 - 
+
+* `20:08:12 UTC` — Added SKU: SKU B10000
+
+* `20:08:12 UTC` — Added Component: B10000 - − HPE Alletra Storage MP  is now NEBS Level 3 cert...
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 23
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 22
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 21
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 20
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 19
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 18
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 17
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 16
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 15
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 14
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 13
+
+* `20:08:12 UTC` — Added Rule: Engineering Rule 12
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 11
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 10
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 9
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 8
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 7
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 6
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 5
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 4
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 3
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 2
+
+* `20:08:11 UTC` — Added Rule: Engineering Rule 1
+
+* `20:08:11 UTC` — Added Workload: Analytics
+
+* `20:08:11 UTC` — Added Workload: Storage
+
+* `20:08:11 UTC` — Added Workload: Database
+
+* `20:08:11 UTC` — Added Workload: AI and Machine Learning
+
+* `20:08:11 UTC` — Added Platform: HPE Alletra Storage MP B10000
+
+* `20:05:41 UTC` — Added Rule: Engineering Rule 105
+
+* `20:05:41 UTC` — Added Rule: Engineering Rule 104
+
+* `20:05:41 UTC` — Added Rule: Engineering Rule 103
+
+* `20:05:41 UTC` — Added Rule: Engineering Rule 102
+
+* `20:02:30 UTC` — Added Rule: Engineering Rule 41
+
+* `20:02:30 UTC` — Added Rule: Engineering Rule 40
+
+* `20:02:30 UTC` — Added Rule: Engineering Rule 39
+
+* `20:02:30 UTC` — Added Rule: Engineering Rule 38
+
+* `20:02:29 UTC` — Added Rule: Engineering Rule 37
+
+* `19:55:48 UTC` — Added Category Limit: Max OCP Slots
+
+* `19:55:47 UTC` — Added SKU: SKU H49SXE
+
+* `19:55:47 UTC` — Added Component: H49SXE - 
+
+* `19:55:47 UTC` — Added SKU: SKU H49SWE
+
+* `19:55:47 UTC` — Added Component: H49SWE - 
+
+* `19:55:47 UTC` — Added SKU: SKU H49RSE
+
+* `19:55:47 UTC` — Added Component: H49RSE - 
+
+* `19:55:46 UTC` — Added SKU: SKU U4555E
+
+* `19:55:46 UTC` — Added Component: U4555E - 
+
+* `19:55:46 UTC` — Added SKU: SKU BD505A
+
+* `19:55:46 UTC` — Added Component: BD505A - Features ().
+
+* `19:55:46 UTC` — Added SKU: SKU P48922-B21
+
+* `19:55:45 UTC` — Added SKU: SKU DL380T
+
+* `19:55:45 UTC` — Added Component: DL380T - ProLiant Compute DL380 Gen12 is re-branded as a HP...
+
+* `19:55:45 UTC` — Added SKU: SKU P03178-B21
+
+* `19:55:45 UTC` — Added SKU: SKU 865438
+
+* `19:55:45 UTC` — Added Component: 865438 - output and 96% for single-output. HPE Flexible Slo...
+
+* `19:55:45 UTC` — Added SKU: SKU R7N87A
+
+* `19:55:45 UTC` — Added Component: R7N87A - 
+
+* `19:55:44 UTC` — Added SKU: SKU SN1700Q
+
+* `19:55:44 UTC` — Added Component: SN1700Q - HPE  64Gb 1-port Fibre Channel Host Bus Adapter
+
+* `19:55:44 UTC` — Added SKU: SKU SN1610Q
+
+* `19:55:44 UTC` — Added Component: SN1610Q - HPE  32Gb 1-port Fibre Channel Host Bus Adapter
+
+* `19:55:44 UTC` — Added SKU: SKU S5T74C
+
+* `19:55:44 UTC` — Added Component: S5T74C - 
+
+* `19:55:44 UTC` — Added SKU: SKU P83356-B21
+
+* `19:55:43 UTC` — Added SKU: SKU P80997-B21
+
+* `19:55:43 UTC` — Added SKU: SKU P77486-B21
+
+* `19:55:43 UTC` — Added SKU: SKU P72207-B21
+
+* `19:55:43 UTC` — Added SKU: SKU P76463-B21
+
+* `19:55:42 UTC` — Added SKU: SKU P76462-B21
+
+* `19:55:42 UTC` — Added SKU: SKU P77492-B21
+
+* `19:55:42 UTC` — Added SKU: SKU P25527-B21
+
+* `19:55:42 UTC` — Added SKU: SKU P48802-B21
+
+* `19:55:42 UTC` — Added SKU: SKU P48803-B21
+
+* `19:55:41 UTC` — Added SKU: SKU P74741-B21
+
+* `19:55:41 UTC` — Added SKU: SKU P74734-B21
+
+* `19:55:41 UTC` — Added SKU: SKU P75807-B21
+
+* `19:55:41 UTC` — Added SKU: SKU P75740-B21
+
+* `19:55:41 UTC` — Added SKU: SKU P36394-B21
+
+* `19:55:40 UTC` — Added SKU: SKU P73282-B21
+
+* `19:55:40 UTC` — Added SKU: SKU P74758-B21
+
+* `19:55:40 UTC` — Added SKU: SKU P74757-B21
+
+* `19:55:40 UTC` — Added SKU: SKU P72203-B21
+
+* `19:55:39 UTC` — Added SKU: SKU P72201-B21
+
+* `19:55:39 UTC` — Added SKU: SKU 6000MT
+
+* `19:55:39 UTC` — Added Component: 6000MT - 8.0 TB 32 x 256 GB RDIMM /s @ 2DPC
+
+* `19:55:39 UTC` — Added Rule: Engineering Rule 101
+
+* `19:55:38 UTC` — Added Rule: Engineering Rule 100
+
+* `19:55:38 UTC` — Added Rule: Engineering Rule 99
+
+* `19:55:38 UTC` — Added Rule: Engineering Rule 98
+
+* `19:55:38 UTC` — Added Rule: Engineering Rule 97
+
+* `19:55:37 UTC` — Added Rule: Engineering Rule 96
+
+* `19:55:37 UTC` — Added Rule: Engineering Rule 95
+
+* `19:55:37 UTC` — Added Rule: Engineering Rule 94
+
+* `19:55:37 UTC` — Added Rule: Engineering Rule 93
+
+* `19:55:37 UTC` — Added Rule: Engineering Rule 92
+
+* `19:55:36 UTC` — Added Rule: Engineering Rule 91
+
+* `19:55:36 UTC` — Added Rule: Engineering Rule 90
+
+* `19:55:36 UTC` — Added Rule: Engineering Rule 89
+
+* `19:53:30 UTC` — Added SKU: SKU P69728-B21
+
+* `19:53:30 UTC` — Added SKU: SKU P74508-B21
+
+* `19:53:30 UTC` — Added SKU: SKU H49SXE
+
+* `19:53:29 UTC` — Added Component: H49SXE - 
+
+* `19:53:29 UTC` — Added SKU: SKU H49SWE
+
+* `19:53:29 UTC` — Added Component: H49SWE - 
+
+* `19:53:29 UTC` — Added SKU: SKU H49RSE
+
+* `19:53:29 UTC` — Added Component: H49RSE - 
+
+* `19:53:29 UTC` — Added SKU: SKU U4555E
+
+* `19:53:28 UTC` — Added Component: U4555E - 
+
+* `19:53:28 UTC` — Added SKU: SKU R7N87A
+
+* `19:53:28 UTC` — Added Component: R7N87A - 
+
+* `19:53:28 UTC` — Added SKU: SKU SN1700Q
+
+* `19:53:28 UTC` — Added Component: SN1700Q - HPE  64Gb 1-port Fibre Channel Host Bus Adapter
+
+* `19:53:28 UTC` — Added SKU: SKU SN1610Q
+
+* `19:53:28 UTC` — Added Component: SN1610Q - HPE  32Gb 1-port Fibre Channel Host Bus Adapter
+
+* `19:53:27 UTC` — Added SKU: SKU 726537-B21
+
+* `19:53:27 UTC` — Added SKU: SKU A0K02A
+
+* `19:53:27 UTC` — Added Component: A0K02A - A standard 6-foot IEC C-13/C-14 jumper cord () is ...
+
+* `19:53:27 UTC` — Added SKU: SKU P03178-B21
+
+* `19:53:26 UTC` — Added SKU: SKU S0V52A
+
+* `19:53:26 UTC` — Added Component: S0V52A - With over 75,000 server deployments, HPE is a worl...
+
+* `19:53:26 UTC` — Added SKU: SKU P83540-B21
+
+* `19:53:26 UTC` — Added SKU: SKU P36394-B21
+
+* `19:53:26 UTC` — Added SKU: SKU P75399-B21
+
+* `19:53:25 UTC` — Added SKU: SKU 32EDSFF
+
+* `19:53:25 UTC` — Added Component: 32EDSFF - 
+
+* `19:53:25 UTC` — Added SKU: SKU P80421-B21
+
+* `19:53:25 UTC` — Added SKU: SKU P80399-B21
+
+* `19:53:24 UTC` — Added SKU: SKU 24EDSFF
+
+* `19:53:24 UTC` — Added Component: 24EDSFF - 
+
+* `19:53:24 UTC` — Added SKU: SKU P80419-B21
+
+* `19:53:24 UTC` — Added SKU: SKU P80398-B21
+
+* `19:53:23 UTC` — Added SKU: SKU 16EDSFF
+
+* `19:53:23 UTC` — Added Component: 16EDSFF - 
+
+* `19:53:23 UTC` — Added SKU: SKU P81003-B21
+
+* `19:53:23 UTC` — Added SKU: SKU P80418-B21
+
+* `19:53:23 UTC` — Added SKU: SKU P80397-B21
+
+* `19:53:22 UTC` — Added SKU: SKU 8EDSFF
+
+* `19:53:22 UTC` — Added Component: 8EDSFF - 
+
+* `19:53:22 UTC` — Added SKU: SKU P81001-B21
+
+* `19:53:22 UTC` — Added SKU: SKU P80417-B21
+
+* `19:53:21 UTC` — Added SKU: SKU P80396-B21
+
+* `19:53:21 UTC` — Added SKU: SKU P80395-B21
+
+* `19:53:21 UTC` — Added SKU: SKU P80390-B21
+
+* `19:53:21 UTC` — Added SKU: SKU P80394-B21
+
+* `19:53:20 UTC` — Added SKU: SKU P80389-B21
+
+* `19:53:20 UTC` — Added SKU: SKU P80409-B21
+
+* `19:53:20 UTC` — Added SKU: SKU P80393-B21
+
+* `19:53:19 UTC` — Added SKU: SKU P80388-B21
+
+* `19:53:19 UTC` — Added SKU: SKU P80408-B21
+
+* `19:53:19 UTC` — Added SKU: SKU P80391-B21
+
+* `19:53:19 UTC` — Added SKU: SKU P80387-B21
+
+* `19:53:18 UTC` — Added SKU: SKU P80380-B21
+
+* `19:53:18 UTC` — Added SKU: SKU P811004
+
+* `19:53:18 UTC` — Added Component: P811004 - Full-height, ¾ length slot
+
+* `19:53:18 UTC` — Added SKU: SKU P81004-B21
+
+* `19:53:18 UTC` — Added SKU: SKU P80381-B21
+
+* `19:53:17 UTC` — Added SKU: SKU 5200MT
+
+* `19:53:17 UTC` — Added Component: 5200MT - 16.0 TB 64 x 256 GB RDIMM 6400 MT/s @ 1DPC and /s ...
+
+* `19:53:17 UTC` — Added SKU: SKU 12EDSFF
+
+* `19:53:17 UTC` — Added Component: 12EDSFF - Box-6 ( shown)
+
+* `19:53:17 UTC` — Added Rule: Engineering Rule 36
+
+* `19:53:17 UTC` — Added Rule: Engineering Rule 35
+
+* `19:53:17 UTC` — Added Rule: Engineering Rule 34
+
+* `19:53:17 UTC` — Added Rule: Engineering Rule 33
+
+* `19:53:17 UTC` — Added Rule: Engineering Rule 32
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 31
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 30
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 29
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 28
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 27
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 26
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 25
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 24
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 23
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 22
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 21
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 20
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 19
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 18
+
+* `19:53:16 UTC` — Added Rule: Engineering Rule 17
+
+* `19:51:18 UTC` — Added SKU: SKU S0R21B
+
+* `19:51:18 UTC` — Added Component: S0R21B - S0S41B, S4V66B, S4V67B, R7D02B, S0S42B, R7D03B, S0...
+
+* `19:51:17 UTC` — Added SKU: SKU R9S02A
+
+* `19:51:17 UTC` — Added Component: R9S02A - R9R66A, R9S03A, R9R67A.
+
+* `19:51:17 UTC` — Added SKU: SKU S0S39A
+
+* `19:51:17 UTC` — Added Component: S0S39A - Obsolete SKUs were removed - , S0S43A.
+
+* `19:51:17 UTC` — Added SKU: SKU B10240
+
+* `19:51:17 UTC` — Added Component: B10240 - controller nodes
+
+* `19:51:17 UTC` — Added SKU: SKU B10010
+
+* `19:51:17 UTC` — Added Component: B10010 - expansion shelf nodes
+
+* `19:51:16 UTC` — Added SKU: SKU B10140
+
+* `19:51:16 UTC` — Added Component: B10140 - controller nodes
+
+* `19:51:16 UTC` — Added SKU: SKU B10130
+
+* `19:51:16 UTC` — Added Component: B10130 - controller nodes
+
+* `19:51:16 UTC` — Added SKU: SKU B10230
+
+* `19:51:16 UTC` — Added Component: B10230 - 
+
+* `19:51:16 UTC` — Added SKU: SKU B10120
+
+* `19:51:16 UTC` — Added Component: B10120 - 
+
+* `19:51:16 UTC` — Added SKU: SKU B10000
+
+* `19:51:16 UTC` — Added Component: B10000 - − HPE Alletra Storage MP  is now NEBS Level 3 cert...
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 27
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 26
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 25
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 24
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 23
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 22
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 21
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 20
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 19
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 18
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 17
+
+* `19:51:15 UTC` — Added Rule: Engineering Rule 16
+
+* `19:51:14 UTC` — Added Rule: Engineering Rule 15
+
+* `19:51:14 UTC` — Added Rule: Engineering Rule 14
+
+* `19:51:14 UTC` — Added Rule: Engineering Rule 13
+
+* `19:51:14 UTC` — Added Rule: Engineering Rule 12
+
+* `19:51:14 UTC` — Added Rule: Engineering Rule 11
+
+* `19:51:14 UTC` — Added Rule: Engineering Rule 10
+
+* `19:51:14 UTC` — Added Rule: Engineering Rule 9
+
+* `10:06:10 UTC` — Added Component: P69728-B21 - ...
+
+* `10:06:09 UTC` — Added Component: P74508-B21 - ...
+
+* `10:06:09 UTC` — Added Component: 726537-B21 - ...
+
+* `10:06:09 UTC` — Added Component: P03178-B21 - for single-output. HPE Flexibl...
+
+* `10:06:09 UTC` — Added Component: P83540-B21 - SKU Number...
+
+* `10:06:08 UTC` — Added Component: P36394-B21 - – Optional....
+
+* `10:06:08 UTC` — Added Component: P75399-B21 - SKU Number...
+
+* `10:06:08 UTC` — Added Component: P80403-B21 - N/A...
+
+* `10:06:08 UTC` — Added Component: P80421-B21 - 4...
+
+* `10:06:07 UTC` — Added Component: P80399-B21 - N/A...
+
+* `10:06:07 UTC` — Added Component: P80415-B21 - N/A...
+
+* `10:06:07 UTC` — Added Component: P80402-B21 - N/A...
+
+* `10:06:07 UTC` — Added Component: P80419-B21 - 3...
+
+* `10:06:06 UTC` — Added Component: P80398-B21 - N/A...
+
+* `10:06:06 UTC` — Added Component: P80401-B21 - N/A...
+
+* `10:06:06 UTC` — Added Component: P81003-B21 - 4...
+
+* `10:06:06 UTC` — Added Component: P80418-B21 - 2...
+
+* `10:06:06 UTC` — Added Component: P80397-B21 - N/A...
+
+* `10:06:05 UTC` — Added Component: P80414-B21 - N/A...
+
+* `10:06:05 UTC` — Added Component: P80400-B21 - N/A...
+
+* `10:06:05 UTC` — Added Component: P81001-B21 - 2...
+
+* `10:06:05 UTC` — Added Component: P80417-B21 - 1...
+
+* `10:06:04 UTC` — Added Component: P80396-B21 - N/A...
+
+* `10:06:04 UTC` — Added Component: P80395-B21 - 2...
+
+* `10:06:04 UTC` — Added Component: P80390-B21 - 2...
+
+* `10:06:04 UTC` — Added Component: P80394-B21 - 2...
+
+* `10:06:04 UTC` — Added Component: P80389-B21 - 2...
+
+* `10:06:03 UTC` — Added Component: P80409-B21 - 2...
+
+* `10:06:03 UTC` — Added Component: P80393-B21 - 1...
+
+* `10:06:03 UTC` — Added Component: P80388-B21 - 1...
+
+* `10:06:03 UTC` — Added Component: P80408-B21 - 2...
+
+* `10:06:02 UTC` — Added Component: P80391-B21 - 1...
+
+* `10:06:02 UTC` — Added Component: P80387-B21 - 1...
+
+* `10:06:02 UTC` — Added Component: P80380-B21 - Full-height, ¾ length slot...
+
+* `10:06:02 UTC` — Added Component: P81004-B21 - Full-height, ¾ length slot...
+
+* `10:06:02 UTC` — Added Component: P80381-B21 - Full-height, ¾ length slot...
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 16
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 15
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 14
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 13
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 12
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 11
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 10
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 9
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 8
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 7
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 6
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 5
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 4
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 3
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 2
+
+* `10:06:01 UTC` — Added Rule: Engineering Rule 1
+
+* `10:06:01 UTC` — Added Component: DDR5 Memory
+
+* `10:06:01 UTC` — Added Category Limit: DIMM Slot Count
+
+* `10:06:01 UTC` — Added Component: Intel Xeon 6 6788P
+
+* `10:06:00 UTC` — Added Component: Intel Xeon 6 6768P
+
+* `10:06:00 UTC` — Added Component: Intel Xeon 6 6748P
+
+* `10:06:00 UTC` — Added Component: Intel Xeon 6 6738P
+
+* `10:06:00 UTC` — Added Component: Intel Xeon 6 6728P
+
+* `10:05:59 UTC` — Added Component: Intel Xeon 6 6724P
+
+* `10:05:59 UTC` — Added Component: Intel Xeon 6 6714P
+
+* `10:05:59 UTC` — Added Workload: Virtualization
+
+* `10:05:59 UTC` — Added Platform: HPE ProLiant Compute DL580 Gen12
+
+* `10:05:16 UTC` — Added Rule: Engineering Rule 8
+
+* `10:05:16 UTC` — Added Rule: Engineering Rule 7
+
+* `10:05:16 UTC` — Added Rule: Engineering Rule 6
+
+* `10:05:16 UTC` — Added Rule: Engineering Rule 5
+
+* `10:05:16 UTC` — Added Rule: Engineering Rule 4
+
+* `10:05:16 UTC` — Added Rule: Engineering Rule 3
+
+* `10:05:16 UTC` — Added Rule: Engineering Rule 2
+
+* `10:05:16 UTC` — Added Rule: Engineering Rule 1
+
+* `10:05:16 UTC` — Added Workload: Database
+
+* `10:05:16 UTC` — Added Workload: Analytics
+
+* `10:05:16 UTC` — Added Workload: Storage
+
+* `10:05:16 UTC` — Added Platform: HPE Alletra Storage MP B10000
+
+
 ## 2026-07-16
 * `17:40:03 UTC` — Added Component: 2200W Power Supply
 

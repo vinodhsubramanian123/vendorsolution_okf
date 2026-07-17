@@ -14,7 +14,7 @@ Responsibilities:
 import os
 import yaml
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
@@ -53,6 +53,8 @@ class OKFWriter:
             parts.append(self._slugify(obj.generation))
         if obj.platform_id:
             parts.append(self._slugify(obj.platform_id))
+        elif obj.type.value == "Platform":
+            parts.append(self._slugify(obj.id))
 
         # Group by object type inside the hierarchy
         if obj.type.value != "Platform":
@@ -101,7 +103,7 @@ class OKFWriter:
         if obj.tags:
             fm["tags"] = obj.tags
         fm["timestamp"] = (
-            getattr(obj, "last_updated", datetime.utcnow()).isoformat() + "Z"
+            getattr(obj, "last_updated", datetime.now(timezone.utc)).isoformat() + "Z"
         )
 
         # Blueprint 06 §5 metadata for search-space reduction
@@ -113,6 +115,8 @@ class OKFWriter:
             fm["product_family"] = obj.product_family
         if obj.generation:
             fm["generation"] = obj.generation
+        if obj.platform_id:
+            fm["platform_id"] = obj.platform_id
         if obj.lifecycle_status:
             fm["lifecycle_status"] = obj.lifecycle_status.value
         if obj.capabilities:
@@ -145,6 +149,34 @@ class OKFWriter:
         # Component-specific fields
         if hasattr(obj, "component_category") and obj.component_category:
             fm["component_category"] = obj.component_category
+        if hasattr(obj, "component_subcategory") and obj.component_subcategory:
+            fm["component_subcategory"] = obj.component_subcategory
+
+        # Platform-specific fields
+        if hasattr(obj, "parent_platform_id") and obj.parent_platform_id:
+            fm["parent_platform_id"] = obj.parent_platform_id
+        if hasattr(obj, "platform_sku") and obj.platform_sku:
+            fm["platform_sku"] = obj.platform_sku
+
+        # SKU-specific fields
+        if hasattr(obj, "part_number") and obj.part_number:
+            fm["part_number"] = obj.part_number
+        if hasattr(obj, "component_id") and obj.component_id:
+            fm["component_id"] = obj.component_id
+        if hasattr(obj, "packaging_type") and obj.packaging_type:
+            fm["packaging_type"] = obj.packaging_type.value
+
+        # Variant-specific fields
+        if hasattr(obj, "base_platform_id") and obj.base_platform_id:
+            fm["base_platform_id"] = obj.base_platform_id
+        if hasattr(obj, "differentiators") and obj.differentiators:
+            fm["differentiators"] = obj.differentiators
+
+        # Configuration-specific fields
+        if hasattr(obj, "included_components") and obj.included_components:
+            fm["included_components"] = obj.included_components
+        if hasattr(obj, "validated") and obj.validated:
+            fm["validated"] = obj.validated
 
         return fm
 
@@ -167,9 +199,10 @@ class OKFWriter:
         if obj.relationships:
             lines = ["# Relationships\n"]
             for rel in obj.relationships:
+                safe_target = self._slugify(rel.target_id)
                 lines.append(
                     f"- **{rel.relationship_type.value}**: "
-                    f"[{rel.target_id}](/{rel.target_id}.md)"
+                    f"[{rel.target_id}]({safe_target}.md)"
                 )
             sections.append("\n".join(lines))
 
@@ -296,7 +329,7 @@ class OKFWriter:
         target_dir = directory or self.repository_path
         log_path = Path(target_dir) / "log.md"
 
-        today = datetime.utcnow().strftime("%Y-%m-%d")
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         link_text = ""
         if concept_path:
             link_text = f" for [{concept_path}]({concept_path})"

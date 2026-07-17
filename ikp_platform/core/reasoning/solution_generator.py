@@ -86,7 +86,14 @@ class SolutionGenerator:
             if candidate:
                 candidates.append(candidate)
                 
-            # Could build Lowest Cost / Performance here by changing component selection logic
+            # Blueprint 07 §7: Multiple optimization profiles
+            candidate_cost = self._build_candidate(platform_id, request, "Lowest Cost")
+            if candidate_cost:
+                candidates.append(candidate_cost)
+                
+            candidate_perf = self._build_candidate(platform_id, request, "Performance Optimized")
+            if candidate_perf:
+                candidates.append(candidate_perf)
             
         return candidates
 
@@ -146,7 +153,7 @@ class SolutionGenerator:
             reqs_dict = [req.model_dump() for req in request.requirements]
             
             # 3. Call LLM to select components
-            selected_ids, llm_reasoning = self.llm.select_components(platform_id, available_nodes, reqs_dict)
+            selected_ids, llm_reasoning = self.llm.select_components(platform_id, available_nodes, reqs_dict, profile)
             
             if selected_ids or (not selected_ids and llm_reasoning and not any("LLM failure" in r for r in llm_reasoning)):
                 # Sanitize output (ensure LLM didn't hallucinate IDs)

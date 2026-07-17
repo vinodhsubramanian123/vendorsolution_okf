@@ -49,3 +49,9 @@ graph.canvas
 !/CONTEXT.md
 !/STATE.md
 !/LOG.md
+ikp.log
+mcp_server.log
+graph.canvas
+.graphify_obsidian_manifest.json
+work/tmp/
+ikp_web/dist/

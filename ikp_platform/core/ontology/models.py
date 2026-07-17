@@ -15,8 +15,13 @@ Markdown persistence layer, and the LLM extraction pipeline.
 from typing import List, Optional, Dict, Any, Union
 from enum import Enum
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
+
+
+def _utcnow() -> datetime:
+    """Return current UTC time (timezone-aware). Replaces deprecated datetime.utcnow()."""
+    return datetime.now(timezone.utc)
 
 
 # ---------------------------------------------------------------------------
@@ -58,6 +63,10 @@ class RelationshipType(str, Enum):
     VALIDATED_BY = "Validated By"
     EVIDENCED_BY = "Evidenced By"
     RECOMMENDED_WITH = "Recommended With"
+    MEMBER_OF = "Member Of"          # Sub-platform is member of parent (blade in enclosure)
+    HOSTED_BY = "Hosted By"          # VM hosted by physical server
+    HAS_SKU = "Has SKU"              # Component has a commercial SKU
+    BELONGS_TO = "Belongs To"        # Component belongs to a solution category
 
 
 class SourceType(str, Enum):
@@ -119,6 +128,9 @@ class DeltaChangeType(str, Enum):
     NEW_CAPABILITY = "New Capability"
     FIRMWARE_UPDATE = "Firmware Update"
     COMPATIBILITY_CHANGE = "Compatibility Change"
+    NEW_COMPONENT = "New Component"
+    NEW_SKU = "New SKU"
+    UPDATE_COMPONENT = "Update Component"
 
 
 class RuleSeverity(str, Enum):
@@ -155,7 +167,7 @@ class EvidenceRecord(BaseModel):
     """
     source_id: str
     source_version: Optional[str] = None
-    acquisition_date: datetime = Field(default_factory=datetime.utcnow)
+    acquisition_date: datetime = Field(default_factory=_utcnow)
     confidence: ConfidenceLevel = ConfidenceLevel.UNVERIFIED
     original_text_snippet: Optional[str] = None
     description: Optional[str] = None
@@ -167,7 +179,7 @@ class HistoryEntry(BaseModel):
     Immutable change record for an engineering object.
     Blueprint 06 §7: "Never overwrite history."
     """
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=_utcnow)
     change_type: DeltaChangeType
     field_name: Optional[str] = None
     previous_value: Optional[Any] = None
@@ -188,7 +200,7 @@ class EngineeringRelationship(BaseModel):
     """
     target_id: str
     relationship_type: RelationshipType
-    evidence: List[EvidenceRecord] = []
+    evidence: List[EvidenceRecord] = Field(default_factory=list)
     version: int = 1
 
 
@@ -229,7 +241,7 @@ class BaseEngineeringObject(BaseModel):
     tags: List[str] = []
     
     relationships: List[EngineeringRelationship] = []
-    evidence: List[EvidenceRecord] = []
+    evidence: List[EvidenceRecord] = Field(default_factory=list)
     version: int = 1
 
 
@@ -242,9 +254,9 @@ class SlotMapping(BaseEngineeringObject):
     constraints: List[str] = []
 
     # Provenance
-    evidence: List[EvidenceRecord] = []
+    evidence: List[EvidenceRecord] = Field(default_factory=list)
     history: List[HistoryEntry] = []
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=_utcnow)
 
 
 # ---------------------------------------------------------------------------
@@ -254,8 +266,10 @@ class SlotMapping(BaseEngineeringObject):
 class Platform(BaseEngineeringObject):
     """A commercially available product platform (e.g., DL380 Gen11, Alletra 6050)."""
     type: EngineeringObjectType = EngineeringObjectType.PLATFORM
+    parent_platform_id: Optional[str] = None  # For sub-platforms (blades in enclosures)
     variants: List[str] = []  # IDs of Variant objects
     slot_mapping_ids: List[str] = []  # IDs of SlotMapping objects
+    platform_sku: Optional[str] = None  # Master SKU for the platform itself
 
 
 class Component(BaseEngineeringObject):
@@ -277,6 +291,7 @@ class SKU(BaseEngineeringObject):
     currency: Optional[str] = None
     packaging_type: PackagingType = PackagingType.STANDALONE
     inclusive_qty: Optional[int] = None
+    component_id: Optional[str] = None  # Link to the engineering Component this SKU represents
 
 
 class Workload(BaseEngineeringObject):
@@ -327,6 +342,27 @@ class CategoryLimit(Constraint):
     target_subcategory: Optional[str] = None
 
 
+class SolutionCategory(BaseEngineeringObject):
+    """Groups product families (e.g., 'Composable Infrastructure', 'Rack Servers', 'Tower Servers')."""
+    type: EngineeringObjectType = EngineeringObjectType.SOLUTION_CATEGORY
+
+
+class Variant(BaseEngineeringObject):
+    """A configuration variant of a platform (e.g., 'SFF CTO', '8LFF CTO', '3-Frame')."""
+    type: EngineeringObjectType = EngineeringObjectType.VARIANT
+    base_platform_id: str = ""
+    differentiators: List[str] = []  # What makes this variant different
+
+
+class Configuration(BaseEngineeringObject):
+    """A pre-validated, named configuration (e.g., 'SAP HANA Optimized', 'VMware vSAN Ready Node')."""
+    type: EngineeringObjectType = EngineeringObjectType.CONFIGURATION
+    base_platform_id: str = ""
+    included_components: List[str] = []  # Component IDs in this config
+    validated: bool = False
+    validation_source: Optional[str] = None  # Where this config was validated
+
+
 # ---------------------------------------------------------------------------
 # Source Registration — Blueprint 04 §5
 # ---------------------------------------------------------------------------
@@ -349,7 +385,7 @@ class Source(BaseModel):
     )
     publication_date: Optional[datetime] = None
     language: str = "en"
-    acquisition_date: datetime = Field(default_factory=datetime.utcnow)
+    acquisition_date: datetime = Field(default_factory=_utcnow)
     confidence: ConfidenceLevel = ConfidenceLevel.UNVERIFIED
     original_file_path: str = ""
     processing_status: ProcessingStatus = ProcessingStatus.PENDING
@@ -380,7 +416,7 @@ class KnowledgeDelta(BaseModel):
     """
     delta_id: str = Field(default_factory=lambda: f"DELTA-{str(uuid.uuid4())[:8]}")
     source_id: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=_utcnow)
     changes: List[DeltaChange] = []
     status: DeltaStatus = DeltaStatus.PENDING
     review_notes: Optional[str] = None
@@ -412,7 +448,7 @@ class CustomerRequest(BaseModel):
     vendor_preference: Optional[str] = None
     target_platform: Optional[str] = None
     budget: Optional[float] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=_utcnow)
 
 
 class SolutionCandidate(BaseModel):
@@ -432,7 +468,7 @@ class SolutionCandidate(BaseModel):
     dependencies_resolved: List[str] = []
     trade_offs: List[str] = []
     confidence: ConfidenceLevel = ConfidenceLevel.UNVERIFIED
-    evidence: List[EvidenceRecord] = []
+    evidence: List[EvidenceRecord] = Field(default_factory=list)
     validation_status: Optional[str] = None
     estimated_risks: List[str] = []
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=_utcnow)

@@ -64,8 +64,10 @@ class PDFExtractor:
         from ikp_platform.core.reasoning.llm_client import LLMClient
         from ikp_platform.core.repository.mcp_client import ObsidianMCPClient
         self.llm_client = LLMClient()
-        # Fallback to local repository path
-        self.mcp_client = ObsidianMCPClient("/home/vinodh/vendorsolution_okf/repository")
+        # Derive repository path from project structure instead of hardcoding
+        project_root = Path(__file__).parent.parent.parent.parent
+        repository_path = str(project_root / "repository")
+        self.mcp_client = ObsidianMCPClient(repository_path)
 
     def extract(self, file_path: str) -> Tuple[List[BaseEngineeringObject], KnowledgeDelta]:
         """
@@ -150,6 +152,9 @@ class PDFExtractor:
         psus = self._extract_power(full_text, platform)
         self.extracted_objects.extend(psus)
 
+        # Step 9: Post-processing (synthesize limits based on components)
+        self._post_process_limits(platform)
+
         # Build Knowledge Delta
         delta = KnowledgeDelta(
             source_id=self.source.source_id,
@@ -161,6 +166,55 @@ class PDFExtractor:
             f"{len(self.delta_changes)} changes"
         )
         return self.extracted_objects, delta
+
+    # -------------------------------------------------------------------
+    # Post-Processing
+    # -------------------------------------------------------------------
+
+    def _post_process_limits(self, platform: Optional[Platform]):
+        """Analyze extracted components and synthesize limits (e.g. max OCP slots, risers)."""
+        if not platform:
+            return
+            
+        platform_id = platform.id
+        
+        # Count explicit enablement kits or primary/secondary slots
+        ocp_slots_found = 0
+        risers_found = 0
+        
+        for obj in self.extracted_objects:
+            if obj.type == EngineeringObjectType.COMPONENT:
+                title_desc = f"{obj.title} {obj.description}".lower()
+                if "ocp" in title_desc and ("slot" in title_desc or "enablement" in title_desc):
+                    ocp_slots_found += 1
+                if "riser" in title_desc and "cage" in title_desc:
+                    risers_found += 1
+                    
+        # Synthesize CategoryLimit if we found evidence of capacity
+        if ocp_slots_found > 0:
+            limit_id = f"{platform_id}/limits/max-ocp-slots"
+            # check if it already exists
+            if not any(obj.id == limit_id for obj in self.extracted_objects):
+                cl = CategoryLimit(
+                    id=limit_id,
+                    title="Max OCP Slots",
+                    limit_name="Maximum OCP Slots",
+                    limit_value=ocp_slots_found,
+                    target_category="Networking",
+                    target_subcategory="NIC",
+                    vendor=platform.vendor,
+                    solution_domain=platform.solution_domain,
+                    product_family=platform.product_family,
+                    generation=platform.generation,
+                    platform_id=platform.id,
+                    relationships=[EngineeringRelationship(target_id=platform_id, relationship_type=RelationshipType.CONTAINS)]
+                )
+                self.extracted_objects.append(cl)
+                self.delta_changes.append(DeltaChange(
+                    change_type=DeltaChangeType.NEW_OBJECT,
+                    object_id=cl.id,
+                    new_value=ocp_slots_found,
+                ))
 
     # -------------------------------------------------------------------
     # Platform Identity
@@ -192,7 +246,7 @@ class PDFExtractor:
         title = "Unknown Platform"
         platform_id = "unknown-platform"
         
-        first_lines = text[:1500].split('\n')
+        first_lines = text[:2000].split('\n')
         title_found = False
         
         joined_lines = []
@@ -207,13 +261,28 @@ class PDFExtractor:
                     current_block = []
         if current_block:
             joined_lines.append(" ".join(current_block))
-            
+        
+        # Strategy 1: Direct regex for "Vendor ProductName" pattern within any line
+        # This handles cases where the product name is buried in a longer sentence
+        vendor_product_pattern = re.compile(
+            r'((?:HPE|Dell|Cisco|Lenovo|IBM|Supermicro)\s+'
+            r'(?:ProLiant\s+(?:Compute\s+)?|Alletra\s+(?:Storage\s+)?(?:MP\s+)?|PowerEdge\s+|UCS\s+|ThinkSystem\s+)?'
+            r'[\w]+(?:\s+[\w]+){0,4}?'
+            r'(?:\s+(?:Gen\s*\d+|G\d+|v\d+))?)'
+            r'(?=\s+(?:QuickSpecs|provides|is\s+a|features|supports|delivers)|$)',
+            re.IGNORECASE
+        )
+        
         for line in joined_lines:
-            if re.search(r'\b(HPE|Dell|Cisco|Lenovo|IBM|Supermicro)\b', line, re.IGNORECASE) and 5 < len(line) < 1000:
-                clean_title = re.sub(r'(?i)\b(QuickSpecs|Technical Guide|Data Sheet|Datasheet|Spec Sheet)\b.*$', '', line).strip()
-                if clean_title:
-                    title = clean_title
+            match = vendor_product_pattern.search(line)
+            if match:
+                candidate = match.group(1).strip()
+                # Remove trailing noise words that might have been captured
+                candidate = re.sub(r'\s+(?:QuickSpecs|provides|is\s+a|features|supports|delivers).*$', '', candidate, flags=re.IGNORECASE).strip()
+                if len(candidate) > 5:
+                    title = candidate
                     title_found = True
+                    
                     vendor_match = re.search(r'\b(HPE|Dell|Cisco|Lenovo|IBM|Supermicro)\b', title, re.IGNORECASE)
                     if vendor_match:
                         vendor = vendor_match.group(1).upper()
@@ -230,7 +299,8 @@ class PDFExtractor:
                     if gen_match:
                         generation = gen_match.group(1).replace(" ", "")
                     
-                    parts = [p for p in title.split() if p.upper() != vendor.upper() and not re.match(r'(?i)^(Gen\d+|G\d+|v\d+)$', p)]
+                    # Strip vendor and generation from title parts to derive family/model
+                    parts = [p for p in title.split() if p.upper() != vendor.upper() and not re.match(r'(?i)^(Gen\d+|G\d+|v\d+|Compute)$', p)]
                     if len(parts) >= 1:
                         family = parts[0]
                     if len(parts) >= 2:
@@ -324,7 +394,7 @@ class PDFExtractor:
                 description=f"Supports {wl_name} workloads",
                 vendor="Agnostic",  # Workloads are vendor agnostic
                 solution_domain=platform.solution_domain if platform else "Unknown",
-                requirements=[wl_name],
+                performance_requirements={"workload_type": wl_name},
                 relationships=[
                     EngineeringRelationship(
                         target_id=platform.id,
@@ -442,7 +512,7 @@ class PDFExtractor:
             max_mem = max_mem_match.group(1)
             unit = "TB" if "TB" in max_mem_match.group(0).upper() else "GB"
 
-            constraint = Constraint(
+            constraint = CategoryLimit(
                 id=f"{platform_id}/constraints/max-memory",
                 title=f"Maximum Memory Capacity",
                 description=f"Maximum supported memory: {max_mem} {unit}",
@@ -454,6 +524,7 @@ class PDFExtractor:
                 limit_name="Maximum Memory",
                 limit_value=int(max_mem),
                 limit_unit=unit,
+                target_category="Memory",
                 relationships=[
                     EngineeringRelationship(
                         target_id=platform_id,
@@ -478,7 +549,7 @@ class PDFExtractor:
         dimm_match = re.search(r"(\d+)\s*DIMM\s*slots", text, re.IGNORECASE)
         if dimm_match:
             dimm_count = int(dimm_match.group(1))
-            constraint = Constraint(
+            constraint = CategoryLimit(
                 id=f"{platform_id}/constraints/dimm-slots",
                 title="DIMM Slot Count",
                 description=f"Total DIMM slots: {dimm_count}",
@@ -490,6 +561,13 @@ class PDFExtractor:
                 limit_name="DIMM Slots",
                 limit_value=dimm_count,
                 limit_unit="slots",
+                target_category="Memory",
+                relationships=[
+                    EngineeringRelationship(
+                        target_id=platform_id,
+                        relationship_type=RelationshipType.CONTAINS,
+                    )
+                ],
                 evidence=[EvidenceRecord(
                     source_id=self.source.source_id,
                     confidence=ConfidenceLevel.HIGH,
@@ -549,7 +627,7 @@ class PDFExtractor:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
                 count = int(match.group(1))
-                constraint = Constraint(
+                constraint = CategoryLimit(
                     id=f"{platform_id}/constraints/max-{name.lower().replace(' ', '-')}",
                     title=f"Maximum {name}",
                     description=f"Supports up to {count} {name}",
@@ -561,6 +639,7 @@ class PDFExtractor:
                     limit_name=f"Maximum {name}",
                     limit_value=count,
                     limit_unit="drives",
+                    target_category="Drive",
                     relationships=[
                         EngineeringRelationship(
                             target_id=platform_id,
@@ -888,8 +967,79 @@ class PDFExtractor:
     # Structured Tabular Extraction (via TableParser)
     # -------------------------------------------------------------------
 
+    # -------------------------------------------------------------------
+    # Component Category Taxonomy — comprehensive classification
+    # -------------------------------------------------------------------
+
+    COMPONENT_CATEGORY_MAP = [
+        # (keywords_list, category, subcategory)  — checked in priority order
+        # Memory
+        (["Memory", "DIMM", "RDIMM", "LRDIMM", "DDR5", "DDR4", "RAM", "Smart Memory"], "Memory", "DIMM"),
+        # Storage - Controllers
+        (["Controller", "Smart Array", "MR416", "MR216", "MR932", "RAID", "HBA", "SR932", "VROC"], "Storage", "Controller"),
+        # Storage - Boot devices
+        (["NS204", "Boot Optimized", "Boot Device", "MicroServer Boot"], "Storage", "Boot Device"),
+        # Storage - Drives
+        (["Drive", "SSD", "HDD", "NVMe", "EDSFF", "E3.S", "Solid State", "Hard Disk", "Midline"], "Storage", "Drive"),
+        # Storage - Battery/Capacitor
+        (["Battery", "BBWC", "FBWC", "Smart Storage Battery", "Capacitor Pack", "Energy Pack"], "Storage", "Battery Backup"),
+        # Networking - NICs
+        (["Adapter", "NIC", "OCP", "Ethernet", "InfiniBand", "CX7", "CX6", "ConnectX", "BCM57", "I350", "E810", "BASE-T"], "Networking", "NIC"),
+        # Networking - Optics
+        (["Optic", "Transceiver", "SFP", "QSFP", "OSFP", "DAC Cable", "AOC"], "Networking", "Optics"),
+        # Networking - Switches (for Synergy-type)
+        (["Switch", "Interconnect", "Virtual Connect", "Fabric Module"], "Networking", "Switch/Interconnect"),
+        # GPU / Accelerators
+        (["GPU", "Accelerator", "NVIDIA", "Tesla", "A100", "H100", "H200", "L40", "L4", "RTX", "Instinct", "Gaudi"], "Accelerator", "GPU"),
+        # Power
+        (["Power Supply", "PSU", "Flex Slot", "Power Cable", "PDU", "UPS"], "Power", "PSU"),
+        # Power - DC
+        (["DC Power", "-48V", "DC PSU", "HVDC"], "Power", "DC Power"),
+        # Thermal
+        (["Heatsink", "Heat Sink", "Cooling", "Cold Plate", "DLC", "Direct Liquid"], "Thermal", "Heatsink"),
+        (["Fan", "Cooling Fan", "Fan Module", "Performance Fan"], "Thermal", "Fan"),
+        # Chassis
+        (["Bezel", "Front Panel", "Bezel Kit", "Bezel Lock"], "Chassis", "Bezel"),
+        (["Rail", "Rack Rail", "Friction Rail", "Easy Install Rail", "Slide Rail"], "Chassis", "Rail Kit"),
+        (["Blank", "Filler", "DIMM Blank", "Bay Blank", "Drive Blank"], "Chassis", "Blank/Filler"),
+        (["Chassis", "Enclosure", "Frame"], "Chassis", "Enclosure"),
+        # Infrastructure
+        (["Riser", "Riser Kit", "Riser Card", "Secondary Riser"], "Infrastructure", "Riser"),
+        (["Cable Kit", "Cable", "SAS Cable", "Power Cable", "Signal Cable", "Enablement Cable"], "Infrastructure", "Cable"),
+        (["Enablement", "Enable Kit", "Bay Enable", "Cage Enable", "Midplane"], "Infrastructure", "Enablement Kit"),
+        (["Serial Port", "DisplayPort", "VGA", "USB", "I/O Module"], "Infrastructure", "I/O Port"),
+        (["Optical Drive", "DVD", "DVD-ROM", "DVD-RW", "Media Bay"], "Infrastructure", "Optical Drive"),
+        # Security
+        (["TPM", "Trusted Platform", "Security", "Bezel Lock", "Intrusion", "iDevID"], "Security", "TPM/Security"),
+        # Management
+        (["iLO", "Lights Out", "Management", "Compute Ops", "Insight", "OneView"], "Management", "Management Software"),
+        # Services (non-hardware SKUs)
+        (["Service", "Support", "Warranty", "Tech Care", "Install", "Startup", "Consulting"], "Services", "Support/Warranty"),
+    ]
+
+    def _classify_component(self, description: str) -> tuple:
+        """Classify a component description into (category, subcategory) using keyword scoring."""
+        desc_upper = description.upper()
+        
+        best_score = 0
+        best_cat = "Accessory"
+        best_subcat = "General"
+        
+        for keywords, category, subcategory in self.COMPONENT_CATEGORY_MAP:
+            score = 0
+            for kw in keywords:
+                if kw.upper() in desc_upper:
+                    # Longer keywords get higher scores (more specific match)
+                    score += len(kw)
+            if score > best_score:
+                best_score = score
+                best_cat = category
+                best_subcat = subcategory
+        
+        return best_cat, best_subcat
+
     def _process_structured_components(self, structured_components: List[Dict[str, Any]], platform: Optional[Platform]) -> List[BaseEngineeringObject]:
-        """Convert structured dictionary rows from TableParser into Component objects and CategoryLimits."""
+        """Convert structured dictionary rows from TableParser into Component + SKU objects and CategoryLimits."""
         objects = []
         platform_id = platform.id if platform else "unknown"
         seen_skus = set()
@@ -907,25 +1057,19 @@ class PDFExtractor:
             # Use brackets as tags/capabilities
             capabilities = [b.strip("()[]") for b in brackets if len(b) < 10]
             
-            # Determine fine-grained category & subcategory for limits
-            cat = "Accessory"
-            subcat = None
-            if "Memory" in desc or "DIMM" in desc: cat = "Memory"; subcat = "DIMM"
-            elif "Drive" in desc or "SSD" in desc or "HDD" in desc: cat = "Storage"; subcat = "Drive"
-            elif "Adapter" in desc or "NIC" in desc: cat = "Networking"; subcat = "NIC"
-            elif "Power" in desc or "Supply" in desc: cat = "Power"; subcat = "PSU"
-            elif "Riser" in desc: cat = "Infrastructure"; subcat = "Riser"
-            elif "Cable" in desc: cat = "Infrastructure"; subcat = "Cable"
-            elif "Optic" in desc or "Transceiver" in desc: cat = "Networking"; subcat = "Optics"
-            elif "Heatsink" in desc: cat = "Thermal"; subcat = "Heatsink"
+            # Classify with comprehensive taxonomy
+            cat, subcat = self._classify_component(desc)
             
             # Extract category limits (e.g. "Maximum 2 Risers")
-            if subcat:
+            if subcat and subcat != "General":
                 limit_match = re.search(r'Maximum\s+(\d+)\s+' + re.escape(subcat), desc, re.IGNORECASE)
+                if not limit_match:
+                    # Also try with category name
+                    limit_match = re.search(r'Maximum\s+(?:quantity\s+)?(\d+)', desc, re.IGNORECASE)
                 if limit_match:
                     limit_qty = int(limit_match.group(1))
                     cl = CategoryLimit(
-                        id=f"{platform_id}/limits/max-{subcat.lower()}",
+                        id=f"{platform_id}/limits/max-{subcat.lower().replace('/', '-').replace(' ', '-')}",
                         title=f"Max {subcat}",
                         limit_name=f"Maximum {subcat}",
                         limit_value=limit_qty,
@@ -955,9 +1099,11 @@ class PDFExtractor:
             if qty > 0:
                 attributes.append(EngineeringAttribute(name="Default Quantity", value=qty))
 
+            # Create the engineering Component
+            comp_id = f"{platform_id}/components/{sku.lower()}"
             comp = Component(
-                id=f"{platform_id}/components/{sku.lower()}",
-                title=f"{sku} - {desc[:30]}...",
+                id=comp_id,
+                title=f"{sku} - {desc[:50]}..." if len(desc) > 50 else f"{sku} - {desc}",
                 description=desc,
                 vendor=platform.vendor if platform else "Unknown",
                 solution_domain=platform.solution_domain if platform else "Unknown",
@@ -984,9 +1130,46 @@ class PDFExtractor:
             )
             objects.append(comp)
             
+            # Create a paired SKU (commercial identity) linked to the Component
+            sku_obj = SKU(
+                id=f"{platform_id}/skus/{sku.lower()}",
+                title=f"SKU {sku}",
+                description=desc,
+                part_number=sku,
+                vendor=platform.vendor if platform else "Unknown",
+                solution_domain=platform.solution_domain if platform else "Unknown",
+                product_family=platform.product_family if platform else None,
+                generation=platform.generation if platform else None,
+                platform_id=platform.id if platform else None,
+                component_id=comp_id,
+                packaging_type=pkg_type,
+                inclusive_qty=inclusive_qty,
+                relationships=[
+                    EngineeringRelationship(
+                        target_id=comp_id,
+                        relationship_type=RelationshipType.HAS_SKU,
+                    ),
+                    EngineeringRelationship(
+                        target_id=platform_id,
+                        relationship_type=RelationshipType.COMPATIBLE_WITH,
+                    ),
+                ],
+                evidence=[EvidenceRecord(
+                    source_id=self.source.source_id,
+                    confidence=ConfidenceLevel.HIGH,
+                    description=f"SKU extracted from Table on page {data.get('page')}",
+                )]
+            )
+            objects.append(sku_obj)
+            
             self.delta_changes.append(DeltaChange(
-                change_type=DeltaChangeType.NEW_OBJECT,
+                change_type=DeltaChangeType.NEW_COMPONENT,
                 object_id=comp.id,
+                new_value=sku,
+            ))
+            self.delta_changes.append(DeltaChange(
+                change_type=DeltaChangeType.NEW_SKU,
+                object_id=sku_obj.id,
                 new_value=sku,
             ))
 
@@ -1029,17 +1212,32 @@ class PDFExtractor:
         # Look for typical Mezzanine to Bay topology mappings
         # e.g. "Mezzanine Slot 1 connects to Bay 1 and Bay 4"
         topo_pattern = re.compile(r"(Mezzanine\s+Slot\s+\d+).*?(Bay\s+\d+).*?(Bay\s+\d+)", re.IGNORECASE)
+        slot_count = 0
         for match in topo_pattern.finditer(text):
             source_slot = match.group(1).strip()
             target_1 = match.group(2).strip()
             target_2 = match.group(3).strip()
             
+            slot_count += 1
+            mapping_id = f"{platform.id}/slot-mappings/slot-{slot_count:03d}"
+            
             mapping = SlotMapping(
+                id=mapping_id,
+                title=f"Slot Mapping: {source_slot}",
+                vendor=platform.vendor,
+                solution_domain=platform.solution_domain,
+                platform_id=platform.id,
                 source_slot=source_slot,
                 target_bays=[target_1, target_2],
-                redundancy_link=target_2
+                redundancy_link=target_2,
+                evidence=[EvidenceRecord(
+                    source_id=self.source.source_id,
+                    confidence=ConfidenceLevel.HIGH,
+                    original_text_snippet=match.group(0)[:100],
+                )],
             )
-            platform.slot_mappings.append(mapping)
+            self.extracted_objects.append(mapping)
+            platform.slot_mapping_ids.append(mapping_id)
 
     def _extract_description(self, text: str) -> str:
         """Extract product description from introductory text."""

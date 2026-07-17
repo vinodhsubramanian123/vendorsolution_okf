@@ -72,7 +72,7 @@ class RuleEngine:
         platform_compatible = set(self.graph.get_compatible(platform_id))
         
         platform_data = self.graph.graph.nodes[platform_id]
-        platform_domain = platform_data.get("attr_solution_domain", "Unknown").lower()
+        platform_domain = str(platform_data.get("solution_domain") or "Unknown").lower()
         
         for comp_id in component_ids:
             if comp_id not in self.graph.graph:
@@ -80,7 +80,7 @@ class RuleEngine:
                 continue
             
             comp_data = self.graph.graph.nodes[comp_id]
-            comp_domain = comp_data.get("attr_solution_domain", "Unknown").lower()
+            comp_domain = str(comp_data.get("solution_domain") or "Unknown").lower()
             
             # --- STRICT DOMAIN ISOLATION BARRIER ---
             if comp_domain != platform_domain and comp_domain not in ("networking", "infrastructure", "unknown"):
@@ -143,27 +143,27 @@ class RuleEngine:
             
             if c_type == EngineeringObjectType.CATEGORY_LIMIT.value:
                 target_subcat = c_data.get("attr_target_subcategory")
+                target_cat = c_data.get("attr_target_category")
+                
+                current_qty = 0
                 if target_subcat and target_subcat in comp_subcategories:
                     current_qty = comp_subcategories[target_subcat]
-                    if isinstance(limit_value, int) and current_qty > limit_value:
+                elif target_cat and target_cat in comp_categories:
+                    current_qty = comp_categories[target_cat]
+                    
+                if (target_subcat or target_cat) and isinstance(limit_value, int):
+                    if current_qty > limit_value:
                         errors.append(f"Constraint violation: {limit_name} (Max: {limit_value}, Requested: {current_qty})")
-                    else:
-                        evidence = c_data.get("evidence", [{}])[0]
-                        conf = evidence.get("confidence", "UNKNOWN")
-                        snippet = evidence.get("original_text_snippet", "")
-                        reasoning_chain.append(f"Constraint passed: {c_data.get('title')} ({current_qty} <= {limit_value}) [Confidence: {conf}] | Trace: '{snippet}'")
-            else:
-                # Simple heuristic matching for V1
-                if "drive" in limit_name or "sff" in limit_name or "lff" in limit_name:
-                    drive_count = comp_categories.get("Drive", 0) + comp_categories.get("Storage", 0)
-                    if isinstance(limit_value, int) and drive_count > limit_value:
-                        errors.append(f"Constraint violation: {limit_name} (Max: {limit_value}, Requested: {drive_count})")
                     else:
                         evidence = c_data.get("evidence", [{}])[0] if c_data.get("evidence") else {}
                         conf = evidence.get("confidence", "UNKNOWN")
                         snippet = evidence.get("original_text_snippet", "")
-                        reasoning_chain.append(f"Constraint passed: {c_data.get('title')} ({drive_count} <= {limit_value}) [Confidence: {conf}] | Trace: '{snippet}'")
-                    
+                        reasoning_chain.append(f"Constraint passed: {c_data.get('title')} ({current_qty} <= {limit_value}) [Confidence: {conf}] | Trace: '{snippet}'")
+            elif c_type == EngineeringObjectType.CONSTRAINT.value:
+                # Generic constraints require a CSP solver for thermal/power/spatial properties.
+                # Here we log them as unevaluated, relying on CategoryLimits for component counts.
+                reasoning_chain.append(f"Generic constraint noted (requires CSP solver): {c_data.get('title')}")
+                        
         return errors
 
     def _check_dependencies(self, component_ids: List[str], reasoning_chain: List[str]) -> List[str]:
@@ -194,13 +194,13 @@ class RuleEngine:
             r_data = self.graph.graph.nodes[rule_id]
             applicable_objects = set(r_data.get("applicable_objects", []))
             
-            # Check if any applicable object is a substring of any component ID or vice versa
+            # Check if any applicable object matches component ID exactly or as a URI suffix
             applies = False
             for app_obj in applicable_objects:
                 app_obj_clean = app_obj.lower().strip()
                 for comp_id in component_ids:
                     comp_id_clean = comp_id.lower().strip()
-                    if app_obj_clean in comp_id_clean or comp_id_clean in app_obj_clean:
+                    if comp_id_clean == app_obj_clean or comp_id_clean.endswith(f"/{app_obj_clean}"):
                         applies = True
                         break
                 if applies:
@@ -214,7 +214,12 @@ class RuleEngine:
                 conf = evidence.get("confidence", "UNKNOWN")
                 snippet = evidence.get("original_text_snippet", "")
                 rule_text = r_data.get("description") or r_data.get("attr_expected_outcome") or r_data.get("title")
-                reasoning_chain.append(f"Rule evaluated: {rule_text} [{severity}] [Confidence: {conf}] | Trace: '{snippet}'")
+                
+                msg = f"Rule evaluated: {rule_text} [{severity}] [Confidence: {conf}] | Trace: '{snippet}'"
+                reasoning_chain.append(msg)
+                
+                if severity in (RuleSeverity.ERROR.value, RuleSeverity.CRITICAL.value):
+                    errors.append(f"Rule Violation: {rule_text}")
                 
         reasoning_chain.append(f"Evaluated {applicable_count} applicable engineering rules.")
         return errors

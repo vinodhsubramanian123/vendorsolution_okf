@@ -11,7 +11,7 @@ losing all knowledge.
 import yaml
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
@@ -26,6 +26,15 @@ from ikp_platform.core.ontology.models import (
     RuleSeverity,
     Constraint,
     Component,
+    Platform,
+    SKU,
+    Workload,
+    CategoryLimit,
+    SlotMapping,
+    SolutionCategory,
+    Variant,
+    Configuration,
+    PackagingType,
 )
 
 
@@ -125,13 +134,13 @@ class OKFReader:
             "solution_domain": frontmatter.get("solution_domain"),
             "product_family": frontmatter.get("product_family"),
             "generation": frontmatter.get("generation"),
+            "platform_id": frontmatter.get("platform_id"),
             "lifecycle_status": lifecycle,
             "attributes": attributes,
             "relationships": relationships,
             "capabilities": frontmatter.get("capabilities", []),
             "tags": frontmatter.get("tags", []),
             "evidence": evidence,
-            "timestamp": timestamp or datetime.utcnow(),
         }
 
         # Instantiate specialized types
@@ -171,6 +180,70 @@ class OKFReader:
             return Component(
                 **kwargs,
                 component_category=frontmatter.get("component_category"),
+                component_subcategory=frontmatter.get("component_subcategory"),
+            )
+
+        if obj_type == EngineeringObjectType.PLATFORM:
+            return Platform(
+                **kwargs,
+                parent_platform_id=frontmatter.get("parent_platform_id"),
+                platform_sku=frontmatter.get("platform_sku"),
+            )
+
+        if obj_type == EngineeringObjectType.SKU:
+            pkg_type_str = frontmatter.get("packaging_type")
+            pkg_type = PackagingType(pkg_type_str) if pkg_type_str else PackagingType.STANDALONE
+            return SKU(
+                **kwargs,
+                part_number=frontmatter.get("part_number", ""),
+                price=frontmatter.get("price"),
+                currency=frontmatter.get("currency"),
+                component_id=frontmatter.get("component_id"),
+                packaging_type=pkg_type,
+            )
+
+        if obj_type == EngineeringObjectType.WORKLOAD:
+            return Workload(
+                **kwargs,
+                performance_requirements=frontmatter.get("performance_requirements", {}),
+                capacity_requirements=frontmatter.get("capacity_requirements", {}),
+            )
+
+        if obj_type == EngineeringObjectType.CATEGORY_LIMIT:
+            return CategoryLimit(
+                **kwargs,
+                limit_name=frontmatter.get("limit_name", ""),
+                limit_value=frontmatter.get("limit_value"),
+                limit_unit=frontmatter.get("limit_unit"),
+                target_category=frontmatter.get("target_category"),
+                target_subcategory=frontmatter.get("target_subcategory"),
+            )
+
+        if obj_type == EngineeringObjectType.SLOT_MAPPING:
+            return SlotMapping(
+                **kwargs,
+                source_slot=frontmatter.get("source_slot", ""),
+                target_bays=frontmatter.get("target_bays", []),
+                redundancy_link=frontmatter.get("redundancy_link"),
+                constraints=frontmatter.get("constraints", []),
+            )
+
+        if obj_type == EngineeringObjectType.SOLUTION_CATEGORY:
+            return SolutionCategory(**kwargs)
+            
+        if obj_type == EngineeringObjectType.VARIANT:
+            return Variant(
+                **kwargs,
+                base_platform_id=frontmatter.get("base_platform_id", ""),
+                differentiators=frontmatter.get("differentiators", []),
+            )
+            
+        if obj_type == EngineeringObjectType.CONFIGURATION:
+            return Configuration(
+                **kwargs,
+                base_platform_id=frontmatter.get("base_platform_id", ""),
+                included_components=frontmatter.get("included_components", []),
+                validated=frontmatter.get("validated", False),
             )
 
         return BaseEngineeringObject(**kwargs)

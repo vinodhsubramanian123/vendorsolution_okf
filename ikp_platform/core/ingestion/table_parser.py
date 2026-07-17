@@ -11,7 +11,8 @@ class TableParser:
     bracketed notes (e.g. [OB], (BTO)), and default quantities.
     """
     def __init__(self):
-        self.sku_pattern = re.compile(r"\b([A-Z0-9]{6}-[A-Z0-9]{3})\b")
+        # Matches standard ProLiant parts (e.g. P03178-B21) and short 6-8 char alphanumeric parts (e.g. S2T40A)
+        self.sku_pattern = re.compile(r"\b([A-Z0-9]{6}-[A-Z0-9]{3}|[A-Z0-9]{6,8})\b")
         self.bracket_pattern = re.compile(r"(\[.*?\]|\(.*?\))")
 
     def parse_document(self, pdf_path: str) -> List[Dict[str, Any]]:
@@ -33,12 +34,32 @@ class TableParser:
                         
                     headers = cleaned_table[0]
                     
+                    # Find which column contains SKUs
+                    sku_col_indices = []
+                    for idx, h in enumerate(headers):
+                        h_lower = h.lower()
+                        if "sku" in h_lower or "part" in h_lower or "number" in h_lower:
+                            sku_col_indices.append(idx)
+                            
                     for row in cleaned_table[1:]:
                         for cell_idx, cell_text in enumerate(row):
+                            # Only extract SKU if we are in a known SKU column, or if we couldn't find the column 
+                            # we fall back to checking all cells but being very strict.
+                            is_sku_col = cell_idx in sku_col_indices
+                            
                             sku_match = self.sku_pattern.search(cell_text)
                             
                             if sku_match:
                                 sku = sku_match.group(1)
+                                
+                                # Filter out false positives for the short pattern:
+                                if "-" not in sku and not any(c.isdigit() for c in sku):
+                                    continue
+                                    
+                                # If we know the SKU columns, and this cell isn't one, it's a false positive (e.g. 6000MT/s in description)
+                                if len(sku_col_indices) > 0 and not is_sku_col:
+                                    continue
+                                    
                                 brackets = self.bracket_pattern.findall(cell_text)
                                 
                                 # Better heuristic for description: 

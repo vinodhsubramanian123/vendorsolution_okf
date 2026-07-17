@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from typing import List, Dict, Any
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -13,14 +14,13 @@ class ObsidianMCPClient:
     """
     def __init__(self, vault_path: str):
         self.vault_path = vault_path
+        # Inherit PATH from parent environment instead of hardcoding
+        env = dict(os.environ)
+        env["SEEKSTONE_VAULT"] = self.vault_path
         self.server_params = StdioServerParameters(
             command="seekstone",
             args=[],
-            env={
-                "SEEKSTONE_VAULT": self.vault_path,
-                # Ensure node/npm are in path
-                "PATH": "/home/vinodh/.nvm/versions/node/v22.22.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-            }
+            env=env,
         )
 
     async def _search_async(self, query: str) -> List[str]:
@@ -71,5 +71,21 @@ class ObsidianMCPClient:
         Returns a list of relative paths matching the search.
         """
         logger.info(f"Executing Obsidian MCP search for: {query}")
-        return asyncio.run(self._search_async(query))
+        try:
+            loop = asyncio.get_running_loop()
+            is_running = True
+        except RuntimeError:
+            is_running = False
+            
+        if is_running:
+            import threading
+            result = []
+            def _run():
+                result.append(asyncio.run(self._search_async(query)))
+            t = threading.Thread(target=_run)
+            t.start()
+            t.join()
+            return result[0]
+        else:
+            return asyncio.run(self._search_async(query))
 
