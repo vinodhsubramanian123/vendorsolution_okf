@@ -1,6 +1,238 @@
 # IKP Operations Log
 
 ## 2026-07-17
+* `20:13:08 UTC` — Added Category Limit: Max OCP Slots
+
+* `20:13:08 UTC` — Added Component: 2200W Power Supply
+
+* `20:13:07 UTC` — Added Component: 1000W Power Supply
+
+* `20:13:07 UTC` — Added Component: 800W Power Supply
+
+* `20:13:07 UTC` — Added Component: 1600W Power Supply
+
+* `20:13:07 UTC` — Added SKU: SKU H49SXE
+
+* `20:13:07 UTC` — Added Component: H49SXE - 
+
+* `20:13:07 UTC` — Added SKU: SKU H49SWE
+
+* `20:13:07 UTC` — Added Component: H49SWE - 
+
+* `20:13:06 UTC` — Added SKU: SKU H49RSE
+
+* `20:13:06 UTC` — Added Component: H49RSE - 
+
+* `20:13:06 UTC` — Added SKU: SKU U4555E
+
+* `20:13:06 UTC` — Added Component: U4555E - 
+
+* `20:13:06 UTC` — Added SKU: SKU BD505A
+
+* `20:13:06 UTC` — Added Component: BD505A - Features ().
+
+* `20:13:05 UTC` — Added SKU: SKU P48922-B21
+
+* `20:13:05 UTC` — Added Component: P48922-B21 - This option requires the selection of HPE Intrusio...
+
+* `20:13:05 UTC` — Added SKU: SKU DL380T
+
+* `20:13:05 UTC` — Added Component: DL380T - ProLiant Compute DL380 Gen12 is re-branded as a HP...
+
+* `20:13:05 UTC` — Added SKU: SKU P03178-B21
+
+* `20:13:05 UTC` — Added Component: P03178-B21 - B21, , and P44712-B21 are 96% efficient, thus meet...
+
+* `20:13:05 UTC` — Added SKU: SKU 865438
+
+* `20:13:05 UTC` — Added Component: 865438 - output and 96% for single-output. HPE Flexible Slo...
+
+* `20:13:04 UTC` — Added SKU: SKU R7N87A
+
+* `20:13:04 UTC` — Added Component: R7N87A - 
+
+* `20:13:04 UTC` — Added SKU: SKU SN1700Q
+
+* `20:13:04 UTC` — Added Component: SN1700Q - HPE  64Gb 1-port Fibre Channel Host Bus Adapter
+
+* `20:13:04 UTC` — Added SKU: SKU SN1610Q
+
+* `20:13:04 UTC` — Added Component: SN1610Q - HPE  32Gb 1-port Fibre Channel Host Bus Adapter
+
+* `20:13:04 UTC` — Added SKU: SKU S5T74C
+
+* `20:13:04 UTC` — Added Component: S5T74C - 
+
+* `20:13:03 UTC` — Added SKU: SKU P83356-B21
+
+* `20:13:03 UTC` — Added Component: P83356-B21 - 
+
+* `20:13:03 UTC` — Added SKU: SKU P80997-B21
+
+* `20:13:03 UTC` — Added Component: P80997-B21 - 
+
+* `20:13:03 UTC` — Added SKU: SKU P77486-B21
+
+* `20:13:03 UTC` — Added Component: P77486-B21 - .
+
+* `20:13:03 UTC` — Added SKU: SKU P72207-B21
+
+* `20:13:03 UTC` — Added Component: P72207-B21 - 
+
+* `20:13:02 UTC` — Added SKU: SKU P76463-B21
+
+* `20:13:02 UTC` — Added Component: P76463-B21 - .
+
+* `20:13:02 UTC` — Added SKU: SKU P76462-B21
+
+* `20:13:02 UTC` — Added Component: P76462-B21 - .
+
+* `20:13:02 UTC` — Added SKU: SKU P77492-B21
+
+* `20:13:02 UTC` — Added Component: P77492-B21 - (HPE ProLiant Compute DL380 Gen12 16SFF x4 1x Gen4...
+
+* `20:13:02 UTC` — Added SKU: SKU P25527-B21
+
+* `20:13:02 UTC` — Added Component: P25527-B21 - .
+
+* `20:13:02 UTC` — Added SKU: SKU P48802-B21
+
+* `20:13:01 UTC` — Added Component: P48802-B21 - .
+
+* `20:13:01 UTC` — Added SKU: SKU P48803-B21
+
+* `20:13:01 UTC` — Added Component: P48803-B21 - .
+
+* `20:13:01 UTC` — Added SKU: SKU P74741-B21
+
+* `20:13:01 UTC` — Added Component: P74741-B21 - 4LFF Midplane drive cage () can be selected with 2...
+
+* `20:13:01 UTC` — Added SKU: SKU P74734-B21
+
+* `20:13:01 UTC` — Added Component: P74734-B21 - Up to 6 SFF in rear − DL380 Gen12 2SFF Rear Primar...
+
+* `20:13:01 UTC` — Added SKU: SKU P75807-B21
+
+* `20:13:01 UTC` — Added Component: P75807-B21 - − DL3XX Gen12 Front SFF for 2SFF Enablement U.3 HD...
+
+* `20:13:00 UTC` — Added SKU: SKU P75740-B21
+
+* `20:13:00 UTC` — Added Component: P75740-B21 - − DL3XX Gen12 8SFF x1 U.3 TM Kit () or/and − DL3XX...
+
+* `20:13:00 UTC` — Added SKU: SKU P36394-B21
+
+* `20:13:00 UTC` — Added Component: P36394-B21 - – Optional.
+
+* `20:13:00 UTC` — Added SKU: SKU P73282-B21
+
+* `20:13:00 UTC` — Added Component: P73282-B21 - SKU Number
+
+* `20:13:00 UTC` — Added SKU: SKU P74758-B21
+
+* `20:13:00 UTC` — Added Component: P74758-B21 - 1 Front Secondary OCP (OCP3.0) (Box 2, Bay 11)
+
+* `20:13:00 UTC` — Added SKU: SKU P74757-B21
+
+* `20:13:00 UTC` — Added Component: P74757-B21 - 1 Front Primary OCP2 (OCP3.0) (Box 2, Bay 9)
+
+* `20:12:59 UTC` — Added SKU: SKU P72203-B21
+
+* `20:12:59 UTC` — Added Component: P72203-B21 - P72205-B21 & P72207-B21
+
+* `20:12:59 UTC` — Added SKU: SKU P72201-B21
+
+* `20:12:59 UTC` — Added Component: P72201-B21 - Default &
+
+* `20:12:59 UTC` — Added SKU: SKU 6000MT
+
+* `20:12:59 UTC` — Added Component: 6000MT - 8.0 TB 32 x 256 GB RDIMM /s @ 2DPC
+
+* `20:12:58 UTC` — Added Rule: Engineering Rule 106
+
+* `20:12:58 UTC` — Added Rule: Engineering Rule 105
+
+* `20:12:58 UTC` — Added Rule: Engineering Rule 104
+
+* `20:12:57 UTC` — Added Rule: Engineering Rule 103
+
+* `20:12:57 UTC` — Added Rule: Engineering Rule 102
+
+* `20:12:57 UTC` — Added Rule: Engineering Rule 101
+
+* `20:12:56 UTC` — Added Rule: Engineering Rule 100
+
+* `20:12:56 UTC` — Added Rule: Engineering Rule 99
+
+* `20:12:56 UTC` — Added Rule: Engineering Rule 98
+
+* `20:12:56 UTC` — Added Rule: Engineering Rule 97
+
+* `20:12:55 UTC` — Added Rule: Engineering Rule 96
+
+* `20:12:55 UTC` — Added Rule: Engineering Rule 95
+
+* `20:12:55 UTC` — Added Rule: Engineering Rule 94
+
+* `20:12:55 UTC` — Added Rule: Engineering Rule 93
+
+* `20:12:54 UTC` — Added Rule: Engineering Rule 92
+
+* `20:12:54 UTC` — Added Rule: Engineering Rule 91
+
+* `20:12:54 UTC` — Added Rule: Engineering Rule 90
+
+* `20:12:54 UTC` — Added Rule: Engineering Rule 89
+
+* `20:12:54 UTC` — Added Rule: Engineering Rule 88
+
+* `20:12:53 UTC` — Added Rule: Engineering Rule 87
+
+* `20:12:53 UTC` — Added Rule: Engineering Rule 86
+
+* `20:12:53 UTC` — Added Rule: Engineering Rule 85
+
+* `20:12:53 UTC` — Added Rule: Engineering Rule 84
+
+* `20:12:53 UTC` — Added Rule: Engineering Rule 83
+
+* `20:12:52 UTC` — Added Rule: Engineering Rule 82
+
+* `20:12:52 UTC` — Added Rule: Engineering Rule 81
+
+* `20:12:52 UTC` — Added Rule: Engineering Rule 80
+
+* `20:12:52 UTC` — Added Rule: Engineering Rule 79
+
+* `20:12:52 UTC` — Added Rule: Engineering Rule 78
+
+* `20:12:51 UTC` — Added Rule: Engineering Rule 77
+
+* `20:12:51 UTC` — Added Rule: Engineering Rule 76
+
+* `20:12:51 UTC` — Added Rule: Engineering Rule 75
+
+* `20:12:51 UTC` — Added Rule: Engineering Rule 74
+
+* `20:12:51 UTC` — Added Rule: Engineering Rule 73
+
+* `20:12:50 UTC` — Added Rule: Engineering Rule 72
+
+* `20:12:50 UTC` — Added Rule: Engineering Rule 71
+
+* `20:12:50 UTC` — Added Rule: Engineering Rule 70
+
+* `20:12:50 UTC` — Added Rule: Engineering Rule 69
+
+* `20:12:49 UTC` — Added Rule: Engineering Rule 68
+
+* `20:12:49 UTC` — Added Rule: Engineering Rule 67
+
+* `20:12:49 UTC` — Added Rule: Engineering Rule 66
+
+* `20:12:48 UTC` — Added Rule: Engineering Rule 65
+
+* `20:12:48 UTC` — Added Rule: Engineering Rule 64
+
 * `20:12:48 UTC` — Added Rule: Engineering Rule 63
 
 * `20:12:48 UTC` — Added Rule: Engineering Rule 62
