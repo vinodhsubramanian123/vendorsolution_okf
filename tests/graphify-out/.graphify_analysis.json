@@ -1,0 +1,181 @@
+{
+  "communities": {
+    "0": [
+      "test_foundation",
+      "test_foundation_rationale_1",
+      "test_foundation_rationale_258",
+      "test_foundation_rationale_52",
+      "test_foundation_temp_dir",
+      "test_foundation_testokfreader",
+      "test_foundation_testokfreader_test_round_trip",
+      "test_foundation_testokfwriter",
+      "test_foundation_testokfwriter_test_generates_index",
+      "test_foundation_testokfwriter_test_hierarchical_path",
+      "test_foundation_testokfwriter_test_hierarchical_path_component",
+      "test_foundation_testokfwriter_test_log_entry",
+      "test_foundation_testokfwriter_test_writes_valid_frontmatter",
+      "test_foundation_testrepomanager",
+      "test_foundation_testrepomanager_test_add_and_bootstrap"
+    ],
+    "1": [
+      "test_foundation_rationale_291",
+      "test_foundation_testgraphbuilder",
+      "test_foundation_testgraphbuilder_build_test_graph",
+      "test_foundation_testgraphbuilder_test_filter_by_capabilities",
+      "test_foundation_testgraphbuilder_test_filter_by_component_category",
+      "test_foundation_testgraphbuilder_test_filter_by_custom_attributes",
+      "test_foundation_testgraphbuilder_test_filter_by_rule_and_constraint",
+      "test_foundation_testgraphbuilder_test_filter_by_solution_domain",
+      "test_foundation_testgraphbuilder_test_filter_by_vendor",
+      "test_foundation_testgraphbuilder_test_filter_by_workload_requirements",
+      "test_foundation_testgraphbuilder_test_filter_by_workload_type",
+      "test_foundation_testgraphbuilder_test_get_dependencies",
+      "test_foundation_testgraphbuilder_test_stats",
+      "test_foundation_testgraphbuilder_test_traverse_relationships"
+    ],
+    "2": [
+      "test_foundation_rationale_104",
+      "test_foundation_rationale_119",
+      "test_foundation_rationale_141",
+      "test_foundation_rationale_81",
+      "test_foundation_testontologymodels",
+      "test_foundation_testontologymodels_test_knowledge_delta_creation",
+      "test_foundation_testontologymodels_test_platform_creation",
+      "test_foundation_testontologymodels_test_rule_creation_with_full_fields",
+      "test_foundation_testontologymodels_test_solution_candidate",
+      "test_foundation_testontologymodels_test_source_registration"
+    ],
+    "3": [
+      "test_fuzzy_matching",
+      "test_fuzzy_matching_testfuzzymatching",
+      "test_fuzzy_matching_testfuzzymatching_setup",
+      "test_fuzzy_matching_testfuzzymatching_test_exact_match",
+      "test_fuzzy_matching_testfuzzymatching_test_fuzzy_match",
+      "test_fuzzy_matching_testfuzzymatching_test_invalid_match"
+    ],
+    "4": [
+      "test_category_limits",
+      "test_category_limits_testcategorylimits",
+      "test_category_limits_testcategorylimits_setup",
+      "test_category_limits_testcategorylimits_test_exceeds_limit",
+      "test_category_limits_testcategorylimits_test_within_limit"
+    ],
+    "5": [
+      "test_ingestion",
+      "test_ingestion_testingestion",
+      "test_ingestion_testingestion_setup_method",
+      "test_ingestion_testingestion_test_rule_extraction",
+      "test_ingestion_testingestion_test_structured_components"
+    ],
+    "6": [
+      "test_mcp_integration",
+      "test_mcp_integration_rationale_21",
+      "test_mcp_integration_rationale_6",
+      "test_mcp_integration_test_mcp_client_init",
+      "test_mcp_integration_test_mcp_server_parameters"
+    ],
+    "7": [
+      "test_reasoning",
+      "test_reasoning_test_intent_parser",
+      "test_reasoning_test_repo_graph_integration",
+      "test_reasoning_test_rule_engine",
+      "test_reasoning_test_solution_generator"
+    ],
+    "8": [
+      "test_api_endpoints",
+      "test_api_endpoints_test_health_endpoint",
+      "test_api_endpoints_test_query_endpoint"
+    ],
+    "9": [
+      "test_topology",
+      "test_topology_testtopology",
+      "test_topology_testtopology_test_slot_mapping"
+    ],
+    "10": [
+      "init"
+    ]
+  },
+  "cohesion": {
+    "0": 0.13333333333333333,
+    "1": 0.26373626373626374,
+    "2": 0.2,
+    "3": 0.3333333333333333,
+    "4": 0.4,
+    "5": 0.4,
+    "6": 0.4,
+    "7": 0.4,
+    "8": 0.6666666666666666,
+    "9": 0.6666666666666666,
+    "10": 1.0
+  },
+  "gods": [
+    {
+      "id": "test_foundation_testgraphbuilder",
+      "label": "TestGraphBuilder",
+      "degree": 13
+    },
+    {
+      "id": "test_foundation_testontologymodels",
+      "label": "TestOntologyModels",
+      "degree": 6
+    },
+    {
+      "id": "test_foundation_testokfwriter",
+      "label": "TestOKFWriter",
+      "degree": 6
+    },
+    {
+      "id": "test_fuzzy_matching_testfuzzymatching",
+      "label": "TestFuzzyMatching",
+      "degree": 5
+    },
+    {
+      "id": "test_category_limits_testcategorylimits",
+      "label": "TestCategoryLimits",
+      "degree": 4
+    },
+    {
+      "id": "test_ingestion_testingestion",
+      "label": "TestIngestion",
+      "degree": 4
+    },
+    {
+      "id": "test_foundation_temp_dir",
+      "label": "temp_dir()",
+      "degree": 2
+    },
+    {
+      "id": "test_foundation_testokfreader",
+      "label": "TestOKFReader",
+      "degree": 2
+    },
+    {
+      "id": "test_foundation_testrepomanager",
+      "label": "TestRepoManager",
+      "degree": 2
+    },
+    {
+      "id": "test_mcp_integration_test_mcp_server_parameters",
+      "label": "test_mcp_server_parameters()",
+      "degree": 2
+    }
+  ],
+  "surprises": [],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `TestGraphBuilder` connect `Graph Construction and Filtering` to `Foundation Layer Tests`?",
+      "why": "High betweenness centrality (0.142) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `TestOntologyModels` connect `Ontology and Knowledge Models` to `Foundation Layer Tests`?",
+      "why": "High betweenness centrality (0.118) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Foundation Layer Tests` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

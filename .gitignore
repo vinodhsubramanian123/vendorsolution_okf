@@ -32,3 +32,20 @@ logs/
 # Temp
 tmp/
 .temp/
+
+# Graphify
+graphify-out/cost.json
+
+# Obsidian Vault Artifacts
+.obsidian/
+.graphify_obsidian_manifest.json
+graph.canvas
+
+# Ignore all auto-generated markdown nodes in the root
+/*.md
+
+# But explicitly whitelist your actual root documentation
+!/README.md
+!/CONTEXT.md
+!/STATE.md
+!/LOG.md
