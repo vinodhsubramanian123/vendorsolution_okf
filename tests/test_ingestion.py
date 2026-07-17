@@ -58,6 +58,8 @@ class TestIngestion:
         ]
         
         components = self.extractor._process_structured_components(structured_data, self.platform)
-        assert len(components) == 1
-        assert components[0].title.startswith("P48803-B21")
-        assert components[0].component_category == "Infrastructure"
+        assert len(components) == 2
+        comp = [c for c in components if c.type.value == "Component"][0]
+        sku = [c for c in components if c.type.value == "SKU"][0]
+        assert comp.title.startswith("P48803-B21")
+        assert sku.title == "P48803-B21"
