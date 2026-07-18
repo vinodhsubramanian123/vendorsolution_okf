@@ -88,7 +88,7 @@ class OKFReader:
         # We can split by "\n---\n" and handle chunks.
         import re
         # Find all frontmatter blocks
-        pattern = re.compile(r"^---\n(.*?)\n---\n(.*?)(?=\n---|$)", re.MULTILINE | re.DOTALL)
+        pattern = re.compile(r"(?:^|\n)---\n(.*?)\n---\n(.*?)(?=\n---\n|\Z)", re.DOTALL)
         
         matches = pattern.findall(content)
         if not matches:

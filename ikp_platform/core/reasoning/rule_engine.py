@@ -156,8 +156,9 @@ class RuleEngine:
                         errors.append(f"Constraint violation: {limit_name} (Max: {limit_value}, Requested: {current_qty})")
                     else:
                         evidence = c_data.get("evidence", [{}])[0] if c_data.get("evidence") else {}
-                        conf = evidence.get("confidence", "UNKNOWN")
-                        snippet = evidence.get("original_text_snippet", "")
+                        conf_raw = evidence.get("confidence", "UNKNOWN")
+                        conf = conf_raw.value if hasattr(conf_raw, "value") else str(conf_raw)
+                        snippet = str(evidence.get("original_text_snippet") or "").strip()[:120]
                         reasoning_chain.append(f"Constraint passed: {c_data.get('title')} ({current_qty} <= {limit_value}) [Confidence: {conf}] | Trace: '{snippet}'")
             elif c_type == EngineeringObjectType.CONSTRAINT.value:
                 # Generic constraints require a CSP solver for thermal/power/spatial properties.
@@ -208,11 +209,15 @@ class RuleEngine:
             
             if applies:
                 applicable_count += 1
-                severity = r_data.get("attr_severity", RuleSeverity.INFO.value)
+                # 'severity' is stored directly (see graph_builder.py line 81)
+                severity_raw = r_data.get("severity") or r_data.get("attr_severity") or RuleSeverity.INFO.value
+                severity = severity_raw.value if hasattr(severity_raw, "value") else str(severity_raw)
                 
                 evidence = r_data.get("evidence", [{}])[0] if r_data.get("evidence") else {}
-                conf = evidence.get("confidence", "UNKNOWN")
-                snippet = evidence.get("original_text_snippet", "")
+                conf_raw = evidence.get("confidence", "UNKNOWN")
+                # Confidence may be stored as an Enum object from deserialization — coerce to string value
+                conf = conf_raw.value if hasattr(conf_raw, "value") else str(conf_raw)
+                snippet = str(evidence.get("original_text_snippet") or "").strip()[:120]
                 rule_text = r_data.get("description") or r_data.get("attr_expected_outcome") or r_data.get("title")
                 
                 msg = f"Rule evaluated: {rule_text} [{severity}] [Confidence: {conf}] | Trace: '{snippet}'"

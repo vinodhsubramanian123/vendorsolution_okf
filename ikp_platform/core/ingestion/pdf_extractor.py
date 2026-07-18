@@ -448,7 +448,7 @@ class PDFExtractor:
         # Find processor table data
         # Pattern: Model  BaseSpeed  Cores  Cache  Power  UPI  DDR5  SGX  Die
         proc_pattern = re.compile(
-            r"(6\d{3}[EP]?)\s+"          # Model (e.g., 6710E, 6507P)
+            r"([4-9]\d{3}[A-Z]{0,2})\s+" # Model (e.g., 6710E, 8468, 9654P)
             r"(\d+\.?\d*)\s+"             # Base Speed GHz
             r"(\d+)\s+"                    # Cores
             r"(\d+)\s+"                    # L3 Cache MB
@@ -1001,6 +1001,19 @@ class PDFExtractor:
     # Component Category Taxonomy — comprehensive classification
     # -------------------------------------------------------------------
 
+    COMPONENT_WEIGHT_MAP = {
+        "Platform": 100,
+        "CPU": 90,
+        "Memory": 80,
+        "Storage": 70,
+        "Networking": 60,
+        "Accelerator": 85,
+        "Power": 50,
+        "Thermal": 40,
+        "Chassis": 30,
+        "Infrastructure": 20,
+    }
+
     COMPONENT_CATEGORY_MAP = [
         # (keywords_list, category, subcategory)  — checked in priority order
         # Memory
@@ -1128,13 +1141,59 @@ class PDFExtractor:
             attributes = []
             if qty > 0:
                 attributes.append(EngineeringAttribute(name="Default Quantity", value=qty))
+                
+            weight = self.COMPONENT_WEIGHT_MAP.get(cat, 10)
+            attributes.append(EngineeringAttribute(name="Component Weight", value=weight))
+
+            if cat == "CPU":
+                core_match = re.search(r'(\d+)\s*[-]?\s*core', desc, re.IGNORECASE)
+                ghz_match = re.search(r'(\d+\.\d+)\s*GHz', desc, re.IGNORECASE)
+                tdp_match = re.search(r'(\d+)\s*W', desc, re.IGNORECASE)
+                if core_match: attributes.append(EngineeringAttribute(name="Cores", value=int(core_match.group(1))))
+                if ghz_match: attributes.append(EngineeringAttribute(name="Base Speed", value=float(ghz_match.group(1)), unit="GHz"))
+                if tdp_match: attributes.append(EngineeringAttribute(name="TDP", value=int(tdp_match.group(1)), unit="W"))
+            
+            if cat == "Memory":
+                cap_match = re.search(r'(\d+)\s*GB', desc, re.IGNORECASE)
+                ddr_match = re.search(r'(DDR[45])', desc, re.IGNORECASE)
+                speed_match = re.search(r'(\d{4})\s*MT/s', desc, re.IGNORECASE)
+                if cap_match: attributes.append(EngineeringAttribute(name="Capacity", value=int(cap_match.group(1)), unit="GB"))
+                if ddr_match: capabilities.append(ddr_match.group(1).upper())
+                if speed_match: attributes.append(EngineeringAttribute(name="Speed", value=int(speed_match.group(1)), unit="MT/s"))
 
             # Create the engineering Component
             comp_id = f"{platform_id}/components/{sku.lower()}"
+            relationships = [
+                EngineeringRelationship(
+                    target_id=platform_id,
+                    relationship_type=RelationshipType.COMPATIBLE_WITH,
+                )
+            ]
+            
+            role = data.get("role", "component")
+            if role == "dependency_note":
+                requires_match = re.search(r'Requires\s+([A-Z0-9]{6}-[A-Z0-9]{3}|[A-Z0-9]{6,8})', desc, re.IGNORECASE)
+                incompat_match = re.search(r'Cannot be selected with\s+([A-Z0-9]{6}-[A-Z0-9]{3}|[A-Z0-9]{6,8})', desc, re.IGNORECASE)
+                
+                if requires_match:
+                    target_sku = requires_match.group(1).lower()
+                    target_comp_id = f"{platform_id}/components/{target_sku}"
+                    relationships.append(EngineeringRelationship(
+                        target_id=target_comp_id,
+                        relationship_type=RelationshipType.REQUIRES
+                    ))
+                if incompat_match:
+                    target_sku = incompat_match.group(1).lower()
+                    target_comp_id = f"{platform_id}/components/{target_sku}"
+                    relationships.append(EngineeringRelationship(
+                        target_id=target_comp_id,
+                        relationship_type=RelationshipType.INCOMPATIBLE_WITH
+                    ))
+
             comp = Component(
                 id=comp_id,
-                title=f"{sku} - {desc[:50]}..." if len(desc) > 50 else f"{sku} - {desc}",
-                description=desc,
+                title=(f"{sku} - {desc[:50]}..." if len(desc) > 50 else f"{sku} - {desc}").rstrip(" -").strip() if desc else sku,
+                description=desc or None,
                 vendor=platform.vendor if platform else "Unknown",
                 solution_domain=platform.solution_domain if platform else "Unknown",
                 product_family=platform.product_family if platform else None,
@@ -1146,12 +1205,7 @@ class PDFExtractor:
                 inclusive_qty=inclusive_qty,
                 capabilities=capabilities,
                 attributes=attributes,
-                relationships=[
-                    EngineeringRelationship(
-                        target_id=platform_id,
-                        relationship_type=RelationshipType.COMPATIBLE_WITH,
-                    )
-                ],
+                relationships=relationships,
                 evidence=[EvidenceRecord(
                     source_id=self.source.source_id,
                     confidence=ConfidenceLevel.HIGH,

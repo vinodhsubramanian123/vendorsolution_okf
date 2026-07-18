@@ -21,20 +21,23 @@ class TestFuzzyMatching(unittest.TestCase):
     def test_exact_match(self):
         result = self.validator.validate(["P51174-B21"], {"solution_id": "sol1"})
         self.assertTrue(result.is_valid)
-        self.assertEqual(len(result.messages), 0)
+        messages = [m for m in result.messages if m.severity != "Warning"]
+        self.assertEqual(len(messages), 0)
 
     def test_fuzzy_match(self):
         # Missing hyphen
         result = self.validator.validate(["P51174B21"], {"solution_id": "sol1"})
         self.assertTrue(result.is_valid)
-        self.assertEqual(len(result.messages), 1)
-        self.assertIn("Auto-corrected", result.messages[0].message)
+        messages = [m for m in result.messages if m.severity != "Warning"]
+        self.assertEqual(len(messages), 1)
+        self.assertIn("Auto-corrected", messages[0].message)
 
     def test_invalid_match(self):
         result = self.validator.validate(["INVALID-123"], {"solution_id": "sol1"})
         self.assertFalse(result.is_valid)
-        self.assertEqual(len(result.messages), 1)
-        self.assertIn("Invalid SKU", result.messages[0].message)
+        messages = [m for m in result.messages if m.severity != "Warning"]
+        self.assertEqual(len(messages), 1)
+        self.assertIn("Invalid SKU", messages[0].message)
 
 if __name__ == '__main__':
     unittest.main()

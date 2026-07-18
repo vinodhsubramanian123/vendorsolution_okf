@@ -165,6 +165,19 @@ class GraphBuilder:
         for key, expected in criteria.items():
             actual = attrs.get(key)
 
+            if isinstance(expected, dict) and ("min" in expected or "max" in expected):
+                if actual is None:
+                    return False
+                try:
+                    actual_val = float(actual)
+                    if "min" in expected and actual_val < float(expected["min"]):
+                        return False
+                    if "max" in expected and actual_val > float(expected["max"]):
+                        return False
+                except (ValueError, TypeError):
+                    return False
+                continue
+
             if expected is None:
                 # Must be present
                 if actual is None:

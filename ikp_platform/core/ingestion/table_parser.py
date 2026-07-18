@@ -59,10 +59,20 @@ class TableParser:
                                 raw_desc = cell_text.replace(sku, "")
                                 for b in brackets:
                                     raw_desc = raw_desc.replace(b, "")
+                                # Clean up noise prefixes
                                 description = raw_desc.strip(" -.,|\n")
+                                for p in ["Select the associated trigger SKU", "If the HPE", "•", "−", "-", "*"]:
+                                    if description.startswith(p):
+                                        description = description[len(p):].strip(" -.,|\n")
                                 
-                                if len(description) < 5 and cell_idx > 0:
-                                    description = row[cell_idx - 1].strip(" -.,|\n")
+                                if len(description) < 30:
+                                    prev_desc = row[cell_idx - 1].strip(" -.,|\n") if cell_idx > 0 else ""
+                                    next_desc = row[cell_idx + 1].strip(" -.,|\n") if cell_idx + 1 < len(row) else ""
+                                    best_desc = prev_desc if len(prev_desc) > len(next_desc) else next_desc
+                                    if best_desc:
+                                        description = best_desc
+                                        
+                                role = "dependency_note" if self.sku_pattern.search(description) else "component"
                                     
                                 default_qty = 0
                                 row_text = " ".join(row)
@@ -77,6 +87,7 @@ class TableParser:
                                     "description": description,
                                     "brackets": brackets,
                                     "default_qty": default_qty,
+                                    "role": role,
                                     "page": page_num + 1
                                 })
                                 break
@@ -99,21 +110,30 @@ class TableParser:
                             for b in brackets:
                                 raw_desc = raw_desc.replace(b, "")
                             
-                            # Clean up layout artifacts (lots of spaces from layout=True)
+                            # Clean up noise prefixes
                             description = re.sub(r'\s{2,}', ' ', raw_desc).strip(" -.,|")
+                            for p in ["Select the associated trigger SKU", "If the HPE", "•", "−", "-", "*"]:
+                                if description.startswith(p):
+                                    description = description[len(p):].strip(" -.,|\n")
                             
-                            if len(description) < 5 and idx > 0:
-                                # Fallback to previous line
-                                prev_desc = lines[idx-1].strip(" -.,|")
+                            if len(description) < 30:
+                                prev_desc = lines[idx-1].strip(" -.,|") if idx > 0 else ""
+                                next_desc = lines[idx+1].strip(" -.,|") if idx + 1 < len(lines) else ""
                                 prev_desc = re.sub(r'\s{2,}', ' ', prev_desc)
-                                if prev_desc:
-                                    description = prev_desc
+                                next_desc = re.sub(r'\s{2,}', ' ', next_desc)
+                                
+                                best_desc = prev_desc if len(prev_desc) > len(next_desc) else next_desc
+                                if best_desc:
+                                    description = best_desc
+                                    
+                            role = "dependency_note" if self.sku_pattern.search(description) else "component"
 
                             extracted_components.append({
                                 "sku": sku,
                                 "description": description,
                                 "brackets": brackets,
                                 "default_qty": 0,
+                                "role": role,
                                 "page": page_num + 1
                             })
                             

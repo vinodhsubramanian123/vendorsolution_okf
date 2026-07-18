@@ -49,15 +49,43 @@ class BOQValidator(VendorValidator):
         # Semantic fallback
         if self.vector_store:
             results = self.vector_store.semantic_search(requested_sku, n_results=5)
+            # Dynamic threshold based on length (shorter strings need lower threshold)
+            threshold_score = 0.55 if len(requested_sku) <= 10 else 0.80
+            
             for res_id, score in results:
                 if res_id in self.graph.graph:
                     node_type = self.graph.graph.nodes[res_id].get("type")
                     if node_type in (EngineeringObjectType.SKU.value, EngineeringObjectType.COMPONENT.value):
-                        # Accept semantic matches with >= 80% confidence
-                        if score >= 0.80:
+                        # Accept semantic matches based on dynamic threshold
+                        if score >= threshold_score:
+                            logger.info(f"Semantic fallback match: '{requested_sku}' -> '{res_id}' (score: {score:.2f} >= {threshold_score})")
                             return res_id, True, score, "semantic"
                             
         return requested_sku, False, 0.0, "none"
+
+    def _check_completeness(self, component_ids: List[str], result: ValidationResult):
+        categories_found = set()
+        for comp_id in component_ids:
+            if comp_id in self.graph.graph:
+                node = self.graph.graph.nodes[comp_id]
+                node_type = node.get("type")
+                if node_type == EngineeringObjectType.PLATFORM.value:
+                    categories_found.add("Platform")
+                else:
+                    cat = node.get("attr_component_category") or node.get("category")
+                    if cat:
+                        categories_found.add(cat.upper())
+                        
+        missing = []
+        for req in ["PLATFORM", "CPU", "MEMORY"]:
+            if req not in categories_found:
+                missing.append(req)
+                
+        if missing:
+            result.messages.append(ValidationMessage(
+                severity="Warning",
+                message=f"BOQ may be incomplete. Missing core categories: {', '.join(missing)}",
+            ))
 
     def validate(self, solution_components: List[str], context: dict) -> ValidationResult:
         result = ValidationResult(
@@ -84,4 +112,5 @@ class BOQValidator(VendorValidator):
                 ))
                 result.is_valid = False
                 
+        self._check_completeness(corrected_components, result)
         return result

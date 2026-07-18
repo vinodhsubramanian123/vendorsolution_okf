@@ -49,6 +49,16 @@ class VectorStore:
                 metadata = {"type": obj.type.value, "title": obj.title or obj.id}
                 if hasattr(obj, "component_category") and obj.component_category:
                     metadata["category"] = obj.component_category
+                if hasattr(obj, "vendor") and obj.vendor:
+                    metadata["vendor"] = obj.vendor
+                if hasattr(obj, "generation") and obj.generation:
+                    metadata["generation"] = obj.generation
+                if hasattr(obj, "solution_domain") and obj.solution_domain:
+                    metadata["solution_domain"] = obj.solution_domain
+                if hasattr(obj, "component_subcategory") and obj.component_subcategory:
+                    metadata["subcategory"] = obj.component_subcategory
+                if hasattr(obj, "lifecycle_status") and obj.lifecycle_status:
+                    metadata["lifecycle_status"] = obj.lifecycle_status.value
                 ids.append(obj.id)
                 docs.append(text_repr)
                 metas.append(metadata)
@@ -100,7 +110,7 @@ class VectorStore:
                 distances = results.get("distances", [[0.0] * len(ids)])[0]
                 
                 # Convert L2 distance to a 0.0 - 1.0 confidence score
-                scores = [1.0 / (1.0 + d) for d in distances]
+                scores = [max(0.0, 1.0 - (d / 2.0)) for d in distances]
                 return list(zip(ids, scores))
             return []
         except Exception as e:

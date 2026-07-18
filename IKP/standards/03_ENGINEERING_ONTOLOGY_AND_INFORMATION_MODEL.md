@@ -228,6 +228,12 @@ Components SHALL exist independently of products.
 
 Components SHALL declare a **Category** and a **Subcategory** to support high-granularity validation (e.g. Category: `Infrastructure`, Subcategory: `Cable` or `Riser`). Vendor catalogues typically expose 25+ categories which must be accurately mapped.
 
+### 4.1 Component Weight Hierarchy
+The implementation SHALL organize components using a numeric **Weight Map** (e.g. Platform=100, CPU=90, Memory=80, Storage=70) stored as an `attr_component_weight` attribute. This guarantees that missing core items trigger high severity validation errors, whereas missing accessories trigger lower severity warnings.
+
+### 4.2 Explicit Dependency Notes from Text
+The implementation SHALL automatically translate explicit documentation textual markers (`role=dependency_note`) into formal Graph Edges. For example, text strings like "Requires <SKU>" MUST generate a `REQUIRES` relationship, and "Cannot be selected with <SKU>" MUST generate an `INCOMPATIBLE_WITH` relationship.
+
 ---
 
 ## TopologyNode / SlotMapping

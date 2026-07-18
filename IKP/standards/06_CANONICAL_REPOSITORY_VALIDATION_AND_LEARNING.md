@@ -239,6 +239,11 @@ Never lose canonical identity.
 
 When uncertainty exists, preserve both versions until resolved.
 
+### 7.1 Data Persistence Integrity
+The implementation SHALL strictly preserve block boundaries during read/write cycles. 
+- When parsing markdown objects (like `Rule` body content), regex matching MUST use `re.DOTALL` (or equivalent cross-line evaluation) and match against explicit end-of-file tokens (`\Z`) to guarantee that multi-line body paragraphs are not discarded upon restart.
+- The repository SHALL survive service restarts without losing any graph edges or nested markdown evidence.
+
 ---
 
 # 8. Validation Strategy

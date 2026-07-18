@@ -139,6 +139,13 @@ class SolutionGenerator:
                     compatible_ids = list(set(compatible_ids).intersection(search_matches))
                     logger.info(f"Search engines reduced search space to {len(compatible_ids)} candidates.")
             
+            # Gap 5.3: Sort compatible_ids by component weight (core-first)
+            compatible_ids = sorted(
+                compatible_ids,
+                key=lambda x: float(self.graph.graph.nodes[x].get("attr_component_weight", 0)) if x in self.graph.graph else 0,
+                reverse=True
+            )
+            
             # Prepare a JSON representation of available components for the LLM
             available_nodes = {}
             for cid in compatible_ids:
@@ -147,6 +154,7 @@ class SolutionGenerator:
                     available_nodes[cid] = {
                         "title": node_data.get("title", ""),
                         "category": node_data.get("attr_component_category", ""),
+                        "weight": node_data.get("attr_component_weight", 0)
                     }
                     
             # 2. Serialize customer requirements

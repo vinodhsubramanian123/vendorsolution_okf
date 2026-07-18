@@ -50,6 +50,7 @@ class BOQValidationRequest(BaseModel):
 class SearchRequest(BaseModel):
     query: str
     limit: int = 10
+    filter_metadata: Optional[Dict[str, Any]] = None
 
 import threading
 
@@ -235,7 +236,6 @@ async def validate_boq(request: BOQValidationRequest):
     alternatives = []
     if request.num_options > 0:
         import uuid
-        import random
         from ikp_platform.core.ontology.models import CustomerRequest, CustomerRequirement
         
         # Build generator to find closest working solutions
@@ -249,14 +249,16 @@ async def validate_boq(request: BOQValidationRequest):
         
         candidates = generator.generate(cust_req)
         
-        # Mock partner portal pricing/cost metrics for ranking
+        # Placeholder cost estimates by profile (vendor portal integration pending — ADR-003)
+        _PROFILE_COST_MAP = {
+            "Lowest Cost": 5000,
+            "Balanced": 12000,
+            "Performance Optimized": 22000,
+            "AI Optimized": 28000,
+            "Growth Optimized": 15000,
+        }
         for c in candidates:
-            c_cost = random.randint(5000, 25000)
-            if c.profile == "Lowest Cost":
-                c_cost = random.randint(3000, 8000)
-            elif c.profile == "Performance Optimized":
-                c_cost = random.randint(15000, 30000)
-                
+            c_cost = _PROFILE_COST_MAP.get(c.profile, 12000)
             alt_dict = c.model_dump()
             alt_dict["estimated_cost"] = c_cost
             alternatives.append(alt_dict)
@@ -278,8 +280,15 @@ async def validate_boq(request: BOQValidationRequest):
 async def semantic_search(request: SearchRequest):
     repo = get_repo()
     
-    # Search vector store
-    results = repo.vector_store.semantic_search(request.query, n_results=request.limit)
+    # Gap 7.2: Structured search query logging
+    logger.info(f"SEMANTIC_SEARCH|query='{request.query}'|limit={request.limit}|filter={request.filter_metadata}")
+    
+    # Search vector store (Gap 3.2: Passing filter_metadata to where clause)
+    results = repo.vector_store.semantic_search(
+        request.query, 
+        n_results=request.limit,
+        filter_metadata=request.filter_metadata
+    )
     
     formatted_results = []
     for res_id, score in results:
@@ -287,12 +296,15 @@ async def semantic_search(request: SearchRequest):
         if res_id in repo.graph.graph:
             node_data = repo.graph.graph.nodes[res_id]
             
+        description = node_data.get("description") or node_data.get("title") or res_id
         formatted_results.append({
             "id": res_id,
-            "score": score,
-            "text": node_data.get("description", "No description available"),
+            "score": round(score, 4),
+            "text": description,
             "title": node_data.get("title", res_id),
-            "type": node_data.get("type", "unknown")
+            "type": node_data.get("type", "unknown"),
+            "vendor": node_data.get("vendor"),
+            "product_family": node_data.get("product_family"),
         })
         
     return {

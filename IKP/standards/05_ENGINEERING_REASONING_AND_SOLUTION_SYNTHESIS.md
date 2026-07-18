@@ -283,6 +283,11 @@ Validated Configurations
 
 Engineering reasoning SHALL use relationships rather than keyword matching.
 
+### 8.1 Semantic Fallback & Score Normalization
+When strict relationships are missing, the implementation SHALL fallback to semantic approximation with strict numeric boundaries:
+- **Score Normalization**: Vector distance scores MUST be linearly normalized (e.g. `max(0, 1 - d/2)`) rather than compressed via asymptotic formulas (like `1/(1+d)`) to ensure the difference between near-perfect matches and average matches remains mathematically significant to the UI and reasoning engine.
+- **Dynamic Semantic Thresholds**: To prevent false positives, semantic similarity thresholds SHALL be dynamic based on the string length. Very short strings (e.g., SKUs <= 10 characters) MUST have a lower acceptance threshold (e.g., 0.55) to account for extreme lexical density, while longer descriptive strings MUST use a stricter threshold (e.g., 0.80).
+
 ---
 
 # 9. Compatibility Evaluation

@@ -293,6 +293,13 @@ Examples:
 * Power
 * Dimensions
 
+### 7.1 Implementation Constraints for Extraction
+The implementation SHALL employ a **Multi-Pass Strategy** to guarantee high-fidelity extraction:
+1. **Pass 1 (Structured)**: Extract tabular data with boundary definitions.
+2. **Pass 2 (Layout Fallback)**: Extract layout-based SKUs (often missed by raw tabular logic).
+3. **Attribute Normalization**: The implementation SHALL run a dedicated regex sweep across all SKUs (even unstructured ones) to extract core attributes (`Cores`, `GHz`, `TDP`, `Capacity`, `DDR Type`, `Speed`).
+4. **Description Cleansing**: Descriptions SHALL be parsed using look-ahead/look-back logic if they fall below a strict threshold (e.g. `< 30` characters). Noise prefixes MUST be stripped to prevent garbage entity creation.
+
 ---
 
 ### Rules

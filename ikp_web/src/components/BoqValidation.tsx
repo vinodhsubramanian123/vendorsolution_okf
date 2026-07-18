@@ -8,18 +8,21 @@ export function BoqValidation() {
   const [boqInput, setBoqInput] = useState('');
   const [boqResult, setBoqResult] = useState<any>(null);
   const [isBoqLoading, setIsBoqLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleBoqValidation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!boqInput.trim() || isBoqLoading) return;
     
     setIsBoqLoading(true);
+    setErrorMsg('');
     try {
       const components = boqInput.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
       const res = await axios.post(`${API_BASE}/boq/validate`, { components });
       setBoqResult(res.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to validate BOQ:', error);
+      setErrorMsg(error.response?.data?.detail || 'Failed to connect to validation server. Please try again.');
     } finally {
       setIsBoqLoading(false);
     }
@@ -75,7 +78,20 @@ export function BoqValidation() {
           </button>
         </form>
         
-        {boqResult && (
+        {errorMsg && (
+          <div style={{ marginTop: '16px', padding: '16px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ShieldAlert size={20} />
+            {errorMsg}
+          </div>
+        )}
+
+        {!boqResult && !isBoqLoading && !errorMsg && (
+          <div style={{ marginTop: '24px', padding: '32px', textAlign: 'center', border: '1px dashed var(--border)', borderRadius: '8px', color: 'var(--text-muted)' }}>
+            No BOQ loaded. Upload a CSV or paste SKUs above to begin validation.
+          </div>
+        )}
+        
+        {boqResult && !errorMsg && (
           <div style={{ marginTop: '24px' }}>
             <div style={{ 
               padding: '16px', 
@@ -89,6 +105,29 @@ export function BoqValidation() {
                 {boqResult.is_valid ? 'Validation Passed' : 'Validation Failed'}
               </h3>
             </div>
+            
+            {boqResult.messages && boqResult.messages.length > 0 && (
+              <div style={{ marginTop: '16px' }}>
+                <h4>Validation Messages</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                  {boqResult.messages.map((msg: any, i: number) => {
+                    const bgColor = msg.severity === 'Error' ? 'rgba(239, 68, 68, 0.1)' : msg.severity === 'Warning' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(59, 130, 246, 0.1)';
+                    const borderColor = msg.severity === 'Error' ? '#ef4444' : msg.severity === 'Warning' ? '#eab308' : '#3b82f6';
+                    return (
+                      <div key={i} style={{ 
+                        padding: '12px', 
+                        borderRadius: '6px', 
+                        background: bgColor,
+                        borderLeft: `4px solid ${borderColor}`
+                      }}>
+                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{msg.severity}</div>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{msg.message}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             
             {boqResult.rule_evaluations && boqResult.rule_evaluations.length > 0 && (
               <div style={{ marginTop: '16px' }}>

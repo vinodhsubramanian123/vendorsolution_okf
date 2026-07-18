@@ -185,6 +185,23 @@ The architecture remains largely unchanged throughout this evolution.
 **Impact:** Rules are deterministically persisted per-platform without collisions. Reasoning dynamically matches relevant objects despite granular suffix differences in IDs. Intent effectively routes platform-specific queries to appropriate graph clusters.
 **Approval:** Approved.
 
+### ADR-002: Explicit Graph Edge Preservation across Restarts
+**Date:** 2026-07-18
+**Problem Statement:** `OKFReader` was dropping `Rule` multi-line markdown bodies (which contain explicit Graph Edges) upon restart because the regex relied on `re.MULTILINE` and `$` which matched prematurely at the first newline.
+**Decision:** All markdown payload regex parsers MUST use `re.DOTALL` and strict end-of-file tokens (`\Z`) to guarantee full block extraction of evidence and text-based relationship edges.
+**Impact:** Prevents fatal loss of relationship graph edges on service restart. Graph states are strictly idempotent across persistence cycles.
+**Approval:** Approved.
+
+### ADR-003: Linear Score Normalization and Dynamic Thresholds for Semantic Fallbacks
+**Date:** 2026-07-18
+**Problem Statement:** When checking BOQs, exact ID matches often failed. The semantic fallback used asymptotic score compression (`1/(1+d)`) which washed out the difference between excellent and average matches. Furthermore, a static threshold caused false positives for dense, short strings (like SKUs).
+**Decision:**
+1. **Linear Normalization:** ChromaDB L2 distance MUST be linearly scalarized (`max(0, 1 - d/2)`).
+2. **Dynamic Thresholds:** Semantic acceptance thresholds MUST scale with query length. Short queries (`<= 10` characters) require a looser boundary (`0.55`) to account for dense lexical differences, while long queries require a stricter boundary (`0.80`).
+3. **Weight Hierarchy:** Graph validation MUST prioritize component completeness via numeric `attr_component_weight` hierarchy maps (e.g. Platform=100, CPU=90).
+**Impact:** BOQ validation correctly maps mismatched SKUs (e.g., matching a bare SKU against a descriptive ID) without returning garbage false positives. Component validation can distinguish between missing accessories and missing core infrastructure.
+**Approval:** Approved.
+
 Final Principle
 
 IKP is not a document repository.
