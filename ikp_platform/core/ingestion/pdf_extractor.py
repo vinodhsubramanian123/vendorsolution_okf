@@ -893,6 +893,12 @@ class PDFExtractor:
             severity = RuleSeverity.INFO
             if sev_str == "WARNING": severity = RuleSeverity.WARNING
             elif sev_str == "ERROR": severity = RuleSeverity.ERROR
+
+            conf_str = r_dict.get("confidence", "Medium").upper()
+            confidence = ConfidenceLevel.MEDIUM
+            if conf_str == "HIGH": confidence = ConfidenceLevel.HIGH
+            elif conf_str == "LOW": confidence = ConfidenceLevel.LOW
+            elif conf_str == "UNVERIFIED": confidence = ConfidenceLevel.UNVERIFIED
             
             # MCP CROSS-REFERENCING
             mcp_evidence = []
@@ -911,7 +917,7 @@ class PDFExtractor:
             
             evidence = [EvidenceRecord(
                 source_id=self.source.source_id,
-                confidence=ConfidenceLevel.MEDIUM,
+                confidence=confidence,
                 description="AI-generated rule from text chunk",
                 original_text_snippet=rule_text,
             )]
@@ -928,7 +934,7 @@ class PDFExtractor:
                 platform_id=platform.id if platform else None,
                 scope="Platform",
                 severity=severity,
-                confidence=ConfidenceLevel.MEDIUM,
+                confidence=confidence,
                 applicable_objects=[platform_id],
                 expected_outcome=rule_text,
                 negated=False,

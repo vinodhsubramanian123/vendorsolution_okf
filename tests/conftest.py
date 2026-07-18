@@ -99,7 +99,6 @@ def api_client(temp_repo, monkeypatch):
     from fastapi.testclient import TestClient
     from ikp_platform import api as api_module
 
-    api_module.get_repo.cache_clear()
     monkeypatch.setattr(api_module, "get_repo", lambda: temp_repo)
 
     client = TestClient(api_module.app)

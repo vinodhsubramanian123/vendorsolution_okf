@@ -38,6 +38,7 @@ ikp_platform/core/validation/__init__.py
 ikp_platform/core/validation/boq_validator.py
 ikp_platform/core/validation/validator.py
 ikp_platform/scripts/ingest_catalog.py
+ikp_platform/scripts/reindex.py
 ikp_platform/utils/logger.py
 tests/test_api_endpoints.py
 tests/test_category_limits.py

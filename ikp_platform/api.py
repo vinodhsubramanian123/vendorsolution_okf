@@ -49,23 +49,34 @@ class SearchRequest(BaseModel):
     query: str
     limit: int = 10
 
-import functools
+import threading
 
-@functools.lru_cache(maxsize=1)
+_repo_lock = threading.Lock()
+_repo_instance = None
+
 def get_repo() -> RepoManager:
-    repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
-    loaded = repo.bootstrap()
-    if loaded == 0:
-        logger.critical(
-            "Repository at %s is EMPTY (0 objects loaded). The API will run "
-            "but every query/status/search call will return no results. "
-            "This is expected on a fresh clone -- run "
-            "`./scripts/bootstrap.sh` (or "
-            "`uv run python -m ikp_platform.scripts.ingest_catalog`) to "
-            "seed the repository before using the API.",
-            REPOSITORY_PATH,
-        )
-    return repo
+    global _repo_instance
+    if _repo_instance is not None:
+        return _repo_instance
+        
+    with _repo_lock:
+        if _repo_instance is not None:
+            return _repo_instance
+            
+        repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
+        loaded = repo.bootstrap()
+        if loaded == 0:
+            logger.critical(
+                "Repository at %s is EMPTY (0 objects loaded). The API will run "
+                "but every query/status/search call will return no results. "
+                "This is expected on a fresh clone -- run "
+                "`./scripts/bootstrap.sh` (or "
+                "`uv run python -m ikp_platform.scripts.ingest_catalog`) to "
+                "seed the repository before using the API.",
+                REPOSITORY_PATH,
+            )
+        _repo_instance = repo
+        return _repo_instance
 
 @app.get("/api/status")
 async def get_status():
@@ -253,6 +264,59 @@ async def semantic_search(request: SearchRequest):
         "query": request.query,
         "results": formatted_results
     }
+
+class ApprovalRequest(BaseModel):
+    object_id: str
+
+@app.get("/api/review-queue")
+async def get_review_queue():
+    repo = get_repo()
+    unverified = []
+    
+    for node_id, data in repo.graph.graph.nodes(data=True):
+        conf = data.get("confidence")
+        if conf in ["Unverified", "Medium", "Low"]:
+            unverified.append({
+                "id": node_id,
+                "title": data.get("title", node_id),
+                "type": data.get("type", "Unknown"),
+                "confidence": conf,
+                "description": data.get("description", ""),
+                "evidence": data.get("evidence", [])
+            })
+            
+    return {"queue": unverified}
+
+@app.post("/api/review-queue/approve")
+async def approve_object(request: ApprovalRequest):
+    repo = get_repo()
+    
+    try:
+        # We need to load the full object from disk, update it, and save it back
+        # to ensure it's properly formatted and serialized in OKF.
+        obj_path = None
+        # Naive lookup for file path (assuming standard OKF structure)
+        # However, okf_reader handles this.
+        # But we don't have a direct `get_object` by ID in the reader.
+        # So we scan. In a production app, we'd cache file paths.
+        all_objs = repo.reader.load_all()
+        target_obj = None
+        for o in all_objs:
+            if o.id == request.object_id:
+                target_obj = o
+                break
+                
+        if not target_obj:
+            raise HTTPException(status_code=404, detail="Object not found")
+            
+        from ikp_platform.core.ontology.models import ConfidenceLevel
+        target_obj.confidence = ConfidenceLevel.HIGH
+        repo.add_concept(target_obj)
+        
+        return {"status": "success", "message": f"Approved {request.object_id}"}
+    except Exception as e:
+        logger.error(f"Failed to approve object: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

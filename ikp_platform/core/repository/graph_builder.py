@@ -44,6 +44,12 @@ class GraphBuilder:
             "capabilities": obj.capabilities or [],
         }
 
+        if hasattr(obj, "confidence") and obj.confidence:
+            node_attrs["confidence"] = obj.confidence.value if hasattr(obj.confidence, 'value') else obj.confidence
+            
+        if hasattr(obj, "evidence") and obj.evidence:
+            node_attrs["evidence"] = [e.model_dump() if hasattr(e, 'model_dump') else e for e in obj.evidence]
+
         if hasattr(obj, "component_category") and obj.component_category:
             node_attrs["component_category"] = obj.component_category
             node_attrs["attr_component_category"] = obj.component_category

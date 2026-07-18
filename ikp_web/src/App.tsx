@@ -5,11 +5,12 @@ import { SolutionSynthesis } from './components/SolutionSynthesis';
 import { PlatformDashboard } from './components/PlatformDashboard';
 import { BoqValidation } from './components/BoqValidation';
 import { SemanticSearch } from './components/SemanticSearch';
+import { ValidationPortal } from './components/ValidationPortal';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'query' | 'dashboard' | 'boq' | 'search'>('query');
+  const [activeTab, setActiveTab] = useState<'query' | 'dashboard' | 'boq' | 'search' | 'review'>('query');
   const [status, setStatus] = useState<any>(null);
   
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function App() {
         {activeTab === 'dashboard' && <PlatformDashboard status={status} />}
         {activeTab === 'boq' && <BoqValidation />}
         {activeTab === 'search' && <SemanticSearch />}
+        {activeTab === 'review' && <ValidationPortal />}
       </div>
     </div>
   );

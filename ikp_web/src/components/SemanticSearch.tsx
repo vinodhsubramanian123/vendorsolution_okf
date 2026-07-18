@@ -24,6 +24,14 @@ export function SemanticSearch() {
     }
   };
 
+  // Group results by type
+  const groupedResults = searchResults.reduce((acc: any, res: any) => {
+    const type = res.type || 'Unknown';
+    if (!acc[type]) acc[type] = [];
+    acc[type].push(res);
+    return acc;
+  }, {});
+
   return (
     <>
       <header>
@@ -47,23 +55,29 @@ export function SemanticSearch() {
         </form>
         
         {searchResults.length > 0 && (
-          <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {searchResults.map((res: any, i: number) => (
-              <div key={i} style={{ padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>{res.title || res.id}</span>
-                  <span style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '12px' }}>
-                    Score: {(res.score * 100).toFixed(1)}%
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  <span style={{ textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: '4px', marginRight: '8px' }}>
-                    {res.type}
-                  </span>
-                  {res.id}
-                </div>
-                <div style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
-                  {res.text}
+          <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {Object.keys(groupedResults).sort().map(type => (
+              <div key={type}>
+                <h2 style={{ fontSize: '1.2rem', marginBottom: '12px', color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
+                  {type} ({groupedResults[type].length})
+                </h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {groupedResults[type].map((res: any, i: number) => (
+                    <div key={i} style={{ padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{res.title || res.id}</span>
+                        <span style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '12px' }}>
+                          Score: {(res.score * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                        ID: {res.id}
+                      </div>
+                      <div style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
+                        {res.text}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}

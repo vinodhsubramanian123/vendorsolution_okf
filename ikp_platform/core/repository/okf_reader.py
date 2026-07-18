@@ -56,21 +56,62 @@ class OKFReader:
         for md_file in sorted(self.repository_path.rglob("*.md")):
             if md_file.name in ("index.md", "log.md"):
                 continue
-            obj = self._parse_file(md_file)
-            if obj:
-                objects.append(obj)
+            objs = self._parse_file(md_file)
+            if objs:
+                objects.extend(objs)
 
         return objects
 
-    def _parse_file(self, file_path: Path) -> Optional[BaseEngineeringObject]:
-        """Parse a single OKF Markdown file into a Pydantic model."""
+    def _parse_file(self, file_path: Path) -> List[BaseEngineeringObject]:
+        """Parse an OKF Markdown file that may contain multiple Pydantic models."""
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Extract frontmatter
-        frontmatter, body = self._split_frontmatter(content)
-        if not frontmatter:
-            return None
+        objects = []
+        # Split by document separators if multiple exist
+        # A valid OKF block is:
+        # ---
+        # yaml...
+        # ---
+        # body
+        #
+        # If there are multiple, they will look like:
+        # ---
+        # yaml1
+        # ---
+        # body1
+        # ---
+        # yaml2
+        # ---
+        # body2
+        
+        # We can split by "\n---\n" and handle chunks.
+        import re
+        # Find all frontmatter blocks
+        pattern = re.compile(r"^---\n(.*?)\n---\n(.*?)(?=\n---|$)", re.MULTILINE | re.DOTALL)
+        
+        matches = pattern.findall(content)
+        if not matches:
+            # Fallback to single block parser if regex misses
+            fm, body = self._split_frontmatter(content)
+            if fm:
+                obj = self._build_object(fm, body, file_path)
+                if obj: objects.append(obj)
+            return objects
+            
+        for yaml_content, body_content in matches:
+            try:
+                fm = yaml.safe_load(yaml_content) or {}
+                if fm:
+                    obj = self._build_object(fm, body_content.strip(), file_path)
+                    if obj: objects.append(obj)
+            except yaml.YAMLError:
+                continue
+                
+        return objects
+
+    def _build_object(self, frontmatter: Dict[str, Any], body: str, file_path: Path) -> Optional[BaseEngineeringObject]:
+        """Helper to build a Pydantic object from frontmatter and body."""
 
         obj_type_str = frontmatter.get("type")
         if not obj_type_str:

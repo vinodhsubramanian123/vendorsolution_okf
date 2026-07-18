@@ -69,7 +69,14 @@ class OKFWriter:
                 parts.append(self._slugify(obj.component_category))
 
         # Filename is the slugified id to prevent collisions across platforms
-        filename = self._slugify(obj.id)
+        if obj.type.value == "Rule":
+            cat = getattr(obj, "component_category", None)
+            if cat:
+                filename = f"{self._slugify(cat)}-rules"
+            else:
+                filename = "platform-rules"
+        else:
+            filename = self._slugify(obj.id)
 
         return self.repository_path / Path(*parts) / f"{filename}.md"
 
@@ -248,13 +255,36 @@ class OKFWriter:
         file_path = self._compute_path(obj)
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write("---\n")
-            yaml.dump(frontmatter, f, default_flow_style=False, sort_keys=False)
-            f.write("---\n\n")
-            if body:
-                f.write(body)
-                f.write("\n")
+        import re
+        
+        block = "---\n"
+        block += yaml.dump(frontmatter, default_flow_style=False, sort_keys=False)
+        block += "---\n\n"
+        if body:
+            block += body + "\n"
+
+        if obj.type.value == "Rule":
+            if file_path.exists():
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    
+                # Look for existing block with the same id to replace it
+                pattern_str = r"^---\n.*?\nid:\s*['\"]?" + re.escape(obj.id) + r"['\"]?\n.*?\n---\n.*?(?=\n---|$)"
+                pattern = re.compile(pattern_str, re.MULTILINE | re.DOTALL)
+                
+                if pattern.search(content):
+                    content = pattern.sub(block.strip(), content, count=1)
+                else:
+                    content = content.strip() + "\n\n" + block.strip()
+                    
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(content.strip() + "\n")
+            else:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(block)
+        else:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(block)
 
         return str(file_path.relative_to(self.repository_path))
 

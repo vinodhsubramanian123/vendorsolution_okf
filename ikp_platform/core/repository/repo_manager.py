@@ -12,6 +12,7 @@ Responsibilities:
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import List, Optional
+import difflib
 
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
@@ -83,10 +84,31 @@ class RepoManager:
         explicit step (see scripts/reindex.py) once ingestion is done.
         """
         # Deduplication Check
+        # Perform local semantic text similarity (difflib) to prevent duplicates without LLM I/O
+        if obj.type.value == "Rule" and obj.platform_id:
+            for existing_id, data in self.graph.graph.nodes(data=True):
+                if data.get("type") == "Rule" and data.get("platform_id") == obj.platform_id:
+                    existing_desc = data.get("description", "")
+                    if existing_desc and difflib.SequenceMatcher(None, obj.description, existing_desc).ratio() > 0.90:
+                        # Semantic duplicate found. Align IDs to merge them.
+                        obj.id = existing_id
+                        break
+
         if obj.id in self.graph.graph:
             # We already have this concept. We could merge, but for now we just skip duplicating it in LOG.md
             # We still overwrite the OKF file to allow updates.
             is_new = False
+            # Merge evidence if it's an update
+            existing_node = self.graph.graph.nodes[obj.id]
+            if "evidence" in existing_node:
+                existing_ev = existing_node["evidence"]
+                # Only append if source_id is different
+                for ev in obj.evidence:
+                    if not any(e.get("source_id") == ev.source_id for e in existing_ev):
+                        existing_ev.append(ev.model_dump())
+                # Update the object's evidence list before writing
+                from ikp_platform.core.ontology.models import EvidenceRecord
+                obj.evidence = [EvidenceRecord(**e) for e in existing_ev]
         else:
             is_new = True
 

@@ -136,7 +136,7 @@ Output ONLY valid JSON in the following format:
                 raise ValueError("No Gemini API client configured")
                 
             response = self.client.models.embed_content(
-                model='text-embedding-005',
+                model='gemini-embedding-2',
                 contents=texts
             )
             # The response from google.genai has an 'embeddings' attribute which is a list of objects 
@@ -162,6 +162,7 @@ Output ONLY valid JSON in the following format:
     {{
       "rule_text": "description of the rule",
       "severity": "Info|Warning|Error",
+      "confidence": "High|Medium|Low|Unverified",
       "targets": ["target1", "target2"]
     }}
   ]
@@ -226,6 +227,7 @@ Output ONLY valid JSON in the following format:
     {{
       "rule_text": "description of the subtle rule or constraint",
       "severity": "Info|Warning|Error",
+      "confidence": "High|Medium|Low|Unverified",
       "targets": ["target1", "target2"]
     }}
   ]
