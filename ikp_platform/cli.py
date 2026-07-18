@@ -2,7 +2,13 @@
 IKP CLI — Command-line interface for the Infrastructure Knowledge Platform.
 
 Usage:
-    python -m ikp_platform.cli ingest <path>     Ingest an engineering source
+    python -m ikp_platform.cli ingest <path> [--platform-id=<id>]
+                                                  Ingest an engineering source.
+                                                  --platform-id links Excel/BOQ
+                                                  components to a platform via
+                                                  COMPATIBLE_WITH (required for
+                                                  them to be reachable by
+                                                  solution generation).
     python -m ikp_platform.cli query "<text>"    Query the knowledge base
     python -m ikp_platform.cli validate <id>      Validate a solution candidate
     python -m ikp_platform.cli learn              Run the continuous learning loop
@@ -36,7 +42,7 @@ from ikp_platform.core.reasoning.intent_parser import IntentParser
 from ikp_platform.core.reasoning.solution_generator import SolutionGenerator
 
 
-def cmd_ingest(file_path: str):
+def cmd_ingest(file_path: str, platform_id: str = None):
     """Ingest a single engineering source file."""
     logger.info(f"=== IKP Ingestion Pipeline ===")
     logger.info(f"Source: {file_path}")
@@ -92,7 +98,7 @@ def cmd_ingest(file_path: str):
         registry.update_status(source.source_id, ProcessingStatus.EXTRACTING)
 
         extractor = ExcelExtractor()
-        objects, delta = extractor.extract(source, file_path)
+        objects, delta = extractor.extract(source, file_path, platform_id=platform_id)
 
         logger.info(f"Extracted {len(objects)} engineering objects")
         logger.info(f"Knowledge Delta: {delta.delta_id} with {len(delta.changes)} changes")
@@ -253,7 +259,11 @@ def main():
     command = sys.argv[1]
 
     if command == "ingest" and len(sys.argv) >= 3:
-        cmd_ingest(sys.argv[2])
+        platform_id = None
+        for arg in sys.argv[3:]:
+            if arg.startswith("--platform-id="):
+                platform_id = arg.split("=", 1)[1]
+        cmd_ingest(sys.argv[2], platform_id=platform_id)
     elif command == "query" and len(sys.argv) >= 3:
         cmd_query(sys.argv[2])
     elif command == "validate" and len(sys.argv) >= 3:

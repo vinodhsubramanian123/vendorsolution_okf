@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import shutil
 from typing import List, Dict, Any
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -11,6 +12,12 @@ class ObsidianMCPClient:
     """
     Client for interacting with the Obsidian MCP server (seekstone).
     Provides parallel/fallback search capabilities over the markdown vault.
+
+    Requires the `seekstone` binary on PATH -- genuinely optional, most
+    environments won't have it. `is_available()` lets callers (and
+    search() itself) skip the subprocess-spawn/thread overhead entirely
+    in the common case where it isn't installed, rather than paying that
+    cost on every call just to fail closed.
     """
     def __init__(self, vault_path: str):
         self.vault_path = vault_path
@@ -22,6 +29,10 @@ class ObsidianMCPClient:
             args=[],
             env=env,
         )
+
+    def is_available(self) -> bool:
+        """Whether the seekstone binary can actually be found on PATH."""
+        return shutil.which("seekstone") is not None
 
     async def _search_async(self, query: str) -> List[str]:
         results = []
@@ -70,6 +81,10 @@ class ObsidianMCPClient:
         Synchronous wrapper to execute a search against the vault.
         Returns a list of relative paths matching the search.
         """
+        if not self.is_available():
+            logger.debug("seekstone binary not found on PATH; skipping MCP search.")
+            return []
+
         logger.info(f"Executing Obsidian MCP search for: {query}")
         try:
             loop = asyncio.get_running_loop()

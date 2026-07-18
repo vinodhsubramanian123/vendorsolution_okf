@@ -61,12 +61,15 @@ def test_rule_engine():
     
     assert is_valid is True
 
-def test_repo_graph_integration():
-    from ikp_platform.core.repository.repo_manager import RepoManager
-    import os
-    repo = RepoManager("repository", str(os.getcwd()))
-    repo.bootstrap()
-    
-    # Just checking it doesn't crash and we can query
-    comp = repo.graph.get_compatible("dl380-gen12")
+def test_repo_graph_integration(temp_repo):
+    # temp_repo (see conftest.py) is rooted under pytest's tmp_path and
+    # seeded with fixture data -- this must never point at the real,
+    # on-disk project repository/, or it silently overwrites the real
+    # STATE.md as a side effect of running the test suite. (This has
+    # regressed back to a hardcoded os.getcwd() RepoManager call twice
+    # now -- if you're reading this because it happened a third time,
+    # grep the whole tests/ tree for RepoManager( before assuming this
+    # fixture is the problem.)
+    comp = temp_repo.graph.get_compatible("fixture-dl380-gen12")
     assert comp is not None
+    assert "fixture-dl380-gen12/gpu/nvidia-h100" in comp

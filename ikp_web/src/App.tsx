@@ -30,6 +30,17 @@ export default function App() {
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <div className="main-content">
+        {status && status.repository_seeded === false && (
+          <div className="repo-empty-banner" role="alert" style={{
+            background: '#fff3cd', color: '#664d03', border: '1px solid #ffe69c',
+            borderRadius: '6px', padding: '10px 14px', margin: '0 0 16px 0',
+            fontSize: '14px',
+          }}>
+            The knowledge repository is empty -- queries, search, and the
+            dashboard will return no results until it's seeded. Run{' '}
+            <code>./scripts/bootstrap.sh</code> (see SETUP.md) and reload.
+          </div>
+        )}
         {activeTab === 'query' && <SolutionSynthesis />}
         {activeTab === 'dashboard' && <PlatformDashboard status={status} />}
         {activeTab === 'boq' && <BoqValidation />}

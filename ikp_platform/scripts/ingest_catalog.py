@@ -19,6 +19,9 @@ def ingest_all():
     
     # Initialize Canonical RepoManager
     repo = RepoManager(str(repo_dir), str(project_root))
+
+    succeeded = []
+    failed = []
     
     # Iterate through all source PDFs
     for pdf_file in pdf_dir.glob("*.pdf"):
@@ -45,11 +48,24 @@ def ingest_all():
             repo._record_delta(delta)
             
             logger.info(f"Successfully committed {pdf_file.name} to canonical repository.")
-                
+            succeeded.append(pdf_file.name)
+
         except Exception as e:
             logger.error(f"Error extracting from {pdf_file.name}: {e}", exc_info=True)
+            failed.append((pdf_file.name, str(e)))
 
-    logger.info("\nIKP Catalog Ingestion Complete. STATE.md and LOG.md updated.")
+    logger.info("\n" + "=" * 70)
+    logger.info(f"IKP Catalog Ingestion Complete: {len(succeeded)} succeeded, {len(failed)} failed.")
+    if succeeded:
+        logger.info("Succeeded: " + ", ".join(succeeded))
+    if failed:
+        logger.warning("FAILED (see needs_review/ -- these are NOT in the repository):")
+        for name, err in failed:
+            logger.warning(f"  - {name}: {err}")
+    logger.info("STATE.md and LOG.md updated.")
+    logger.info("=" * 70)
+
+    return succeeded, failed
 
 if __name__ == "__main__":
     ingest_all()

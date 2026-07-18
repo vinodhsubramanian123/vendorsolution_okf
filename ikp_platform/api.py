@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import logging
+import os
 
 from ikp_platform.core.repository.repo_manager import RepoManager
 from ikp_platform.core.reasoning.intent_parser import IntentParser
@@ -17,7 +18,13 @@ app = FastAPI(title="IKP Reasoning API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    # `allow_origins=["*"]` combined with `allow_credentials=True` is
+    # invalid per the CORS spec (browsers reject it outright), so we
+    # take an explicit allowlist instead. Override via CORS_ALLOWED_ORIGINS
+    # (comma-separated) for non-local deployments.
+    allow_origins=os.environ.get(
+        "CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,7 +54,17 @@ import functools
 @functools.lru_cache(maxsize=1)
 def get_repo() -> RepoManager:
     repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
-    repo.bootstrap()
+    loaded = repo.bootstrap()
+    if loaded == 0:
+        logger.critical(
+            "Repository at %s is EMPTY (0 objects loaded). The API will run "
+            "but every query/status/search call will return no results. "
+            "This is expected on a fresh clone -- run "
+            "`./scripts/bootstrap.sh` (or "
+            "`uv run python -m ikp_platform.scripts.ingest_catalog`) to "
+            "seed the repository before using the API.",
+            REPOSITORY_PATH,
+        )
     return repo
 
 @app.get("/api/status")
@@ -78,7 +95,8 @@ async def get_status():
                     platforms[plat_id]["rules"] += 1
 
     return {
-        "status": "online", 
+        "status": "online",
+        "repository_seeded": stats.get("total_nodes", 0) > 0,
         "stats": stats,
         "platforms": platforms
     }

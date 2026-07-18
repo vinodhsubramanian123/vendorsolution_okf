@@ -11,6 +11,7 @@ venv.bak/
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
 
 # Node
 node_modules/
@@ -52,6 +53,7 @@ graph.canvas
 !/CONTEXT.md
 !/STATE.md
 !/LOG.md
+!/SETUP.md
 ikp.log
 mcp_server.log
 graph.canvas

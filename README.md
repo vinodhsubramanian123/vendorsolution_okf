@@ -1,5 +1,9 @@
 # Vendorsolution OKF
 
+> First time here? See **[SETUP.md](SETUP.md)** for install, environment
+> variables, seeding the knowledge repository, and running the app/tests.
+> This doc covers the cross-platform CLI toolchain only.
+
 ## Cross-Platform Toolchain Setup
 To completely prevent path, alias, and virtual environment issues when developing across Windows, macOS, and Linux, we have shipped a `tools/` directory inside this repository.
 

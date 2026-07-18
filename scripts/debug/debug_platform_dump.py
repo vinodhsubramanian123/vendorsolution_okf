@@ -1,7 +1,10 @@
 import sys
-sys.path.append(".")
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
 from ikp_platform.core.repository.repo_manager import RepoManager
-repo = RepoManager("/home/vinodh/vendorsolution_okf/repository", ".")
+repo = RepoManager(str(PROJECT_ROOT / "repository"), str(PROJECT_ROOT))
 repo.bootstrap()
 platforms = repo.graph.filter_by_type("Platform")
 print("Platforms:", platforms)

@@ -44,9 +44,6 @@ tests/test_category_limits.py
 tests/test_foundation.py
 tests/test_fuzzy_matching.py
 tests/test_ingestion.py
-tests/test_limit.py
-tests/test_limit_engine.py
 tests/test_mcp_integration.py
 tests/test_reasoning.py
-tests/test_script.py
 tests/test_topology.py

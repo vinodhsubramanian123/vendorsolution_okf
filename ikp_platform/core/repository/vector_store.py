@@ -15,48 +15,65 @@ class VectorStore:
         self.client = chromadb.PersistentClient(path=persist_directory)
         self.collection = self.client.get_or_create_collection(name="ikp_components")
         self.llm = LLMClient()
-        
-    def index_object(self, obj: BaseEngineeringObject):
-        """Vectorize and index a single object."""
-        # We only index Platforms and Components for semantic search
-        if obj.type.value not in ["Platform", "Component"]:
-            return
-            
-        # Create a rich text representation for embedding
+
+    def index_object(self, obj: BaseEngineeringObject) -> int:
+        """Vectorize and index a single object. Prefer index_many() for
+        bulk ingestion -- this makes one embedding API call per call,
+        which is what made ingesting the whole catalog require 100+
+        blocking network round-trips."""
+        return self.index_many([obj], batch_size=1)
+
+    def index_many(self, objects: List[BaseEngineeringObject], batch_size: int = 20) -> int:
+        """Vectorize and index a list of objects, batching embedding API
+        calls in groups of `batch_size` instead of one call per object.
+        Returns the number of objects successfully indexed."""
+        indexable = [
+            o for o in objects
+            if o is not None and o.type.value in ["Platform", "Component"]
+        ]
+        if not indexable:
+            return 0
+
+        indexed_count = 0
+        for start in range(0, len(indexable), batch_size):
+            batch = indexable[start:start + batch_size]
+            text_reprs = [self._text_repr(o) for o in batch]
+
+            embeddings = self.llm.generate_embeddings(text_reprs)
+
+            ids, docs, metas, embs = [], [], [], []
+            for obj, text_repr, embedding in zip(batch, text_reprs, embeddings):
+                if all(v == 0.0 for v in embedding):
+                    logger.warning(f"Skipping vector index for {obj.id} due to embedding failure.")
+                    continue
+                metadata = {"type": obj.type.value, "title": obj.title or obj.id}
+                if hasattr(obj, "component_category") and obj.component_category:
+                    metadata["category"] = obj.component_category
+                ids.append(obj.id)
+                docs.append(text_repr)
+                metas.append(metadata)
+                embs.append(embedding)
+
+            if not ids:
+                continue
+            try:
+                self.collection.upsert(ids=ids, embeddings=embs, documents=docs, metadatas=metas)
+                indexed_count += len(ids)
+                logger.debug(f"Vectorized and indexed batch of {len(ids)} objects.")
+            except Exception as e:
+                logger.error(f"Failed to index batch in ChromaDB: {e}")
+
+        return indexed_count
+
+    @staticmethod
+    def _text_repr(obj: BaseEngineeringObject) -> str:
         text_repr = f"Type: {obj.type.value}\nTitle: {obj.title or obj.id}\n"
         if hasattr(obj, "component_category") and obj.component_category:
             text_repr += f"Category: {obj.component_category}\n"
         if hasattr(obj, "attributes") and obj.attributes:
             text_repr += f"Attributes: {', '.join(f'{attr.name}={attr.value}' for attr in obj.attributes)}\n"
-            
-        # Generate embedding
-        embeddings = self.llm.generate_embeddings([text_repr])
-        embedding = embeddings[0]
-        
-        # Don't index if embedding failed (all zeros)
-        if all(v == 0.0 for v in embedding):
-            logger.warning(f"Skipping vector index for {obj.id} due to embedding failure.")
-            return
-            
-        # Store in ChromaDB
-        metadata = {
-            "type": obj.type.value,
-            "title": obj.title or obj.id
-        }
-        if hasattr(obj, "component_category") and obj.component_category:
-            metadata["category"] = obj.component_category
-            
-        try:
-            self.collection.upsert(
-                ids=[obj.id],
-                embeddings=[embedding],
-                documents=[text_repr],
-                metadatas=[metadata]
-            )
-            logger.debug(f"Vectorized and indexed: {obj.id}")
-        except Exception as e:
-            logger.error(f"Failed to index {obj.id} in ChromaDB: {e}")
-            
+        return text_repr
+
     def semantic_search(self, query: str, n_results: int = 50, filter_metadata: Optional[Dict[str, Any]] = None) -> List[str]:
         """Search the vector database and return a list of matching IDs."""
         embeddings = self.llm.generate_embeddings([query])

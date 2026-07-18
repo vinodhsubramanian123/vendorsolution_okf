@@ -72,6 +72,15 @@ class RepoManager:
         """
         Add a new engineering concept to both layers.
         Returns the relative path of the written OKF file.
+
+        NOTE: this deliberately does NOT touch the vector store. Ingestion
+        (this method) should only ever require local disk I/O; embedding
+        generation requires a live LLM API call per object and was
+        previously invoked here synchronously -- meaning ingesting the
+        whole catalog required 100+ blocking network round-trips and
+        failed silently (falling back to empty results) whenever no API
+        key was configured. Call `reindex_vector_store()` as a separate,
+        explicit step (see scripts/reindex.py) once ingestion is done.
         """
         # Deduplication Check
         if obj.id in self.graph.graph:
@@ -86,27 +95,36 @@ class RepoManager:
 
         # Add to in-memory graph
         self.graph.add_concept(obj)
-        
-        # Add to Vector Store for semantic search
-        self.vector_store.index_object(obj)
 
-        if is_new:
-            # Update log
-            self.writer.append_log_entry(
-                action="Creation",
-                description=f"Added {obj.type.value}: {obj.title or obj.id}",
-                concept_path=relative_path,
-            )
+        action = "Creation" if is_new else "Update"
+        description = f"{'Added' if is_new else 'Updated'} {obj.type.value}: {obj.title or obj.id}"
 
-            # Update managed files
-            self._update_state_file()
-            self._append_root_log(f"Added {obj.type.value}: {obj.title or obj.id}")
+        # Update log (both creations and updates -- previously only
+        # creations were logged, so re-ingesting a changed source
+        # document left no audit trail of what changed).
+        self.writer.append_log_entry(
+            action=action,
+            description=description,
+            concept_path=relative_path,
+        )
+        self._update_state_file()
+        self._append_root_log(description)
 
         # Regenerate index for parent directory
         file_path = self.repository_path / relative_path
         self.writer.generate_index(file_path.parent)
 
         return relative_path
+
+    def reindex_vector_store(self, batch_size: int = 20) -> int:
+        """
+        (Re)build the semantic search index from everything currently on
+        disk in repository/. Separate from add_concept() on purpose --
+        see its docstring. Batches embedding calls instead of one API
+        call per object. Returns the number of objects indexed.
+        """
+        objects = self.reader.load_all()
+        return self.vector_store.index_many(objects, batch_size=batch_size)
 
     def apply_delta(self, delta: KnowledgeDelta, objects: List[BaseEngineeringObject]) -> None:
         """

@@ -3,7 +3,8 @@ from pathlib import Path
 import logging
 import pandas as pd
 
-sys.path.append(str(Path(__file__).parent.parent.parent))
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
 
 from ikp_platform.core.repository.graph_builder import GraphBuilder
 from ikp_platform.core.reasoning.rule_engine import RuleEngine
@@ -17,7 +18,7 @@ def main():
     graph = GraphBuilder()
     
     # Ingest the real DL580 Gen12 Platform from PDF
-    pdf_path = "/home/vinodh/vendorsolution_okf/sources/pdfs/DL580_Gen12_QuickSpecs.pdf"
+    pdf_path = str(PROJECT_ROOT / "sources" / "pdfs" / "DL580_Gen12_QuickSpecs.pdf")
     
     source = Source(
         source_id="doc_dl580_gen12",

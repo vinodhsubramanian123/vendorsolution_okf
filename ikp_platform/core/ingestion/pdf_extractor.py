@@ -10,6 +10,7 @@ warnings, footnotes, and captions. Ignores decorative content.
 """
 
 import re
+import json
 import fitz  # PyMuPDF
 import hashlib
 from pathlib import Path
@@ -221,9 +222,32 @@ class PDFExtractor:
     # -------------------------------------------------------------------
 
     def _human_in_the_loop_fallback(self, text: str) -> Platform:
-        """Fallback mechanism if automated extraction fails. In an interactive environment, this would prompt."""
+        """
+        Fallback when automated title/vendor/domain extraction fails.
+
+        This does not just raise -- it writes the source's raw candidate
+        lines to needs_review/<source_id>.json so a human can map the
+        platform identity manually, instead of the document silently
+        vanishing with nothing but a log line.
+        """
         logger.warning("Automated Platform Identity Extraction Failed or Confidence < 80%. Triggering HITL fallback.")
-        raise ValueError("HITL_REQUIRED: The pipeline could not confidently determine Vendor, Product Family, or Solution Domain. Please map these properties manually for this datasource.")
+
+        review_dir = Path("needs_review")
+        review_dir.mkdir(exist_ok=True)
+        review_path = review_dir / f"{self.source.source_id}.json"
+        candidate_lines = [l.strip() for l in text[:1500].split('\n') if l.strip()][:15]
+        with open(review_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "source_id": self.source.source_id,
+                "reason": "Could not confidently determine Vendor, Product Family, or Solution Domain.",
+                "candidate_first_lines": candidate_lines,
+            }, f, indent=2)
+
+        raise ValueError(
+            f"HITL_REQUIRED: The pipeline could not confidently determine Vendor, "
+            f"Product Family, or Solution Domain for '{self.source.source_id}'. "
+            f"Wrote candidate lines to {review_path} for manual mapping."
+        )
 
     def _infer_solution_domain(self, text: str) -> str:
         text = text[:5000].lower()

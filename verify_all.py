@@ -1,8 +1,11 @@
 import json
+from pathlib import Path
 from ikp_platform.core.repository.repo_manager import RepoManager
 
+PROJECT_ROOT = Path(__file__).parent
+
 def run_verification():
-    repo = RepoManager('repository', '.')
+    repo = RepoManager(str(PROJECT_ROOT / 'repository'), str(PROJECT_ROOT))
     repo.bootstrap()
     
     cats = {}

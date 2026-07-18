@@ -63,3 +63,62 @@ class TestIngestion:
         sku = [c for c in components if c.type.value == "SKU"][0]
         assert comp.title.startswith("P48803-B21")
         assert sku.title == "SKU P48803-B21"
+
+
+class TestPlatformIdentityAgainstRealPDFs:
+    """
+    Regression tests pinned to the actual source PDFs in sources/pdfs/.
+
+    This exact bug has broken twice already, in different ways:
+      1. Original bug: stopped at the first line containing the vendor
+         name, dropping the model number entirely whenever a PDF's title
+         wrapped across lines (e.g. "HPE ProLiant" / "Compute DL580" /
+         "Gen12" -> id became "hpe-proliant-proliant-gen12").
+      2. Regression from the first fix: grouped lines into blank-line
+         delimited blocks, but these PDFs have no blank line between the
+         title and body text, so the whole document became one
+         oversized block and extraction failed outright (HITL_REQUIRED)
+         for 2 of 3 source documents.
+
+    If this test starts failing, check `_extract_platform_identity`'s
+    line-merging heuristic against the actual `sources/pdfs/*.pdf` text
+    before assuming the fixture data is wrong.
+    """
+
+    import pdfplumber
+    from pathlib import Path
+
+    SOURCES_DIR = Path(__file__).parent.parent / "sources" / "pdfs"
+
+    def _extract_text(self, filename):
+        with self.pdfplumber.open(self.SOURCES_DIR / filename) as pdf:
+            text = ""
+            for page in pdf.pages:
+                text += (page.extract_text() or "") + "\n"
+        return text
+
+    def _identity_for(self, filename):
+        source = Source(id="t", source_id=f"doc_{filename}", source_type=SourceType.PDF, status=ProcessingStatus.PENDING)
+        extractor = PDFExtractor(source)
+        return extractor._extract_platform_identity(self._extract_text(filename))
+
+    def test_dl580_gen12_title_and_id(self):
+        platform = self._identity_for("DL580_Gen12_QuickSpecs.pdf")
+        assert platform.id == "hpe-proliant-dl580-gen12"
+        assert "DL580" in platform.title
+        assert "Gen12" in platform.title
+
+    def test_dl380_gen12_title_and_id(self):
+        platform = self._identity_for(
+            "HPE ProLiant Compute DL380 Gen12 QuickSpecs-a00073551enw.pdf"
+        )
+        assert platform.id == "hpe-proliant-dl380-gen12"
+        assert "DL380" in platform.title
+        assert "Gen12" in platform.title
+
+    def test_alletra_mp_b10000_title_and_id(self):
+        platform = self._identity_for(
+            "HPE Alletra Storage MP B10000 QuickSpecs-a50006985enw.pdf"
+        )
+        assert platform.id == "hpe-alletra-storage-mp-b10000"
+        assert "B10000" in platform.title
