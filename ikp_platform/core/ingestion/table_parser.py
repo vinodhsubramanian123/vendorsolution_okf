@@ -17,24 +17,23 @@ class TableParser:
 
     def parse_document(self, pdf_path: str) -> List[Dict[str, Any]]:
         extracted_components = []
-        logger.info(f"Parsing tables from {pdf_path}")
+        seen_skus = set()
+        logger.info(f"Parsing tables and text from {pdf_path}")
         
         with pdfplumber.open(pdf_path) as pdf:
             for page_num, page in enumerate(pdf.pages):
+                # PASS 1: Strict Table Extraction
                 tables = page.extract_tables()
                 for table_idx, table in enumerate(tables):
                     if not table or len(table) < 2:
                         continue
                         
-                    # Basic cleaning
                     cleaned_table = []
                     for row in table:
                         cleaned_row = [cell.replace('\n', ' ').strip() if cell else "" for cell in row]
                         cleaned_table.append(cleaned_row)
                         
                     headers = cleaned_table[0]
-                    
-                    # Find which column contains SKUs
                     sku_col_indices = []
                     for idx, h in enumerate(headers):
                         h_lower = h.lower()
@@ -43,38 +42,28 @@ class TableParser:
                             
                     for row in cleaned_table[1:]:
                         for cell_idx, cell_text in enumerate(row):
-                            # Only extract SKU if we are in a known SKU column, or if we couldn't find the column 
-                            # we fall back to checking all cells but being very strict.
                             is_sku_col = cell_idx in sku_col_indices
-                            
                             sku_match = self.sku_pattern.search(cell_text)
                             
                             if sku_match:
                                 sku = sku_match.group(1)
-                                
-                                # Filter out false positives for the short pattern:
                                 if "-" not in sku and not any(c.isdigit() for c in sku):
                                     continue
-                                    
-                                # If we know the SKU columns, and this cell isn't one, it's a false positive (e.g. 6000MT/s in description)
                                 if len(sku_col_indices) > 0 and not is_sku_col:
                                     continue
                                     
-                                brackets = self.bracket_pattern.findall(cell_text)
+                                if sku in seen_skus:
+                                    continue
                                 
-                                # Better heuristic for description: 
-                                # Remove the SKU and brackets from the cell text.
-                                # If empty, maybe the previous cell was the description.
+                                brackets = self.bracket_pattern.findall(cell_text)
                                 raw_desc = cell_text.replace(sku, "")
                                 for b in brackets:
                                     raw_desc = raw_desc.replace(b, "")
-                                description = raw_desc.strip()
+                                description = raw_desc.strip(" -.,|\n")
                                 
                                 if len(description) < 5 and cell_idx > 0:
-                                    # Fallback to previous cell if this cell is literally just the SKU
-                                    description = row[cell_idx - 1]
+                                    description = row[cell_idx - 1].strip(" -.,|\n")
                                     
-                                # Look for default quantity in headers or row text
                                 default_qty = 0
                                 row_text = " ".join(row)
                                 if "default" in row_text.lower() or "qty" in "".join(headers).lower():
@@ -82,15 +71,51 @@ class TableParser:
                                     if qty_match:
                                         default_qty = int(qty_match.group(1))
 
-                                component_data = {
+                                seen_skus.add(sku)
+                                extracted_components.append({
                                     "sku": sku,
-                                    "description": description.strip(" -,"),
+                                    "description": description,
                                     "brackets": brackets,
                                     "default_qty": default_qty,
                                     "page": page_num + 1
-                                }
-                                extracted_components.append(component_data)
-                                break  # Prevent duplicate extraction if SKU appears multiple times in row
+                                })
+                                break
+
+                # PASS 2: Layout Text Fallback (captures SKUs in lists or badly formatted tables)
+                text = page.extract_text(layout=True) or ""
+                lines = text.split('\n')
+                for idx, line in enumerate(lines):
+                    # Find all potential SKUs in this line
+                    matches = self.sku_pattern.findall(line)
+                    for sku in matches:
+                        if "-" not in sku and not any(c.isdigit() for c in sku):
+                            continue
+                        if sku not in seen_skus:
+                            seen_skus.add(sku)
+                            brackets = self.bracket_pattern.findall(line)
                             
-        logger.info(f"Extracted {len(extracted_components)} structured components from tables.")
+                            # Derive description from the surrounding line text
+                            raw_desc = line.replace(sku, "")
+                            for b in brackets:
+                                raw_desc = raw_desc.replace(b, "")
+                            
+                            # Clean up layout artifacts (lots of spaces from layout=True)
+                            description = re.sub(r'\s{2,}', ' ', raw_desc).strip(" -.,|")
+                            
+                            if len(description) < 5 and idx > 0:
+                                # Fallback to previous line
+                                prev_desc = lines[idx-1].strip(" -.,|")
+                                prev_desc = re.sub(r'\s{2,}', ' ', prev_desc)
+                                if prev_desc:
+                                    description = prev_desc
+
+                            extracted_components.append({
+                                "sku": sku,
+                                "description": description,
+                                "brackets": brackets,
+                                "default_qty": 0,
+                                "page": page_num + 1
+                            })
+                            
+        logger.info(f"Extracted {len(extracted_components)} structured components from tables and text.")
         return extracted_components

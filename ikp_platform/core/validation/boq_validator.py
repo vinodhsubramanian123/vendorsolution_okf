@@ -13,13 +13,14 @@ class BOQValidator(VendorValidator):
     using fuzzy matching to auto-correct minor typos.
     """
 
-    def __init__(self, graph: GraphBuilder):
+    def __init__(self, graph: GraphBuilder, vector_store=None):
         self.graph = graph
+        self.vector_store = vector_store
 
-    def fuzzy_match_sku(self, requested_sku: str, threshold: float = 0.9) -> Tuple[str, bool]:
+    def fuzzy_match_sku(self, requested_sku: str, threshold: float = 0.9) -> Tuple[str, bool, float, str]:
         """
         Attempts to match a requested SKU against catalog SKUs.
-        Returns (matched_sku, was_fuzzy_matched)
+        Returns (matched_sku, was_fuzzy_matched, confidence, algorithm)
         """
         # Get all valid SKUs
         valid_skus = []
@@ -32,19 +33,31 @@ class BOQValidator(VendorValidator):
         # Exact match
         for part_no, node_id in valid_skus:
             if part_no.lower() == requested_sku.lower():
-                return node_id, False
+                return node_id, False, 1.0, "exact"
                 
-        # Fuzzy match
+        # Fuzzy match (string similarity)
         part_nos = [p[0] for p in valid_skus if p[0]]
         matches = difflib.get_close_matches(requested_sku.upper(), part_nos, n=1, cutoff=threshold)
         
         if matches:
             best_match = matches[0]
+            score = difflib.SequenceMatcher(None, requested_sku.upper(), best_match).ratio()
             for part_no, node_id in valid_skus:
                 if part_no == best_match:
-                    return node_id, True
+                    return node_id, True, score, "difflib"
                     
-        return requested_sku, False
+        # Semantic fallback
+        if self.vector_store:
+            results = self.vector_store.semantic_search(requested_sku, n_results=5)
+            for res_id, score in results:
+                if res_id in self.graph.graph:
+                    node_type = self.graph.graph.nodes[res_id].get("type")
+                    if node_type in (EngineeringObjectType.SKU.value, EngineeringObjectType.COMPONENT.value):
+                        # Accept semantic matches with >= 80% confidence
+                        if score >= 0.80:
+                            return res_id, True, score, "semantic"
+                            
+        return requested_sku, False, 0.0, "none"
 
     def validate(self, solution_components: List[str], context: dict) -> ValidationResult:
         result = ValidationResult(
@@ -55,13 +68,13 @@ class BOQValidator(VendorValidator):
         
         corrected_components = []
         for requested_sku in solution_components:
-            matched_id, was_fuzzy = self.fuzzy_match_sku(requested_sku)
+            matched_id, was_fuzzy, score, algo = self.fuzzy_match_sku(requested_sku)
             corrected_components.append(matched_id)
             
             if was_fuzzy:
                 result.messages.append(ValidationMessage(
                     severity="Info",
-                    message=f"Auto-corrected requested SKU '{requested_sku}' to '{matched_id}'",
+                    message=f"Auto-corrected requested SKU '{requested_sku}' to '{matched_id}' (algo: {algo}, confidence: {score:.2f})",
                     affected_object=matched_id
                 ))
             elif matched_id == requested_sku and matched_id not in self.graph.graph:

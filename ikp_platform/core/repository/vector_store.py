@@ -2,7 +2,7 @@ import chromadb
 from chromadb.config import Settings
 from pathlib import Path
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from ikp_platform.core.ontology.models import BaseEngineeringObject
 from ikp_platform.core.reasoning.llm_client import LLMClient
 
@@ -29,7 +29,7 @@ class VectorStore:
         Returns the number of objects successfully indexed."""
         indexable = [
             o for o in objects
-            if o is not None and o.type.value in ["Platform", "Component"]
+            if o is not None and o.type.value in ["Platform", "Component", "SKU", "Rule", "SolutionCategory"]
         ]
         if not indexable:
             return 0
@@ -71,11 +71,16 @@ class VectorStore:
         if hasattr(obj, "component_category") and obj.component_category:
             text_repr += f"Category: {obj.component_category}\n"
         if hasattr(obj, "attributes") and obj.attributes:
-            text_repr += f"Attributes: {', '.join(f'{attr.name}={attr.value}' for attr in obj.attributes)}\n"
+            attr_strings = [f"{attr.name}: {attr.value}{' ' + attr.unit if attr.unit else ''}" for attr in obj.attributes]
+            text_repr += "Attributes:\n- " + "\n- ".join(attr_strings) + "\n"
+        if hasattr(obj, "capabilities") and obj.capabilities:
+            text_repr += "Capabilities:\n- " + "\n- ".join(obj.capabilities) + "\n"
+        if hasattr(obj, "tags") and obj.tags:
+            text_repr += f"Tags: {', '.join(obj.tags)}\n"
         return text_repr
 
-    def semantic_search(self, query: str, n_results: int = 50, filter_metadata: Optional[Dict[str, Any]] = None) -> List[str]:
-        """Search the vector database and return a list of matching IDs."""
+    def semantic_search(self, query: str, n_results: int = 50, filter_metadata: Optional[Dict[str, Any]] = None) -> List[Tuple[str, float]]:
+        """Search the vector database and return a list of matching IDs with confidence scores."""
         embeddings = self.llm.generate_embeddings([query])
         embedding = embeddings[0]
         
@@ -91,7 +96,12 @@ class VectorStore:
             )
             
             if results and "ids" in results and results["ids"]:
-                return results["ids"][0]
+                ids = results["ids"][0]
+                distances = results.get("distances", [[0.0] * len(ids)])[0]
+                
+                # Convert L2 distance to a 0.0 - 1.0 confidence score
+                scores = [1.0 / (1.0 + d) for d in distances]
+                return list(zip(ids, scores))
             return []
         except Exception as e:
             logger.error(f"Semantic search failed: {e}")

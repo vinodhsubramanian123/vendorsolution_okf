@@ -154,7 +154,7 @@ async def validate_boq(request: BOQValidationRequest):
     repo = get_repo()
     
     # 1. Fuzzy match and correct SKUs
-    boq_validator = BOQValidator(repo.graph)
+    boq_validator = BOQValidator(repo.graph, repo.vector_store)
     boq_result = boq_validator.validate(request.components, {})
     
     # Record any fuzzy match corrections as a KnowledgeDelta to "learn" typos
@@ -189,7 +189,7 @@ async def validate_boq(request: BOQValidationRequest):
     # Extract the corrected component IDs
     corrected_components = []
     for comp in request.components:
-        matched_id, _ = boq_validator.fuzzy_match_sku(comp)
+        matched_id, _, _, _ = boq_validator.fuzzy_match_sku(comp)
         corrected_components.append(matched_id)
         
     # 2. Run rule engine
@@ -236,7 +236,7 @@ async def validate_boq(request: BOQValidationRequest):
     if request.num_options > 0:
         import uuid
         import random
-        from ikp_platform.core.ontology.models import CustomerRequest, Requirement
+        from ikp_platform.core.ontology.models import CustomerRequest, CustomerRequirement
         
         # Build generator to find closest working solutions
         generator = SolutionGenerator(repo.graph, repo.vector_store, repo.mcp_client)
@@ -244,7 +244,7 @@ async def validate_boq(request: BOQValidationRequest):
             request_id=f"req-{str(uuid.uuid4())[:8]}",
             target_platform=platform_id,
             workloads=request.workloads,
-            requirements=[Requirement(name="Base", value="Match BOQ capabilities")]
+            requirements=[CustomerRequirement(category="technical", name="Base", value="Match BOQ capabilities")]
         )
         
         candidates = generator.generate(cust_req)
@@ -282,14 +282,14 @@ async def semantic_search(request: SearchRequest):
     results = repo.vector_store.semantic_search(request.query, n_results=request.limit)
     
     formatted_results = []
-    for res_id in results:
+    for res_id, score in results:
         node_data = {}
         if res_id in repo.graph.graph:
             node_data = repo.graph.graph.nodes[res_id]
             
         formatted_results.append({
             "id": res_id,
-            "score": 1.0,
+            "score": score,
             "text": node_data.get("description", "No description available"),
             "title": node_data.get("title", res_id),
             "type": node_data.get("type", "unknown")
