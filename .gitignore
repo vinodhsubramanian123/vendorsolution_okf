@@ -63,3 +63,4 @@ graph.canvas
 work/tmp/
 ikp_web/dist/
 .chroma/
+.*_pid

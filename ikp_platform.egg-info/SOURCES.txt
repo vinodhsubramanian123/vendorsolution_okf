@@ -42,6 +42,7 @@ ikp_platform/scripts/reindex.py
 ikp_platform/utils/logger.py
 tests/test_api_endpoints.py
 tests/test_category_limits.py
+tests/test_excel_parser.py
 tests/test_foundation.py
 tests/test_fuzzy_matching.py
 tests/test_ingestion.py

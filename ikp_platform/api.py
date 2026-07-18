@@ -44,6 +44,8 @@ class ValidationRequest(BaseModel):
 
 class BOQValidationRequest(BaseModel):
     components: List[str]
+    num_options: int = 3
+    workloads: List[str] = []
 
 class SearchRequest(BaseModel):
     query: str
@@ -229,6 +231,38 @@ async def validate_boq(request: BOQValidationRequest):
         })
         
     is_valid = engine_valid and boq_result.is_valid
+    
+    alternatives = []
+    if request.num_options > 0:
+        import uuid
+        import random
+        from ikp_platform.core.ontology.models import CustomerRequest, Requirement
+        
+        # Build generator to find closest working solutions
+        generator = SolutionGenerator(repo.graph, repo.vector_store, repo.mcp_client)
+        cust_req = CustomerRequest(
+            request_id=f"req-{str(uuid.uuid4())[:8]}",
+            target_platform=platform_id,
+            workloads=request.workloads,
+            requirements=[Requirement(name="Base", value="Match BOQ capabilities")]
+        )
+        
+        candidates = generator.generate(cust_req)
+        
+        # Mock partner portal pricing/cost metrics for ranking
+        for c in candidates:
+            c_cost = random.randint(5000, 25000)
+            if c.profile == "Lowest Cost":
+                c_cost = random.randint(3000, 8000)
+            elif c.profile == "Performance Optimized":
+                c_cost = random.randint(15000, 30000)
+                
+            alt_dict = c.model_dump()
+            alt_dict["estimated_cost"] = c_cost
+            alternatives.append(alt_dict)
+            
+        # Rank by cost and slice to requested configurable number of options
+        alternatives = sorted(alternatives, key=lambda x: x["estimated_cost"])[:request.num_options]
         
     return {
         "status": "success",
@@ -236,7 +270,8 @@ async def validate_boq(request: BOQValidationRequest):
         "fuzzy_matches": [m.model_dump() for m in boq_result.messages if m.severity == "Info"],
         "invalid_skus": [m.model_dump() for m in boq_result.messages if m.severity == "Error"],
         "corrected_components": corrected_components,
-        "rule_evaluations": formatted_rules
+        "rule_evaluations": formatted_rules,
+        "alternatives": alternatives
     }
 
 @app.post("/api/search")
