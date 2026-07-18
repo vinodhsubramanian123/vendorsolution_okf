@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/api.py": {
-    "mtime": 1784370092.9111145,
-    "ast_hash": "8e07bae688ce48c69f8519df0be37d25",
+    "mtime": 1784373869.0248806,
+    "ast_hash": "47d57aeef875dc622f50ef272ebe7768",
     "semantic_hash": ""
   },
   "ikp_platform/cli.py": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/ingestion/table_parser.py": {
-    "mtime": 1784318187.7039428,
-    "ast_hash": "c308bf01a3756dac27ca0397f3d8faec",
+    "mtime": 1784374676.3339384,
+    "ast_hash": "3543cba3dcbb200cebed6f1ec405c48e",
     "semantic_hash": ""
   },
   "ikp_platform/core/learning/__init__.py": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/vector_store.py": {
-    "mtime": 1784369074.9803545,
-    "ast_hash": "f22ffa62d0518a22c1de18def64d3e07",
+    "mtime": 1784373831.4041524,
+    "ast_hash": "db9a7e46dc9e90dfedc40350e63f233c",
     "semantic_hash": ""
   },
   "ikp_platform/core/validation/__init__.py": {
@@ -140,8 +140,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/validation/boq_validator.py": {
-    "mtime": 1784185179.3798451,
-    "ast_hash": "caf1f403a97d51bb42d8d2ea5f274b4b",
+    "mtime": 1784373820.8319473,
+    "ast_hash": "cb624b6b99ce69dd41a23c5c1965a3f4",
     "semantic_hash": ""
   },
   "ikp_platform/core/validation/validator.py": {
@@ -405,8 +405,8 @@
     "semantic_hash": ""
   },
   "STATE.md": {
-    "mtime": 1784370474.2616913,
-    "ast_hash": "08d8598abeb2af893fdc80350d0679ef",
+    "mtime": 1784375462.9880948,
+    "ast_hash": "ee6b2f2f2a8b13b926d47578e882733e",
     "semantic_hash": ""
   },
   "ikp_web/index.html": {
