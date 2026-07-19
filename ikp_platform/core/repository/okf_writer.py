@@ -72,9 +72,10 @@ class OKFWriter:
         if obj.type.value == "Rule":
             cat = getattr(obj, "component_category", None)
             if cat:
-                filename = f"{self._slugify(cat)}-rules"
+                parts.append(f"{self._slugify(cat)}-rules")
             else:
-                filename = "platform-rules"
+                parts.append("platform-rules")
+            filename = self._slugify(obj.id)
         else:
             filename = self._slugify(obj.id)
 
@@ -98,36 +99,30 @@ class OKFWriter:
         Blueprint 06 §5: vendor, solution_domain, product_family, generation,
                          capabilities, lifecycle_status, etc.
         """
+        # Full field dump; enums -> their .value, datetimes -> ISO strings.
+        # Exclude structured lists that are handled in the Markdown body or separately.
+        raw_fm: Dict[str, Any] = obj.model_dump(
+            mode="json", exclude={"attributes", "relationships", "history", "evidence"}
+        )
+
+        # OKF specific required/recommended fields
         fm: Dict[str, Any] = {
             "id": obj.id,
             "type": obj.type.value,
             "title": obj.title or obj.id,
         }
+        
+        for k, v in raw_fm.items():
+            if v is not None and v != [] and v != "":
+                if k not in fm:
+                    fm[k] = v
 
-        # OKF recommended fields
-        if obj.description:
-            fm["description"] = obj.description
-        if obj.tags:
-            fm["tags"] = obj.tags
-        fm["timestamp"] = (
-            getattr(obj, "last_updated", datetime.now(timezone.utc)).isoformat() + "Z"
-        )
-
-        # Blueprint 06 §5 metadata for search-space reduction
-        if obj.vendor:
-            fm["vendor"] = obj.vendor
-        if obj.solution_domain:
-            fm["solution_domain"] = obj.solution_domain
-        if obj.product_family:
-            fm["product_family"] = obj.product_family
-        if obj.generation:
-            fm["generation"] = obj.generation
-        if obj.platform_id:
-            fm["platform_id"] = obj.platform_id
-        if obj.lifecycle_status:
-            fm["lifecycle_status"] = obj.lifecycle_status.value
-        if obj.capabilities:
-            fm["capabilities"] = obj.capabilities
+        # Ensure timestamp (last_updated defaults to now if missing)
+        last_updated = getattr(obj, "last_updated", None) or datetime.now(timezone.utc)
+        if isinstance(last_updated, str):
+            fm["timestamp"] = last_updated if last_updated.endswith("Z") or "+" in last_updated else last_updated + "Z"
+        else:
+            fm["timestamp"] = last_updated.isoformat() + ("Z" if not last_updated.isoformat().endswith("Z") else "")
 
         # Structured attributes as frontmatter extensions
         for attr in obj.attributes:
@@ -135,55 +130,10 @@ class OKFWriter:
             fm[key] = attr.value
             if attr.unit:
                 fm[f"{key}_unit"] = attr.unit
-
-        # Rule-specific fields (Blueprint 03 §8)
-        if isinstance(obj, Rule):
-            if obj.scope:
-                fm["scope"] = obj.scope
-            fm["severity"] = obj.severity.value
-            fm["confidence"] = obj.confidence.value
-            fm["rule_version"] = obj.version
-            if obj.applicable_objects:
-                fm["applicable_objects"] = obj.applicable_objects
-
-        # Constraint-specific fields (Blueprint 03 §9)
-        if isinstance(obj, Constraint):
-            fm["limit_name"] = obj.limit_name
-            fm["limit_value"] = obj.limit_value
-            if obj.limit_unit:
-                fm["limit_unit"] = obj.limit_unit
-
-        # Component-specific fields
-        if hasattr(obj, "component_category") and obj.component_category:
-            fm["component_category"] = obj.component_category
-        if hasattr(obj, "component_subcategory") and obj.component_subcategory:
-            fm["component_subcategory"] = obj.component_subcategory
-
-        # Platform-specific fields
-        if hasattr(obj, "parent_platform_id") and obj.parent_platform_id:
-            fm["parent_platform_id"] = obj.parent_platform_id
-        if hasattr(obj, "platform_sku") and obj.platform_sku:
-            fm["platform_sku"] = obj.platform_sku
-
-        # SKU-specific fields
-        if hasattr(obj, "part_number") and obj.part_number:
-            fm["part_number"] = obj.part_number
-        if hasattr(obj, "component_id") and obj.component_id:
-            fm["component_id"] = obj.component_id
-        if hasattr(obj, "packaging_type") and obj.packaging_type:
-            fm["packaging_type"] = obj.packaging_type.value
-
-        # Variant-specific fields
-        if hasattr(obj, "base_platform_id") and obj.base_platform_id:
-            fm["base_platform_id"] = obj.base_platform_id
-        if hasattr(obj, "differentiators") and obj.differentiators:
-            fm["differentiators"] = obj.differentiators
-
-        # Configuration-specific fields
-        if hasattr(obj, "included_components") and obj.included_components:
-            fm["included_components"] = obj.included_components
-        if hasattr(obj, "validated") and obj.validated:
-            fm["validated"] = obj.validated
+                
+        # Rule specific override for version naming to match existing expectations
+        if isinstance(obj, Rule) and "version" in fm:
+            fm["rule_version"] = fm.pop("version")
 
         return fm
 
@@ -263,28 +213,8 @@ class OKFWriter:
         if body:
             block += body + "\n"
 
-        if obj.type.value == "Rule":
-            if file_path.exists():
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    
-                # Look for existing block with the same id to replace it
-                pattern_str = r"^---\n.*?\nid:\s*['\"]?" + re.escape(obj.id) + r"['\"]?\n.*?\n---\n.*?(?=\n---|$)"
-                pattern = re.compile(pattern_str, re.MULTILINE | re.DOTALL)
-                
-                if pattern.search(content):
-                    content = pattern.sub(block.strip(), content, count=1)
-                else:
-                    content = content.strip() + "\n\n" + block.strip()
-                    
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(content.strip() + "\n")
-            else:
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(block)
-        else:
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(block)
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(block)
 
         return str(file_path.relative_to(self.repository_path))
 

@@ -1,8 +1,8 @@
-import { Database, Server, Cpu, LayoutTemplate, CheckCircle2 } from 'lucide-react';
+import { Database, Server, Cpu, LayoutTemplate, CheckCircle2, BookOpen, Search } from 'lucide-react';
 
 interface SidebarProps {
-  activeTab: 'query' | 'dashboard' | 'boq' | 'search' | 'review';
-  setActiveTab: (tab: 'query' | 'dashboard' | 'boq' | 'search' | 'review') => void;
+  activeTab: 'query' | 'dashboard' | 'boq' | 'search' | 'review' | 'kt';
+  setActiveTab: (tab: 'query' | 'dashboard' | 'boq' | 'search' | 'review' | 'kt') => void;
 }
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
@@ -92,7 +92,26 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           }}
           onClick={() => setActiveTab('search')}
         >
-          <Database size={20} /> Semantic Search
+          <Search size={20} /> Semantic Search
+        </button>
+
+        <button 
+          style={{
+            background: activeTab === 'kt' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            border: 'none',
+            color: 'var(--text-main)',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            textAlign: 'left',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '1rem'
+          }}
+          onClick={() => setActiveTab('kt')}
+        >
+          <BookOpen size={20} /> Knowledge Transfer
         </button>
 
         <button 

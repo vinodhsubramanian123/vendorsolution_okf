@@ -25,6 +25,16 @@ REPOSITORY_PATH = PROJECT_ROOT / "repository"
 
 app = Server("ikp-mcp-server")
 
+_repo_instance = None
+
+def get_repo() -> RepoManager:
+    global _repo_instance
+    if _repo_instance is None:
+        logger.info("Initializing global RepoManager for MCP Server")
+        _repo_instance = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
+        _repo_instance.bootstrap()
+    return _repo_instance
+
 @app.list_tools()
 async def list_tools() -> list[types.Tool]:
     """List available tools."""
@@ -65,8 +75,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
                 return [types.TextContent(type="text", text="Missing 'query' argument.")]
                 
             # Initialize backend
-            repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
-            repo.bootstrap()
+            repo = get_repo()
             
             parser = IntentParser()
             request = parser.parse_request(query)
@@ -91,8 +100,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
             return [types.TextContent(type="text", text=output)]
             
         elif name == "get_platform_status":
-            repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
-            repo.bootstrap()
+            repo = get_repo()
             stats = repo.graph.get_stats()
             
             output = "IKP Platform Status:\n"

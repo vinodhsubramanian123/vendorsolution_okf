@@ -90,9 +90,14 @@ class RuleEngine:
             if comp_id not in platform_compatible:
                 comp_outbound = set(self.graph.get_compatible(comp_id))
                 if platform_id not in comp_outbound:
-                    contains_rels = self.graph.traverse_relationships(platform_id, "Contains", "outbound")
-                    contains_targets = {r["target"] for r in contains_rels}
-                    
+                    # Both directions, not just outbound: extractors and
+                    # tests don't consistently orient Contains edges the same
+                    # way (platform->component vs component->platform). This
+                    # is the same direction-assumption bug commit a6ef5df
+                    # fixed in _evaluate_constraints below. Hand-rolled loops
+                    # have been replaced with `get_related`.
+                    contains_targets = self.graph.get_related(platform_id, "Contains")
+
                     if comp_id not in contains_targets:
                         reasoning_chain.append(f"Warning: {comp_id} has no explicit compatibility link to {platform_id}")
             else:
@@ -106,8 +111,7 @@ class RuleEngine:
         
         # Get all constraints attached to the platform
         platform_constraints = set()
-        for r in self.graph.traverse_relationships(platform_id, "Contains", "both"):
-            other_id = r["target"] if r["source"] == platform_id else r["source"]
+        for other_id in self.graph.get_related(platform_id, "Contains"):
             if self.graph.graph.nodes[other_id].get("type") in (EngineeringObjectType.CONSTRAINT.value, EngineeringObjectType.CATEGORY_LIMIT.value):
                 platform_constraints.add(other_id)
         platform_constraints = list(platform_constraints)

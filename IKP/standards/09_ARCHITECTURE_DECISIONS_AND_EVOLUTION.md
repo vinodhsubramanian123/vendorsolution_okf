@@ -213,3 +213,13 @@ IKP is not a chatbot.
 IKP is an Engineering Knowledge Platform that continuously acquires, understands, organizes, reasons over, validates and learns from engineering knowledge to produce explainable infrastructure solutions.
 
 Everything implemented within IKP SHALL support that objective.
+
+### ADR-004: Orchestrator Decoupling, Telemetry Injection, and E2E Testing
+**Date:** 2026-07-19
+**Problem Statement:** LangGraph workflow nodes and FastAPI endpoints lacked structured observability. Additionally, the `WorkflowNodes` had tightly coupled dependencies to concrete classes (e.g., `IntentParser`, `SolutionGenerator`), causing infinite LLM recursive loops during isolated CI testing due to unintentional external API quota exhaustion. 
+**Decision:**
+1. **Dependency Injection:** The orchestrator nodes MUST accept core reasoning engines via constructor injection (Dependency Injection pattern). Concrete execution chains MUST NOT statically import or instantiate these engines internally.
+2. **Telemetry Tracing:** A universal `@telemetry_trace` decorator MUST wrap all workflow stages and API endpoints. The decorator MUST capture execution duration, exceptions, sanitized parameter payloads, and emit structured JSON compatible with standard log aggregators.
+3. **E2E UI Testing:** Browser testing (e.g. Playwright) MUST run purely against the UI frontend, fully mocking the backend in scenarios where legacy partner portals are integrated, to prevent network timeouts and flaky test behavior.
+**Impact:** Prevents LLM quota exhaustion in automated test pipelines by natively allowing mock objects. Granular telemetry enables precise distributed tracing of the LLM reasoning pipelines.
+**Approval:** Approved.

@@ -30,67 +30,60 @@ class GraphBuilder:
     # -------------------------------------------------------------------
 
     def add_concept(self, obj: BaseEngineeringObject) -> None:
-        """Add a concept and all its attributes as a node in the graph."""
-        node_attrs = {
-            "type": obj.type.value,
-            "title": obj.title,
-            "description": obj.description,
-            "vendor": obj.vendor,
-            "solution_domain": obj.solution_domain,
-            "product_family": obj.product_family,
-            "generation": obj.generation,
-            "lifecycle_status": obj.lifecycle_status.value if obj.lifecycle_status else None,
-            "tags": obj.tags or [],
-            "capabilities": obj.capabilities or [],
-        }
+        """Add a concept and all its attributes as a node in the graph.
 
-        if hasattr(obj, "confidence") and obj.confidence:
-            node_attrs["confidence"] = obj.confidence.value if hasattr(obj.confidence, 'value') else obj.confidence
-            
-        if hasattr(obj, "evidence") and obj.evidence:
-            node_attrs["evidence"] = [e.model_dump() if hasattr(e, 'model_dump') else e for e in obj.evidence]
+        Field mapping strategy (2026-07-18 audit / see .agents/rules/graph_serialization.md):
+        node_attrs is derived from a full ``model_dump`` of the object rather than a
+        hand-maintained allowlist of ``hasattr`` checks. The old allowlist pattern
+        silently dropped fields THREE separate times as the ontology grew:
+          - ``description`` / ``applicable_objects`` (fixed by ADR-001)
+          - ``target_subcategory`` / ``component_subcategory`` / ``inclusive_qty``
+            (fixed by commit a6ef5df — "CategoryLimit Serialization Issue")
+          - ``platform_id`` was found still-missing during the 2026-07-18 audit,
+            silently breaking the Rule dedup check in
+            ``RepoManager.add_concept`` (it compares
+            ``data.get("platform_id") == obj.platform_id``, which could never
+            match because the key was never written).
+        Dumping every field automatically closes this whole bug class: any field
+        added to any ontology subclass now reaches the graph without a manual
+        edit here. tests/test_graph_field_parity.py is the regression guard —
+        it fails loudly if a future refactor reintroduces an allowlist.
+        """
+        # Full field dump; enums -> their .value, datetimes -> ISO strings.
+        # `attributes`/`relationships`/`history` are handled separately below
+        # (structured lists that need their own transformation, not flat scalars).
+        node_attrs: Dict[str, Any] = obj.model_dump(
+            mode="json", exclude={"attributes", "relationships", "history"}
+        )
 
-        if hasattr(obj, "component_category") and obj.component_category:
-            node_attrs["component_category"] = obj.component_category
-            node_attrs["attr_component_category"] = obj.component_category
-            
-        if hasattr(obj, "component_subcategory") and obj.component_subcategory:
-            node_attrs["attr_component_subcategory"] = obj.component_subcategory
-            
-        if hasattr(obj, "inclusive_qty") and obj.inclusive_qty is not None:
-            node_attrs["attr_inclusive_qty"] = obj.inclusive_qty
-            
-        if hasattr(obj, "target_category") and obj.target_category:
-            node_attrs["attr_target_category"] = obj.target_category
-            
-        if hasattr(obj, "target_subcategory") and obj.target_subcategory:
-            node_attrs["attr_target_subcategory"] = obj.target_subcategory
+        node_attrs["tags"] = node_attrs.get("tags") or []
+        node_attrs["capabilities"] = node_attrs.get("capabilities") or []
 
-        if hasattr(obj, "performance_requirements") and obj.performance_requirements:
-            for k, v in obj.performance_requirements.items():
-                node_attrs[f"req_perf_{k}"] = v
+        # Historical `attr_*` aliases some rules/filters key off directly —
+        # kept alongside the plain field name for backward compatibility.
+        for field, alias in (
+            ("component_category", "attr_component_category"),
+            ("component_subcategory", "attr_component_subcategory"),
+            ("inclusive_qty", "attr_inclusive_qty"),
+            ("target_category", "attr_target_category"),
+            ("target_subcategory", "attr_target_subcategory"),
+            ("part_number", "attr_part_number"),
+        ):
+            if node_attrs.get(field) is not None:
+                node_attrs[alias] = node_attrs[field]
 
-        if hasattr(obj, "capacity_requirements") and obj.capacity_requirements:
-            for k, v in obj.capacity_requirements.items():
-                node_attrs[f"req_cap_{k}"] = v
+        # Requirement dicts (Workload) get flattened with their historical prefixes.
+        for k, v in (getattr(obj, "performance_requirements", None) or {}).items():
+            node_attrs[f"req_perf_{k}"] = v
+        for k, v in (getattr(obj, "capacity_requirements", None) or {}).items():
+            node_attrs[f"req_cap_{k}"] = v
 
-        if hasattr(obj, "scope") and obj.scope:
-            node_attrs["scope"] = obj.scope
-            
-        if hasattr(obj, "severity") and obj.severity:
-            node_attrs["severity"] = obj.severity.value if hasattr(obj.severity, 'value') else obj.severity
+        # NOTE: `evidence` is NOT in the exclude set above, so it's already
+        # present in node_attrs, correctly serialized (nested EvidenceRecord
+        # models -> dicts, datetimes -> ISO strings) by the top-level
+        # model_dump call. No separate handling needed here.
 
-        if hasattr(obj, "applicable_objects") and obj.applicable_objects:
-            node_attrs["applicable_objects"] = obj.applicable_objects
-
-        if hasattr(obj, "limit_name") and obj.limit_name:
-            node_attrs["limit_name"] = obj.limit_name
-            node_attrs["limit_value"] = obj.limit_value
-            
-        if hasattr(obj, "part_number") and obj.part_number:
-            node_attrs["attr_part_number"] = obj.part_number
-
-        # Add structured attributes
+        # Structured `attributes` list -> attr_<name> keys (Blueprint 03 §5).
         for attr in obj.attributes:
             key = f"attr_{attr.name.lower().replace(' ', '_')}"
             node_attrs[key] = attr.value
@@ -266,6 +259,20 @@ class GraphBuilder:
                 if data.get("relationship_type") in dep_types:
                     results.append(target)
         return results
+
+    def get_related(self, node_id: str, relationship_type: Optional[str] = None) -> List[str]:
+        """
+        Get all related node IDs traversing both inbound and outbound edges.
+        
+        This prevents bugs where relationship direction is inconsistent
+        (e.g., Contains can be platform->component or component->platform).
+        """
+        related = set()
+        for r in self.traverse_relationships(node_id, relationship_type, direction="both"):
+            other_id = r["target"] if r["source"] == node_id else r["source"]
+            if other_id != node_id:
+                related.add(other_id)
+        return list(related)
 
     def get_compatible(self, object_id: str) -> List[str]:
         """Get all objects compatible with the given object."""

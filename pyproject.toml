@@ -24,6 +24,9 @@ dependencies = [
     "mcp>=1.2.0",
     "chromadb>=0.4.22",
     "google-genai>=0.2.0",
+    "langchain-core>=0.1.0",
+    "langchain-google-genai>=1.0.0",
+    "langgraph>=0.0.30",
     "typing-extensions>=4.5.0",
     "python-dotenv>=1.0.0",
 ]

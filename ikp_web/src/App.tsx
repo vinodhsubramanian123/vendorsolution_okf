@@ -6,11 +6,12 @@ import { PlatformDashboard } from './components/PlatformDashboard';
 import { BoqValidation } from './components/BoqValidation';
 import { SemanticSearch } from './components/SemanticSearch';
 import { ValidationPortal } from './components/ValidationPortal';
+import { KnowledgeTransfer } from './components/KnowledgeTransfer';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'query' | 'dashboard' | 'boq' | 'search' | 'review'>('query');
+  const [activeTab, setActiveTab] = useState<'query' | 'dashboard' | 'boq' | 'search' | 'review' | 'kt'>('query');
   const [status, setStatus] = useState<any>(null);
   
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function App() {
         {activeTab === 'boq' && <BoqValidation />}
         {activeTab === 'search' && <SemanticSearch />}
         {activeTab === 'review' && <ValidationPortal />}
+        {activeTab === 'kt' && <KnowledgeTransfer />}
       </div>
     </div>
   );

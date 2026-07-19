@@ -37,6 +37,11 @@ ikp_platform/core/repository/vector_store.py
 ikp_platform/core/validation/__init__.py
 ikp_platform/core/validation/boq_validator.py
 ikp_platform/core/validation/validator.py
+ikp_platform/core/workflow/__init__.py
+ikp_platform/core/workflow/executor.py
+ikp_platform/core/workflow/graph.py
+ikp_platform/core/workflow/nodes.py
+ikp_platform/core/workflow/state.py
 ikp_platform/scripts/ingest_catalog.py
 ikp_platform/scripts/reindex.py
 ikp_platform/utils/logger.py
@@ -45,7 +50,10 @@ tests/test_category_limits.py
 tests/test_excel_parser.py
 tests/test_foundation.py
 tests/test_fuzzy_matching.py
+tests/test_graph_field_parity.py
 tests/test_ingestion.py
 tests/test_mcp_integration.py
 tests/test_reasoning.py
+tests/test_restart_persistence.py
 tests/test_topology.py
+tests/test_workflow.py

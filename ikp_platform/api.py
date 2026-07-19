@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
+from contextlib import asynccontextmanager
 from pathlib import Path
 import logging
 import os
@@ -13,8 +14,30 @@ from ikp_platform.core.reasoning.rule_engine import RuleEngine
 from ikp_platform.core.validation.validator import ManualReviewValidator
 from ikp_platform.core.validation.boq_validator import BOQValidator
 from ikp_platform.core.ontology.models import EngineeringObjectType
+from ikp_platform.core.observability import telemetry_trace
 
-app = FastAPI(title="IKP Reasoning API", version="2.0.0")
+_repo_instance = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global _repo_instance
+    repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
+    loaded = repo.bootstrap()
+    if loaded == 0:
+        logger.critical(
+            "Repository at %s is EMPTY (0 objects loaded). The API will run "
+            "but every query/status/search call will return no results. "
+            "This is expected on a fresh clone -- run "
+            "`./scripts/bootstrap.sh` (or "
+            "`uv run python -m ikp_platform.scripts.ingest_catalog`) to "
+            "seed the repository before using the API.",
+            REPOSITORY_PATH,
+        )
+    _repo_instance = repo
+    yield
+    _repo_instance = None
+
+app = FastAPI(title="IKP Reasoning API", version="2.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -52,36 +75,13 @@ class SearchRequest(BaseModel):
     limit: int = 10
     filter_metadata: Optional[Dict[str, Any]] = None
 
-import threading
-
-_repo_lock = threading.Lock()
-_repo_instance = None
-
 def get_repo() -> RepoManager:
-    global _repo_instance
-    if _repo_instance is not None:
-        return _repo_instance
-        
-    with _repo_lock:
-        if _repo_instance is not None:
-            return _repo_instance
-            
-        repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
-        loaded = repo.bootstrap()
-        if loaded == 0:
-            logger.critical(
-                "Repository at %s is EMPTY (0 objects loaded). The API will run "
-                "but every query/status/search call will return no results. "
-                "This is expected on a fresh clone -- run "
-                "`./scripts/bootstrap.sh` (or "
-                "`uv run python -m ikp_platform.scripts.ingest_catalog`) to "
-                "seed the repository before using the API.",
-                REPOSITORY_PATH,
-            )
-        _repo_instance = repo
-        return _repo_instance
+    if _repo_instance is None:
+        raise RuntimeError("Repository not initialized. Is the lifespan active?")
+    return _repo_instance
 
 @app.get("/api/status")
+@telemetry_trace
 async def get_status():
     repo = get_repo()
     stats = repo.graph.get_stats()
@@ -116,6 +116,7 @@ async def get_status():
     }
 
 @app.post("/api/query")
+@telemetry_trace
 async def query_solution(request: QueryRequest):
     repo = get_repo()
     parser = IntentParser()
@@ -137,6 +138,7 @@ async def query_solution(request: QueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/validate")
+@telemetry_trace
 async def validate_solution(request: ValidationRequest):
     repo = get_repo()
     validator = ManualReviewValidator()
@@ -151,6 +153,7 @@ async def validate_solution(request: ValidationRequest):
     }
 
 @app.post("/api/boq/validate")
+@telemetry_trace
 async def validate_boq(request: BOQValidationRequest):
     repo = get_repo()
     
@@ -277,6 +280,7 @@ async def validate_boq(request: BOQValidationRequest):
     }
 
 @app.post("/api/search")
+@telemetry_trace
 async def semantic_search(request: SearchRequest):
     repo = get_repo()
     
@@ -316,6 +320,7 @@ class ApprovalRequest(BaseModel):
     object_id: str
 
 @app.get("/api/review-queue")
+@telemetry_trace
 async def get_review_queue():
     repo = get_repo()
     unverified = []
@@ -335,6 +340,7 @@ async def get_review_queue():
     return {"queue": unverified}
 
 @app.post("/api/review-queue/approve")
+@telemetry_trace
 async def approve_object(request: ApprovalRequest):
     repo = get_repo()
     

@@ -1,15 +1,14 @@
-.PHONY: test lint clean install run
+.PHONY: install test lint clean run ui-install ui-test ui-dev
 
 install:
-	uv pip install -r requirements.txt
-	uv pip install pytest pytest-cov ruff mypy
+	uv sync --extra dev
 
 test:
 	uv run --python 3.11 pytest tests/ -v
 
 lint:
-	ruff check .
-	mypy ikp_platform/
+	uv run --python 3.11 ruff check .
+	uv run --python 3.11 mypy ikp_platform/
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
@@ -19,3 +18,12 @@ clean:
 
 run:
 	uv run --python 3.11 python -m ikp_platform.api
+
+ui-install:
+	cd ikp_web && npm install
+
+ui-test:
+	cd ikp_web && npm run test:e2e
+
+ui-dev:
+	cd ikp_web && npm run dev

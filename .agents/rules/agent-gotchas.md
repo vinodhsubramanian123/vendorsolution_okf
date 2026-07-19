@@ -18,3 +18,22 @@ The `graphify` tool was previously run to export an Obsidian Vault directly into
 
 ## 3. Path Preservation
 The host machine may switch between Windows and macOS. The `tools/` folder was created to normalize this. Assume `tools/` is already in the user's `$PATH`, which intercepts standard calls like `python`, `pip`, and `agy` to ensure they run with absolute perfection cross-platform.
+
+## 4. Verify CLI flags before using them — do not infer them from naming convention
+Commit `a6ef5df` shows an agent adding `--elevate` and `--parallel` flags to
+`antigravity-cli` subprocess calls in `llm_client.py`, because a prior
+instruction implied the CLI should "elevate reasoning quality" and "run in
+parallel." Those flags do not exist. The agent caught this itself by
+actually running `antigravity-cli --help` before shipping, and used
+`concurrent.futures` for the parallel part instead — but this was a near
+miss, not a caught-in-code-review bug, and it would have broken the whole
+extraction pipeline with an "unrecognized flag" error on every ingestion run.
+**Rule:** Before adding any new flag/argument to a `subprocess` call for
+`antigravity-cli`, `graphify`, or any other external CLI tool used in this
+repo, run `<tool> --help` (or read its documented flag list) first and
+confirm the flag actually exists in the output. Never add a flag because the
+name "sounds right" for what you're trying to accomplish — verify, then use.
+This applies equally to library APIs: if you're not certain a method/kwarg
+exists on a dependency (chromadb, networkx, pydantic, fastapi, mcp), check
+the installed version's actual signature rather than assuming it matches an
+API you remember from training data or from a different version.

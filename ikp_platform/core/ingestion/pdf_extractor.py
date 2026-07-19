@@ -830,9 +830,13 @@ class PDFExtractor:
 
                 rule_count += 1
 
+                rule_title_snippet = " ".join(rule_text.split()[:6]).strip()
+                if len(rule_text.split()) > 6:
+                    rule_title_snippet += "..."
+
                 rule = Rule(
                     id=f"{platform_id}/rules/rule-{rule_count:03d}",
-                    title=f"Engineering Rule {rule_count}",
+                    title=f"Rule: {rule_title_snippet}",
                     description=rule_text[:200],
                     vendor=platform.vendor if platform else "Unknown",
                     solution_domain=platform.solution_domain if platform else "Unknown",
@@ -923,9 +927,13 @@ class PDFExtractor:
             )]
             evidence.extend(mcp_evidence)
 
+            rule_title_snippet = " ".join(rule_text.split()[:6]).strip()
+            if len(rule_text.split()) > 6:
+                rule_title_snippet += "..."
+
             rule = Rule(
                 id=f"{platform_id}/rules/rule-{rule_count:03d}",
-                title=f"Engineering Rule {rule_count}",
+                title=f"Rule: {rule_title_snippet}",
                 description=rule_text[:200],
                 vendor=platform.vendor if platform else "Unknown",
                 solution_domain=platform.solution_domain if platform else "Unknown",
