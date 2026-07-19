@@ -128,6 +128,11 @@ class WorkflowNodes:
         is_valid, _, errors = self.rule_engine.evaluate_solution(
             platform_id, current_bom
         )
+        
+        if is_valid:
+            logger.info(f"BOM Validation passed perfectly for {platform_id} with {len(current_bom)} components.")
+        else:
+            logger.warning(f"BOM Validation failed with {len(errors)} errors: {errors}")
 
         return {"is_valid_static": is_valid, "validation_errors": errors}
 
@@ -179,6 +184,7 @@ class WorkflowNodes:
                 "removed": removed,
                 "updated": len(added) + len(removed) > 0
             }
+            logger.info(f"Solution Profile '{solution.get('profile')}' Delta: Added {len(added)} components, Removed {len(removed)} components")
 
         return {"ranked_solutions": ranked}
 

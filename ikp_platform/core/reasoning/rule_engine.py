@@ -70,11 +70,15 @@ class RuleEngine:
 
         if errors:
             is_valid = False
-            reasoning_chain.append(f"Evaluation failed with {len(errors)} errors.")
+            msg = f"Evaluation failed with {len(errors)} errors."
+            reasoning_chain.append(msg)
+            logger.warning(msg)
+            for err in errors:
+                logger.warning(f"  - {err}")
         else:
-            reasoning_chain.append(
-                "Evaluation successful. All constraints and rules satisfied."
-            )
+            msg = "Evaluation successful. All constraints and rules satisfied."
+            reasoning_chain.append(msg)
+            logger.info(msg)
 
         return is_valid, reasoning_chain, errors
 
@@ -102,9 +106,9 @@ class RuleEngine:
                 "infrastructure",
                 "unknown",
             ):
-                errors.append(
-                    f"CROSS-DOMAIN BLEED DETECTED: Rejected {comp_id} (Domain: {comp_domain}) on Platform {platform_id} (Domain: {platform_domain})"
-                )
+                err_msg = f"CROSS-DOMAIN BLEED DETECTED: Rejected {comp_id} (Domain: {comp_domain}) on Platform {platform_id} (Domain: {platform_domain})"
+                errors.append(err_msg)
+                logger.error(err_msg)
                 continue
 
             if comp_id not in platform_compatible:
@@ -119,13 +123,13 @@ class RuleEngine:
                     contains_targets = self.graph.get_related(platform_id, "Contains")
 
                     if comp_id not in contains_targets:
-                        reasoning_chain.append(
-                            f"Warning: {comp_id} has no explicit compatibility link to {platform_id}"
-                        )
+                        msg = f"Warning: {comp_id} has no explicit compatibility link to {platform_id}"
+                        reasoning_chain.append(msg)
+                        logger.warning(msg)
             else:
-                reasoning_chain.append(
-                    f"Validated compatibility: {comp_id} <-> {platform_id}"
-                )
+                msg = f"Validated compatibility: {comp_id} <-> {platform_id}"
+                reasoning_chain.append(msg)
+                logger.debug(msg)
 
         return errors
 

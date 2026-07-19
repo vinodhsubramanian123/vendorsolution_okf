@@ -13,6 +13,9 @@ from ikp_platform.core.reasoning.intent_parser import IntentParser
 from ikp_platform.core.reasoning.solution_generator import SolutionGenerator
 from ikp_platform.core.reasoning.rule_engine import RuleEngine
 from ikp_platform.core.observability import telemetry_trace
+import logging
+
+logger = logging.getLogger("ikp.workflow.executor")
 
 
 class WorkflowExecutor:
@@ -51,10 +54,15 @@ class WorkflowExecutor:
             ranked_solutions=[],
         )
 
+        logger.info(f"Starting LangGraph workflow execution for query: '{query[:50]}...'")
         result = self.app.invoke(initial_state)
+        
+        platform_result = result.get("selected_platform")
+        bom_result = result.get("current_bom", [])
+        logger.info(f"LangGraph execution completed. Platform: {platform_result}, BOM size: {len(bom_result)}")
 
         return {
-            "platform": result.get("selected_platform"),
-            "bom": result.get("current_bom"),
+            "platform": platform_result,
+            "bom": bom_result,
             "ranked_solutions": result.get("ranked_solutions", []),
         }
