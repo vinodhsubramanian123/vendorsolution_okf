@@ -295,6 +295,24 @@ class GraphBuilder:
         ]
 
     # -------------------------------------------------------------------
+    # Subgraph generation
+    # -------------------------------------------------------------------
+
+    def build_subgraph(self, node_ids: List[str]) -> nx.DiGraph:
+        """
+        Return an induced subgraph containing only the specified nodes and the
+        edges between them. This is useful for passing a narrowed context to
+        the LLM reasoning engine.
+        
+        Args:
+            node_ids: List of node IDs to include.
+            
+        Returns:
+            A new NetworkX DiGraph containing the induced subgraph.
+        """
+        return self.graph.subgraph(node_ids).copy()
+
+    # -------------------------------------------------------------------
     # Graph statistics — Blueprint 02 §11 (Observability)
     # -------------------------------------------------------------------
 

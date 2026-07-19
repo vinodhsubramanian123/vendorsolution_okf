@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/graph_builder.py": {
-    "mtime": 1784444332.3743193,
-    "ast_hash": "28b713597582e0ab4f9555930863e9fe",
+    "mtime": 1784451042.9952052,
+    "ast_hash": "d2dcdbad58815bdb4d8eb36b3645b0ae",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/mcp_client.py": {
@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "tests/test_foundation.py": {
-    "mtime": 1784222390.1165378,
-    "ast_hash": "0874497c3210b07485a0e6fe6523adec",
+    "mtime": 1784451060.8558974,
+    "ast_hash": "a78d0bf4a21a06f8cc471fc844916666",
     "semantic_hash": ""
   },
   "tests/test_fuzzy_matching.py": {

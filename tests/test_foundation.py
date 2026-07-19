@@ -460,6 +460,24 @@ class TestGraphBuilder:
         res_const = graph.filter_by_metadata({"limit_name": "max_drives", "limit_value": 24})
         assert "const-1" in res_const
 
+    def test_build_subgraph(self):
+        graph = self._build_test_graph()
+        
+        # Test creating a subgraph with a subset of nodes
+        subgraph = graph.build_subgraph(["alletra-6050", "controller-a"])
+        
+        # Verify the subgraph only contains the requested nodes
+        assert subgraph.number_of_nodes() == 2
+        assert "alletra-6050" in subgraph.nodes
+        assert "controller-a" in subgraph.nodes
+        
+        # Verify edges are preserved in the induced subgraph
+        assert subgraph.has_edge("alletra-6050", "controller-a")
+        
+        # Verify excluded nodes and their edges are missing
+        assert "dl380-gen11" not in subgraph.nodes
+        assert not subgraph.has_edge("alletra-6050", "firmware-1.30")
+
 
 
 # -----------------------------------------------------------------------
