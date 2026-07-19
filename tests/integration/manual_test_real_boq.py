@@ -6,10 +6,10 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-from ikp_platform.core.repository.graph_builder import GraphBuilder
-from ikp_platform.core.reasoning.rule_engine import RuleEngine
-from ikp_platform.core.ingestion.pdf_extractor import PDFExtractor
-from ikp_platform.core.ontology.models import Source, SourceType
+from ikp_platform.core.repository.graph_builder import GraphBuilder  # noqa: E402
+from ikp_platform.core.reasoning.rule_engine import RuleEngine  # noqa: E402
+from ikp_platform.core.ingestion.pdf_extractor import PDFExtractor  # noqa: E402
+from ikp_platform.core.ontology.models import Source, SourceType  # noqa: E402
 
 logging.basicConfig(level=logging.ERROR)
 

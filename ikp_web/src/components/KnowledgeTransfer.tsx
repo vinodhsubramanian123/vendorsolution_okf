@@ -38,7 +38,7 @@ export function KnowledgeTransfer() {
         {!loading && !error && (
           <ReactMarkdown
             components={{
-              code({ node, inline, className, children, ...props }: any) {
+              code({ node: _node, inline, className, children, ...props }: any) {
                 return !inline ? (
                   <div className="code-block-wrapper">
                     <pre className={className}>

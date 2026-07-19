@@ -16,7 +16,7 @@ Naming note: the project is `vendorsolution_okf` and the platform is IKP. Refere
 | Canonical repository | OKF Markdown with YAML frontmatter | Generated under `repository/` by ingestion/bootstrap |
 | Graph engine | NetworkX `DiGraph` | Rebuilt in memory from OKF on startup |
 | Vector search | ChromaDB local persistent client | Uses Gemini embeddings through `LLMClient` |
-| LLM integration | Gemini via `google-genai`; Antigravity CLI for rule mining helpers | Requires `GEMINI_API_KEY` for LLM/embedding quality |
+| LLM integration | Gemini via `google-genai` with Pydantic `response_schema` structs; Antigravity CLI for rule mining helpers | Requires `GEMINI_API_KEYS` (comma-separated list supported for free-tier rotation) |
 | Ingestion | PDF, Excel, source registry | PDF uses vendor adapters; Excel supports `Components` and `SKUs` sheets |
 | Tests | Pytest, Ruff, Vite build, optional Playwright | `mypy` exists as a separate backlog gate |
 
@@ -62,7 +62,7 @@ Useful environment variables:
 - Excel extraction for structured `Components` and `SKUs` sheets, with optional platform linking.
 - OKF reader/writer round trip for canonical ontology objects.
 - NetworkX graph traversal for compatibility, relationships, category limits, dependencies, and solution-domain isolation.
-- Gemini-backed intent parsing and component selection, with graceful fallbacks when the key is missing.
+- Gemini-backed intent parsing and component selection with Pydantic deterministic structs and automatic HTTP 429 multi-key rotation, with graceful fallbacks when the keys are missing.
 - Gemini embedding based semantic search through ChromaDB.
 - BOQ validation with exact/fuzzy matching, invalid SKU reporting, platform inference, rule evaluation, and alternative solution suggestions.
 - A LangGraph workflow with bounded draft/validate attempts and placeholder nodes for future dynamic integrations.
@@ -76,7 +76,7 @@ Useful environment variables:
 - Cost estimates in BOQ alternatives are static profile placeholders, not live pricing.
 - Semantic search depends on successful Gemini embeddings and a populated ChromaDB index. Without `GEMINI_API_KEY`, vector queries return empty or degraded results.
 - Rule extraction through Antigravity CLI helpers is available but depends on the local `antigravity-cli` command being installed and configured.
-- `make typecheck` is not currently a release gate; mypy has a known backlog.
+- `make typecheck` is now a mandatory release gate with full strict coverage.
 
 ## Not In Scope Yet
 
@@ -108,4 +108,4 @@ make typecheck
 git diff --check
 ```
 
-Current known status after the latest audit: pytest, frontend build, Ruff lint, and diff whitespace checks pass. `make typecheck` still reports the existing mypy backlog and should be treated as a planned cleanup track until fixed.
+Current known status after the latest audit: pytest, frontend build, Ruff lint, and mypy/pyright typechecks (`make typecheck`) are completely clean and strictly enforced.

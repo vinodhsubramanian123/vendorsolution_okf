@@ -46,7 +46,7 @@ from ikp_platform.core.ontology.models import (
 
 # Fields intentionally NOT expected as a flat/aliased key in node_attrs,
 # because add_concept handles them via a documented, different mechanism.
-HANDLED_SEPARATELY = {"attributes", "relationships", "history", "id"}
+HANDLED_SEPARATELY = {"attributes", "relationships", "history", "id", "source_filepath"}
 
 # field_name -> the alternate key it's expected under in node_attrs, for the
 # handful of fields kept under a historical `attr_*`/`req_*` alias.

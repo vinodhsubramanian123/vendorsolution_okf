@@ -11,7 +11,7 @@ complementary doc, not a replacement for this one.
 - [`uv`](https://docs.astral.sh/uv/) (this project's dependency manifest
   and lockfile are uv-native; see `README.md` for why)
 - Node 18+ (for `ikp_web/`, the frontend)
-- A Gemini API key (optional but recommended -- see step 3)
+- A Gemini API key (or multiple keys separated by commas for free-tier pooling)
 
 ## 2. Install
 
@@ -25,16 +25,11 @@ uv sync --extra dev
 
 ```bash
 cp .env.example .env
-# edit .env and set GEMINI_API_KEY
+# edit .env and set GEMINI_API_KEYS (comma-separated list of keys)
+# optionally set Langfuse variables for LLM tracing
 ```
 
-**Note on `GEMINI_API_KEY`:** the platform runs without it. Intent
-parsing falls back to keyword heuristics, and PDF ingestion still
-extracts structured components/rules/SKUs. What you lose without a
-key: LLM-assisted rule extraction from prose, LLM-assisted component
-selection, and semantic (vector) search -- those degrade silently to
-"no results" rather than erroring, so if search seems to return
-nothing, check this first.
+**Note on `GEMINI_API_KEYS`**: You can pass multiple Google AI Studio free-tier keys separated by commas (e.g., `key1,key2`). The system uses a round-robin rotation strategy with automatic failover if a `429 Too Many Requests` limit is hit, which is perfect for maximizing free-tier usage across multiple logins. Without any key, intent parsing falls back to keyword heuristics and semantic search returns empty results.
 
 ## 4. Seed the knowledge repository (required, every fresh clone)
 
@@ -127,8 +122,7 @@ npm run build --prefix ikp_web
 git diff --check
 ```
 
-`make typecheck` runs mypy separately. It is useful for backlog work, but
-it is not currently clean.
+`make typecheck` runs mypy/pyright separately. The backlog has been completely cleared, so this command is now clean and enforces strict typing across the core logic.
 
 ## Project layout
 

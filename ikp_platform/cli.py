@@ -19,6 +19,8 @@ Usage:
 
 import sys
 from pathlib import Path
+from typing import Optional
+import uuid
 
 from ikp_platform.utils.logger import setup_logger
 
@@ -30,17 +32,20 @@ PROJECT_ROOT = Path(__file__).parent.parent
 REPOSITORY_PATH = PROJECT_ROOT / "repository"
 SOURCES_PATH = PROJECT_ROOT / "sources"
 
-from ikp_platform.core.repository.repo_manager import RepoManager
-from ikp_platform.core.ingestion.source_registry import SourceRegistry
-from ikp_platform.core.ingestion.source_watcher import SourceWatcher
-from ikp_platform.core.ingestion.pdf_extractor import PDFExtractor
-from ikp_platform.core.ingestion.excel_parser import ExcelExtractor
-from ikp_platform.core.ontology.models import ProcessingStatus, SourceType
-from ikp_platform.core.reasoning.intent_parser import IntentParser
-from ikp_platform.core.reasoning.solution_generator import SolutionGenerator
+from ikp_platform.core.repository.repo_manager import RepoManager  # noqa: E402
+from ikp_platform.core.ingestion.source_registry import SourceRegistry, ProcessingRegistry  # noqa: E402
+from ikp_platform.core.ingestion.source_watcher import SourceWatcher  # noqa: E402
+from ikp_platform.core.ingestion.pdf_extractor import PDFExtractor  # noqa: E402
+from ikp_platform.core.ingestion.excel_parser import ExcelExtractor  # noqa: E402
+from ikp_platform.core.ontology.models import ProcessingStatus, SourceType  # noqa: E402
+from ikp_platform.core.reasoning.intent_parser import IntentParser  # noqa: E402
+from ikp_platform.core.reasoning.solution_generator import SolutionGenerator  # noqa: E402
+
+from dotenv import load_dotenv  # noqa: E402
+load_dotenv()
 
 
-def cmd_ingest(file_path: str, platform_id: str = None):
+def cmd_ingest(file_path: str, platform_id: Optional[str] = None):
     """Ingest a single engineering source file."""
     logger.info("=== IKP Ingestion Pipeline ===")
     logger.info(f"Source: {file_path}")
@@ -60,7 +65,14 @@ def cmd_ingest(file_path: str, platform_id: str = None):
         registry.update_status(source.source_id, ProcessingStatus.EXTRACTING)
 
         extractor = PDFExtractor(source)
-        objects, delta = extractor.extract(file_path)
+        objects, delta_changes = extractor.extract(file_path)
+        
+        from ikp_platform.core.ontology.models import KnowledgeDelta
+        delta = KnowledgeDelta(
+            delta_id=f"DELTA-{str(uuid.uuid4())[:8]}",
+            source_id=source.source_id,
+            changes=delta_changes,
+        )
 
         logger.info(f"Extracted {len(objects)} engineering objects")
         logger.info(
@@ -91,13 +103,15 @@ def cmd_ingest(file_path: str, platform_id: str = None):
         logger.info(f"Total nodes in graph: {stats['total_nodes']}")
         logger.info(f"Total edges in graph: {stats['total_edges']}")
         logger.info("Objects by type:")
-        for obj_type, count in sorted(stats.get("type_counts", {}).items()):
-            logger.info(f"  {obj_type}: {count}")
+        type_counts = stats.get("type_counts", {})
+        if isinstance(type_counts, dict):
+            for obj_type, count in sorted(type_counts.items()):
+                logger.info(f"  {obj_type}: {count}")
     elif source.source_type == SourceType.EXCEL:
         registry.update_status(source.source_id, ProcessingStatus.EXTRACTING)
 
-        extractor = ExcelExtractor()
-        objects, delta = extractor.extract(source, file_path, platform_id=platform_id)
+        excel_extractor = ExcelExtractor()
+        objects, delta = excel_extractor.extract(source, file_path, platform_id=platform_id)
 
         logger.info(f"Extracted {len(objects)} engineering objects")
         logger.info(
@@ -141,7 +155,7 @@ def cmd_status():
     print()
 
     type_counts = stats.get("type_counts", {})
-    if type_counts:
+    if isinstance(type_counts, dict) and type_counts:
         print("  Objects by type:")
         for obj_type, count in sorted(type_counts.items()):
             print(f"    {obj_type}: {count}")
@@ -232,19 +246,25 @@ def cmd_validate(solution_id: str):
 def cmd_learn():
     """Run the continuous learning loop to process pending knowledge deltas."""
     logger.info("=== IKP Learning Loop ===")
-    history_dir = PROJECT_ROOT / "history"
-    if not history_dir.exists():
-        logger.info("No pending deltas in history/")
+    registry = ProcessingRegistry()
+    repo = RepoManager(registry)
+    from ikp_platform.core.learning.learning_engine import LearningEngine
+    
+    if not hasattr(repo, "learning_engine"):
+        repo.learning_engine = LearningEngine(repo)
+        
+    pending = repo.learning_engine.get_pending_reviews()
+    if not pending:
+        logger.info("No pending deltas in learning engine.")
         return
-
-    count = 0
-    for file in history_dir.glob("*.md"):
-        count += 1
-
-    logger.info(f"Found {count} delta records in history/")
-    logger.info(
-        "Manual review required for V1.0 deltas before merging into canonical knowledge."
-    )
+        
+    logger.info(f"Found {len(pending)} pending deltas.")
+    for delta in pending:
+        logger.info(f"Delta {delta.delta_id} from {delta.source_id}")
+        for change in delta.changes:
+            logger.info(f"  - {change.change_type.value} on {change.object_id}")
+            
+    logger.info("Use the API or UI to approve or reject these deltas.")
 
 
 def cmd_mcp():

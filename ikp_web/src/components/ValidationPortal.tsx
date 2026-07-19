@@ -4,26 +4,13 @@ import { CheckCircle } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
-type Evidence = {
-  source_id: string;
-  confidence: string;
-  description?: string;
-  original_text_snippet?: string;
-};
-
-type ReviewItem = {
-  id: string;
-  title: string;
-  type: string;
-  confidence: string;
-  description: string;
-  evidence: Evidence[];
-};
+import type { ReviewQueueItem } from '../types/api';
 
 export function ValidationPortal() {
-  const [queue, setQueue] = useState<ReviewItem[]>([]);
+  const [queue, setQueue] = useState<ReviewQueueItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     fetchQueue();
@@ -31,11 +18,13 @@ export function ValidationPortal() {
 
   const fetchQueue = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const res = await axios.get(`${API_BASE}/review-queue`);
       setQueue(res.data.queue || []);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch review queue', err);
+      setErrorMsg('Failed to fetch review queue.');
     } finally {
       setLoading(false);
     }
@@ -43,13 +32,14 @@ export function ValidationPortal() {
 
   const handleApprove = async (id: string) => {
     setApprovingId(id);
+    setErrorMsg(null);
     try {
       await axios.post(`${API_BASE}/review-queue/approve`, { object_id: id });
       // Remove from queue
       setQueue(queue.filter(item => item.id !== id));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to approve', err);
-      alert('Failed to approve object. Check console for details.');
+      setErrorMsg(err.response?.data?.detail || 'Failed to approve object.');
     } finally {
       setApprovingId(null);
     }
@@ -72,16 +62,22 @@ export function ValidationPortal() {
           </button>
         </div>
 
+        {errorMsg && (
+          <div style={{ padding: '16px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            {errorMsg}
+          </div>
+        )}
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             Loading review queue...
           </div>
-        ) : queue.length === 0 ? (
+        ) : queue.length === 0 && !errorMsg ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
             <CheckCircle size={48} style={{ opacity: 0.5, marginBottom: '16px' }} />
             <p>Queue is empty. All knowledge is fully verified.</p>
           </div>
-        ) : (
+        ) : queue.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {queue.map(item => (
               <div key={item.id} style={{ 
@@ -163,7 +159,7 @@ export function ValidationPortal() {
               </div>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
     </>
   );

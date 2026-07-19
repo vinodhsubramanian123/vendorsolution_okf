@@ -30,12 +30,14 @@ class TableParser:
                     if not table or len(table) < 2:
                         continue
 
-                    cleaned_table = []
+                    cleaned_table: List[List[str]] = []
                     for row in table:
-                        cleaned_row = [
-                            cell.replace("\n", " ").strip() if cell else ""
-                            for cell in row
-                        ]
+                        cleaned_row = []
+                        for cell in row:
+                            if cell is not None:
+                                cleaned_row.append(str(cell).replace("\n", " ").strip())
+                            else:
+                                cleaned_row.append("")
                         cleaned_table.append(cleaned_row)
 
                     headers = cleaned_table[0]
@@ -45,8 +47,8 @@ class TableParser:
                         if "sku" in h_lower or "part" in h_lower or "number" in h_lower:
                             sku_col_indices.append(idx)
 
-                    for row in cleaned_table[1:]:
-                        for cell_idx, cell_text in enumerate(row):
+                    for c_row in cleaned_table[1:]:
+                        for cell_idx, cell_text in enumerate(c_row):
                             is_sku_col = cell_idx in sku_col_indices
                             sku_match = self.sku_pattern.search(cell_text)
 
@@ -81,13 +83,13 @@ class TableParser:
 
                                 if len(description) < 30:
                                     prev_desc = (
-                                        row[cell_idx - 1].strip(" -.,|\n")
+                                        c_row[cell_idx - 1].strip(" -.,|\n")
                                         if cell_idx > 0
                                         else ""
                                     )
                                     next_desc = (
-                                        row[cell_idx + 1].strip(" -.,|\n")
-                                        if cell_idx + 1 < len(row)
+                                        c_row[cell_idx + 1].strip(" -.,|\n")
+                                        if cell_idx + 1 < len(c_row)
                                         else ""
                                     )
                                     best_desc = (
@@ -105,7 +107,7 @@ class TableParser:
                                 )
 
                                 default_qty = 0
-                                row_text = " ".join(row)
+                                row_text = " ".join(c_row)
                                 if (
                                     "default" in row_text.lower()
                                     or "qty" in "".join(headers).lower()

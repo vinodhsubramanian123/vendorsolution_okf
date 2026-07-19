@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
@@ -6,8 +6,12 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 import logging
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from ikp_platform.core.repository.repo_manager import RepoManager
+from ikp_platform.core.repository.repo_watcher import RepositoryWatcher
 from ikp_platform.core.reasoning.intent_parser import IntentParser
 from ikp_platform.core.reasoning.solution_generator import SolutionGenerator
 from ikp_platform.core.reasoning.rule_engine import RuleEngine
@@ -16,8 +20,10 @@ from ikp_platform.core.validation.boq_validator import BOQValidator
 from ikp_platform.core.ontology.models import EngineeringObjectType
 from ikp_platform.core.observability import telemetry_trace
 from ikp_platform.core.learning.learning_engine import LearningEngine
+from langfuse.decorators import observe, langfuse_context
 
-_repo_instance = None
+_repo_instance: Optional[RepoManager] = None
+_watcher_instance: Optional[RepositoryWatcher] = None
 
 
 @asynccontextmanager
@@ -36,8 +42,18 @@ async def lifespan(app: FastAPI):
             REPOSITORY_PATH,
         )
     _repo_instance = repo
+    
+    # Start the repository watcher to track external Obsidian edits
+    _watcher_instance = RepositoryWatcher(repo)
+    _watcher_instance.start()
+    
     yield
+    
+    if _watcher_instance:
+        _watcher_instance.stop()
+        
     _repo_instance = None
+    langfuse_context.flush()
 
 
 app = FastAPI(title="IKP Reasoning API", version="2.0.0", lifespan=lifespan)
@@ -94,7 +110,8 @@ def _infer_platforms_for_components(
     repo: RepoManager, component_ids: List[str]
 ) -> set[str]:
     """Infer possible platforms from explicit platform IDs and compatibility links."""
-    platforms = set()
+    explicit_platforms = set()
+    platform_counts = {}
 
     for comp_id in component_ids:
         if comp_id not in repo.graph.graph:
@@ -102,16 +119,17 @@ def _infer_platforms_for_components(
 
         node = repo.graph.graph.nodes[comp_id]
         if node.get("type") == EngineeringObjectType.PLATFORM.value:
-            platforms.add(comp_id)
+            explicit_platforms.add(comp_id)
             continue
 
+        comp_platforms = set()
         for related_id in repo.graph.get_related(comp_id, "Compatible With"):
             if (
                 related_id in repo.graph.graph
                 and repo.graph.graph.nodes[related_id].get("type")
                 == EngineeringObjectType.PLATFORM.value
             ):
-                platforms.add(related_id)
+                comp_platforms.add(related_id)
 
         component_id = node.get("component_id")
         if component_id and component_id in repo.graph.graph:
@@ -121,9 +139,19 @@ def _infer_platforms_for_components(
                     and repo.graph.graph.nodes[related_id].get("type")
                     == EngineeringObjectType.PLATFORM.value
                 ):
-                    platforms.add(related_id)
+                    comp_platforms.add(related_id)
 
-    return platforms
+        for p in comp_platforms:
+            platform_counts[p] = platform_counts.get(p, 0) + 1
+
+    if explicit_platforms:
+        return explicit_platforms
+
+    if platform_counts:
+        max_count = max(platform_counts.values())
+        return {p for p, c in platform_counts.items() if c == max_count}
+
+    return set()
 
 
 @app.get("/api/status")
@@ -163,6 +191,7 @@ async def get_status():
 
 
 @app.post("/api/query")
+@observe(name="query-solution")
 @telemetry_trace
 async def query_solution(request: QueryRequest):
     repo = get_repo()
@@ -185,6 +214,32 @@ async def query_solution(request: QueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/status/integrations")
+@telemetry_trace
+async def get_integrations_status():
+    repo = get_repo()
+    
+    # LLM Status
+    import os
+    has_gemini = bool(os.environ.get("GEMINI_API_KEY"))
+    llm_status = "Available" if has_gemini else "Not Configured"
+    
+    # Vector Index Status
+    vector_status = "Available" if hasattr(repo, "vector_store") and repo.vector_store else "Not Configured"
+    
+    # MCP Status
+    has_mcp = bool(os.environ.get("OBSIDIAN_MCP_URL")) or bool(os.environ.get("MCP_SERVER_URL"))
+    mcp_status = "Configured" if has_mcp else "Not Configured"
+        
+    return {
+        "integrations": {
+            "llm": {"status": llm_status, "name": "Gemini API"},
+            "vector_index": {"status": vector_status, "name": "ChromaDB"},
+            "mcp": {"status": mcp_status, "name": "Obsidian MCP"}
+        }
+    }
+
+
 @app.post("/api/validate")
 @telemetry_trace
 async def validate_solution(request: ValidationRequest):
@@ -204,8 +259,9 @@ async def validate_solution(request: ValidationRequest):
 
 
 @app.post("/api/boq/validate")
+@observe(name="validate-boq")
 @telemetry_trace
-async def validate_boq(request: BOQValidationRequest):
+async def validate_boq(request: BOQValidationRequest, background_tasks: BackgroundTasks):
     repo = get_repo()
 
     # 1. Fuzzy match and correct SKUs
@@ -257,8 +313,8 @@ async def validate_boq(request: BOQValidationRequest):
                     objs = repo.reader._parse_file(full_path)
                     for obj in objs:
                         if obj.id == change.object_id:
-                            if change.new_value not in obj.aliases:
-                                obj.aliases.append(change.new_value)
+                            if change.new_value and str(change.new_value) not in obj.aliases:
+                                obj.aliases.append(str(change.new_value))
                             objects_to_update.append(obj)
                 except Exception as e:
                     logger.error(f"Failed to load object {change.object_id} for learning: {e}")
@@ -268,6 +324,7 @@ async def validate_boq(request: BOQValidationRequest):
         delta.status = DeltaStatus.VALIDATED
         learning_engine.pending_deltas.append(delta)
         learning_engine.process_validated_deltas(objects_to_update)
+        background_tasks.add_task(repo.reindex_vector_store)
 
     # Extract the corrected component IDs
     corrected_components = []
@@ -384,6 +441,7 @@ async def validate_boq(request: BOQValidationRequest):
 
 
 @app.post("/api/search")
+@observe(name="semantic-search")
 @telemetry_trace
 async def semantic_search(request: SearchRequest):
     repo = get_repo()
@@ -449,35 +507,69 @@ async def get_review_queue():
 
 @app.post("/api/review-queue/approve")
 @telemetry_trace
-async def approve_object(request: ApprovalRequest):
+async def approve_object(request: ApprovalRequest, background_tasks: BackgroundTasks):
     repo = get_repo()
 
     try:
-        # We need to load the full object from disk, update it, and save it back
-        # to ensure it's properly formatted and serialized in OKF.
-        # Naive lookup for file path (assuming standard OKF structure)
-        # However, okf_reader handles this.
-        # But we don't have a direct `get_object` by ID in the reader.
-        # So we scan. In a production app, we'd cache file paths.
-        all_objs = repo.reader.load_all()
         target_obj = None
-        for o in all_objs:
-            if o.id == request.object_id:
-                target_obj = o
-                break
+        
+        # Use path_cache instead of full scan
+        if request.object_id in repo.graph.path_cache:
+            file_path = repo.graph.path_cache[request.object_id]
+            target_obj = repo.reader.load(file_path)
 
         if not target_obj:
             raise HTTPException(status_code=404, detail="Object not found")
 
         from ikp_platform.core.ontology.models import ConfidenceLevel
 
-        target_obj.confidence = ConfidenceLevel.HIGH
+        target_obj.confidence = ConfidenceLevel.HIGH  # type: ignore
         repo.add_concept(target_obj)
+
+        background_tasks.add_task(repo.reindex_vector_store)
 
         return {"status": "success", "message": f"Approved {request.object_id}"}
     except Exception as e:
         logger.error(f"Failed to approve object: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/review-queue/deltas")
+@telemetry_trace
+async def get_pending_deltas():
+    repo = get_repo()
+    if not hasattr(repo, "learning_engine"):
+        from ikp_platform.core.learning.learning_engine import LearningEngine
+        repo.learning_engine = LearningEngine(repo)
+    deltas = repo.learning_engine.get_pending_reviews()
+    return {"deltas": [d.model_dump(mode="json") for d in deltas]}
+
+@app.post("/api/review-queue/deltas/{delta_id}/approve")
+@telemetry_trace
+async def approve_delta(delta_id: str, background_tasks: BackgroundTasks, reviewer: str = "Human"):
+    repo = get_repo()
+    if not hasattr(repo, "learning_engine"):
+        from ikp_platform.core.learning.learning_engine import LearningEngine
+        repo.learning_engine = LearningEngine(repo)
+        
+    success = repo.learning_engine.approve_delta(delta_id, reviewer)
+    if success:
+        repo.learning_engine.process_validated_deltas(repo.reader.load_all())
+        background_tasks.add_task(repo.reindex_vector_store)
+        return {"status": "success", "message": f"Approved and merged delta {delta_id}"}
+    raise HTTPException(status_code=404, detail="Delta not found or not pending")
+
+@app.post("/api/review-queue/deltas/{delta_id}/reject")
+@telemetry_trace
+async def reject_delta(delta_id: str, reviewer: str = "Human", reason: str = ""):
+    repo = get_repo()
+    if not hasattr(repo, "learning_engine"):
+        from ikp_platform.core.learning.learning_engine import LearningEngine
+        repo.learning_engine = LearningEngine(repo)
+        
+    success = repo.learning_engine.reject_delta(delta_id, reviewer, reason)
+    if success:
+        return {"status": "success", "message": f"Rejected delta {delta_id}"}
+    raise HTTPException(status_code=404, detail="Delta not found or not pending")
 
 
 if __name__ == "__main__":

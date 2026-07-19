@@ -264,6 +264,9 @@ class BaseEngineeringObject(BaseModel):
     relationships: List[EngineeringRelationship] = Field(default_factory=list)
     evidence: List[EvidenceRecord] = Field(default_factory=list)
     version: int = 1
+    
+    # Internal metadata for avoiding path duplication on updates
+    source_filepath: Optional[str] = Field(default=None, exclude=True)
 
 
 class SlotMapping(BaseEngineeringObject):

@@ -11,7 +11,12 @@ losing all knowledge.
 import yaml
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
+import logging
+
+logger = logging.getLogger("ikp.repository.reader")
+
+import logging
 
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
@@ -50,7 +55,7 @@ class OKFReader:
         Recursively scan the repository and parse all concept files.
         Skips reserved files (index.md, log.md).
         """
-        objects = []
+        objects: List[BaseEngineeringObject] = []
         if not self.repository_path.exists():
             return objects
 
@@ -158,16 +163,16 @@ class OKFReader:
             lifecycle = LifecycleStatus.UNKNOWN
 
         # Parse timestamp
+        timestamp = datetime.now(timezone.utc)
         ts = frontmatter.get("timestamp")
-        timestamp = None
         if ts:
             try:
                 if isinstance(ts, datetime):
-                    _ = ts
+                    timestamp = ts
                 else:
-                    _ = datetime.fromisoformat(ts.rstrip("Z"))
+                    timestamp = datetime.fromisoformat(ts.rstrip("Z"))
             except (ValueError, AttributeError):
-                _ = None
+                pass
 
         # Derive ID from frontmatter if available, otherwise fallback to file path
         relative = file_path.relative_to(self.repository_path)
@@ -186,6 +191,7 @@ class OKFReader:
             "generation": frontmatter.get("generation"),
             "platform_id": frontmatter.get("platform_id"),
             "lifecycle_status": lifecycle,
+            "timestamp": timestamp,
             "attributes": attributes,
             "relationships": relationships,
             "capabilities": frontmatter.get("capabilities", []),
@@ -194,130 +200,44 @@ class OKFReader:
             "evidence": evidence,
         }
 
-        # Instantiate specialized types
+        # Merge all data into a single dict for Pydantic validation
+        merged_data = {**frontmatter, **kwargs}
+        merged_data["source_filepath"] = str(file_path.absolute())
+
+        TYPE_MAP = {
+            EngineeringObjectType.RULE: Rule,
+            EngineeringObjectType.CONSTRAINT: Constraint,
+            EngineeringObjectType.COMPONENT: Component,
+            EngineeringObjectType.PLATFORM: Platform,
+            EngineeringObjectType.SKU: SKU,
+            EngineeringObjectType.WORKLOAD: Workload,
+            EngineeringObjectType.CATEGORY_LIMIT: CategoryLimit,
+            EngineeringObjectType.SLOT_MAPPING: SlotMapping,
+            EngineeringObjectType.SOLUTION_CATEGORY: SolutionCategory,
+            EngineeringObjectType.VARIANT: Variant,
+            EngineeringObjectType.CONFIGURATION: Configuration,
+        }
+        
+        ModelClass = TYPE_MAP.get(obj_type, BaseEngineeringObject)
+
+        # Inject body-extracted rule specifics
         if obj_type == EngineeringObjectType.RULE:
-            severity_str = frontmatter.get("severity", "Info")
+            extracted_outcome = self._extract_section(body, "Expected Outcome")
+            extracted_triggers = self._extract_list_section(body, "Trigger Conditions")
+            if extracted_outcome:
+                merged_data["expected_outcome"] = extracted_outcome
+            if extracted_triggers:
+                merged_data["trigger_conditions"] = extracted_triggers
+
+        try:
+            return ModelClass.model_validate(merged_data)
+        except Exception as e:
+            logger.error(f"Failed to fully validate {obj_id} as {ModelClass.__name__}, falling back to base object: {e}")
             try:
-                severity = RuleSeverity(severity_str)
-            except ValueError:
-                severity = RuleSeverity.INFO
-
-            confidence_str = frontmatter.get("confidence", "Unverified")
-            try:
-                confidence = ConfidenceLevel(confidence_str)
-            except ValueError:
-                confidence = ConfidenceLevel.UNVERIFIED
-
-            return Rule(
-                **kwargs,
-                scope=frontmatter.get("scope"),
-                severity=severity,
-                confidence=confidence,
-                applicable_objects=frontmatter.get("applicable_objects", []),
-                expected_outcome=self._extract_section(body, "Expected Outcome"),
-                trigger_conditions=self._extract_list_section(
-                    body, "Trigger Conditions"
-                ),
-                version=frontmatter.get("rule_version", 1),
-                negated=frontmatter.get("negated", False),
-                scaling_factor=frontmatter.get("scaling_factor"),
-                dependency_targets=frontmatter.get("dependency_targets", []),
-            )
-
-        if obj_type == EngineeringObjectType.CONSTRAINT:
-            return Constraint(
-                **kwargs,
-                limit_name=frontmatter.get("limit_name", ""),
-                limit_value=frontmatter.get("limit_value"),
-                limit_unit=frontmatter.get("limit_unit"),
-            )
-
-        if obj_type == EngineeringObjectType.COMPONENT:
-            pkg_type_str = frontmatter.get("packaging_type")
-            pkg_type = (
-                PackagingType(pkg_type_str)
-                if pkg_type_str
-                else PackagingType.STANDALONE
-            )
-            return Component(
-                **kwargs,
-                component_category=frontmatter.get("component_category"),
-                component_subcategory=frontmatter.get("component_subcategory"),
-                packaging_type=pkg_type,
-                inclusive_qty=frontmatter.get("inclusive_qty"),
-            )
-
-        if obj_type == EngineeringObjectType.PLATFORM:
-            return Platform(
-                **kwargs,
-                parent_platform_id=frontmatter.get("parent_platform_id"),
-                platform_sku=frontmatter.get("platform_sku"),
-            )
-
-        if obj_type == EngineeringObjectType.SKU:
-            pkg_type_str = frontmatter.get("packaging_type")
-            pkg_type = (
-                PackagingType(pkg_type_str)
-                if pkg_type_str
-                else PackagingType.STANDALONE
-            )
-            return SKU(
-                **kwargs,
-                part_number=frontmatter.get("part_number", ""),
-                price=frontmatter.get("price"),
-                currency=frontmatter.get("currency"),
-                component_id=frontmatter.get("component_id"),
-                packaging_type=pkg_type,
-            )
-
-        if obj_type == EngineeringObjectType.WORKLOAD:
-            return Workload(
-                **kwargs,
-                performance_requirements=frontmatter.get(
-                    "performance_requirements", {}
-                ),
-                capacity_requirements=frontmatter.get("capacity_requirements", {}),
-            )
-
-        if obj_type == EngineeringObjectType.CATEGORY_LIMIT:
-            return CategoryLimit(
-                **kwargs,
-                limit_name=frontmatter.get("limit_name", ""),
-                limit_value=frontmatter.get("limit_value"),
-                limit_unit=frontmatter.get("limit_unit"),
-                target_category=frontmatter.get("target_category"),
-                target_subcategory=frontmatter.get("target_subcategory"),
-            )
-
-        if obj_type == EngineeringObjectType.SLOT_MAPPING:
-            return SlotMapping(
-                **kwargs,
-                source_slot=frontmatter.get("source_slot", ""),
-                target_bays=frontmatter.get("target_bays", []),
-                redundancy_link=frontmatter.get("redundancy_link"),
-                constraints=frontmatter.get("constraints", []),
-            )
-
-        if obj_type == EngineeringObjectType.SOLUTION_CATEGORY:
-            return SolutionCategory(**kwargs)
-
-        if obj_type == EngineeringObjectType.VARIANT:
-            return Variant(
-                **kwargs,
-                base_platform_id=frontmatter.get("base_platform_id", ""),
-                differentiators=frontmatter.get("differentiators", []),
-            )
-
-        if obj_type == EngineeringObjectType.CONFIGURATION:
-            return Configuration(
-                **kwargs,
-                base_platform_id=frontmatter.get("base_platform_id", ""),
-                included_components=frontmatter.get("included_components", []),
-                validated=frontmatter.get("validated", False),
-                validation_source=frontmatter.get("validation_source"),
-            )
-
-        return BaseEngineeringObject(**kwargs)
+                return BaseEngineeringObject.model_validate(merged_data)
+            except Exception as base_e:
+                logger.error(f"Absolute validation failure for {obj_id}: {base_e}")
+                return None
 
     # -------------------------------------------------------------------
     # Parsing helpers

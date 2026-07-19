@@ -1,4 +1,7 @@
-export function PlatformDashboard({ status }: { status: any }) {
+import type { StatusResponse, IntegrationsResponse } from '../types/api';
+import { Activity, Database, Brain } from 'lucide-react';
+
+export function PlatformDashboard({ status, integrations }: { status: StatusResponse | any, integrations: IntegrationsResponse | null }) {
   if (!status) return null;
   
   return (
@@ -27,6 +30,40 @@ export function PlatformDashboard({ status }: { status: any }) {
           </div>
         </div>
       </div>
+      
+      {integrations && (
+        <div className="glass-panel" style={{ marginTop: '24px' }}>
+          <h2>Integrations Health</h2>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '200px', padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', borderLeft: `4px solid ${integrations.integrations.llm.status === 'Available' ? '#22c55e' : '#ef4444'}` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <Brain size={20} color={integrations.integrations.llm.status === 'Available' ? '#22c55e' : '#ef4444'} />
+                <strong style={{ fontSize: '1.1rem' }}>LLM</strong>
+              </div>
+              <div style={{ color: 'var(--text-muted)' }}>{integrations.integrations.llm.name}</div>
+              <div style={{ marginTop: '8px', fontWeight: 'bold', color: integrations.integrations.llm.status === 'Available' ? '#22c55e' : '#ef4444' }}>{integrations.integrations.llm.status}</div>
+            </div>
+
+            <div style={{ flex: 1, minWidth: '200px', padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', borderLeft: `4px solid ${integrations.integrations.vector_index.status === 'Available' ? '#22c55e' : '#ef4444'}` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <Database size={20} color={integrations.integrations.vector_index.status === 'Available' ? '#22c55e' : '#ef4444'} />
+                <strong style={{ fontSize: '1.1rem' }}>Vector Index</strong>
+              </div>
+              <div style={{ color: 'var(--text-muted)' }}>{integrations.integrations.vector_index.name}</div>
+              <div style={{ marginTop: '8px', fontWeight: 'bold', color: integrations.integrations.vector_index.status === 'Available' ? '#22c55e' : '#ef4444' }}>{integrations.integrations.vector_index.status}</div>
+            </div>
+
+            <div style={{ flex: 1, minWidth: '200px', padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', borderLeft: `4px solid ${integrations.integrations.mcp.status === 'Configured' ? '#3b82f6' : '#94a3b8'}` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <Activity size={20} color={integrations.integrations.mcp.status === 'Configured' ? '#3b82f6' : '#94a3b8'} />
+                <strong style={{ fontSize: '1.1rem' }}>MCP Tools</strong>
+              </div>
+              <div style={{ color: 'var(--text-muted)' }}>{integrations.integrations.mcp.name}</div>
+              <div style={{ marginTop: '8px', fontWeight: 'bold', color: integrations.integrations.mcp.status === 'Configured' ? '#3b82f6' : '#94a3b8' }}>{integrations.integrations.mcp.status}</div>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="glass-panel" style={{ marginTop: '24px' }}>
         <h2>Products Overview</h2>

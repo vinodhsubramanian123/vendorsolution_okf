@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
-from ikp_platform.core.ontology.models import BaseEngineeringObject, Platform
+from typing import List, Optional, Tuple
+from ikp_platform.core.ontology.models import BaseEngineeringObject, Platform, DeltaChange
 
 class BasePDFAdapter(ABC):
     """
@@ -18,6 +18,6 @@ class BasePDFAdapter(ABC):
         pass
 
     @abstractmethod
-    def extract_components(self, text: str, platform: Platform, structured_components: List[dict]) -> List[BaseEngineeringObject]:
+    def extract_components(self, text: str, platform: Platform, structured_components: List[dict]) -> Tuple[List[BaseEngineeringObject], List[DeltaChange]]:
         """Extract all related components, rules, and workloads from the text and tables."""
         pass

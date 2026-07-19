@@ -13,7 +13,16 @@ def telemetry_trace(func: Callable) -> Callable:
     Decorator for end-to-end observability.
     Logs method entry, exit, duration, exceptions, and sanitized inputs/outputs.
     Works for both synchronous and asynchronous functions.
+    If Langfuse is configured (LANGFUSE_PUBLIC_KEY is set), it also wraps the function
+    with Langfuse's @observe decorator.
     """
+    import os
+    try:
+        from langfuse.decorators import observe as langfuse_observe
+        has_langfuse = bool(os.environ.get("LANGFUSE_PUBLIC_KEY") and os.environ.get("LANGFUSE_SECRET_KEY"))
+    except ImportError:
+        has_langfuse = False
+        langfuse_observe = None
 
     def _log_start(func_name: str, kwargs: dict) -> float:
         start_time = time.time()
@@ -88,6 +97,9 @@ def telemetry_trace(func: Callable) -> Callable:
                 _log_error(func_name, start_time, e)
                 raise e
 
+        if has_langfuse and langfuse_observe:
+            async_wrapper = langfuse_observe(as_type="generation")(async_wrapper)
+            
         return async_wrapper
     else:
 
@@ -103,4 +115,7 @@ def telemetry_trace(func: Callable) -> Callable:
                 _log_error(func_name, start_time, e)
                 raise e
 
+        if has_langfuse and langfuse_observe:
+            sync_wrapper = langfuse_observe(as_type="generation")(sync_wrapper)
+            
         return sync_wrapper

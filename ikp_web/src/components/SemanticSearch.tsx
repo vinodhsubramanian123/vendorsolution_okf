@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { Database } from 'lucide-react';
+import type { SearchResult } from '../types/api';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -9,8 +10,9 @@ export function SemanticSearch() {
   const [filterCategory, setFilterCategory] = useState('');
   const [filterVendor, setFilterVendor] = useState('');
   const [filterGeneration, setFilterGeneration] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +20,7 @@ export function SemanticSearch() {
     
     setIsSearchLoading(true);
     try {
-      const filter_metadata: any = {};
+      const filter_metadata: Record<string, string> = {};
       if (filterCategory) filter_metadata.category = filterCategory;
       if (filterVendor) filter_metadata.vendor = filterVendor;
       if (filterGeneration) filter_metadata.generation = filterGeneration;
@@ -29,15 +31,17 @@ export function SemanticSearch() {
       };
       const res = await axios.post(`${API_BASE}/search`, payload);
       setSearchResults(res.data.results);
-    } catch (error) {
+      setSearchError(null);
+    } catch (error: any) {
       console.error('Failed to search:', error);
+      setSearchError(error.response?.data?.detail || 'Search failed. Please try again later.');
     } finally {
       setIsSearchLoading(false);
     }
   };
 
   // Group results by type
-  const groupedResults = searchResults.reduce((acc: any, res: any) => {
+  const groupedResults = searchResults.reduce((acc: Record<string, SearchResult[]>, res: SearchResult) => {
     const type = res.type || 'Unknown';
     if (!acc[type]) acc[type] = [];
     acc[type].push(res);
@@ -87,8 +91,14 @@ export function SemanticSearch() {
               <Database size={18} /> Search
             </button>
           </form>
+
+        {searchError && (
+          <div style={{ padding: '16px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {searchError}
+          </div>
+        )}
         
-        {searchResults.length > 0 && (
+        {searchResults.length > 0 && !searchError && (
           <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {Object.keys(groupedResults).sort().map(type => (
               <div key={type}>
@@ -96,7 +106,7 @@ export function SemanticSearch() {
                   {type} ({groupedResults[type].length})
                 </h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {groupedResults[type].map((res: any, i: number) => (
+                  {groupedResults[type].map((res: SearchResult, i: number) => (
                     <div key={i} style={{ padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid var(--border)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                         <span style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{res.title || res.id}</span>

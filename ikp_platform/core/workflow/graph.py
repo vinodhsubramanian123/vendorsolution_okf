@@ -5,6 +5,7 @@ Governs: LangGraph Orchestrator Pipeline
 """
 
 from langgraph.graph import StateGraph, END
+from langgraph.graph.state import CompiledStateGraph
 from ikp_platform.core.workflow.state import WorkflowState
 from ikp_platform.core.workflow.nodes import WorkflowNodes
 from ikp_platform.core.repository.graph_builder import GraphBuilder
@@ -42,7 +43,7 @@ def build_workflow_graph(
     parser: IntentParser,
     generator: SolutionGenerator,
     rule_engine: RuleEngine,
-) -> StateGraph:
+) -> CompiledStateGraph:
     """Builds and wires the LangGraph StateMachine."""
 
     workflow_nodes = WorkflowNodes(knowledge_graph, parser, generator, rule_engine)

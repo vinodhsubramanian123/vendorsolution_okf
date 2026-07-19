@@ -1,26 +1,24 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Semantic Search', () => {
-  test('should load the home page and perform a search', async ({ page }) => {
+test.describe('Semantic Search (E2E Integration)', () => {
+  test('should load search page, query real backend, and show results', async ({ page }) => {
+    // Navigate to the main page
     await page.goto('/');
     
-    // Check if the application loaded by finding the search input
-    const searchInput = page.locator('input[type="text"], input[type="search"], [placeholder*="earch"]');
+    // Check backend connection status implicitly by seeing if the page loads properly
+    // Navigate to Semantic Search tab
+    await page.getByRole('button', { name: /search/i }).click();
+
+    // Find the search input
+    const searchInput = page.getByPlaceholder(/search the vector/i).or(page.getByPlaceholder(/e.g. Memory configuration/i));
+    await expect(searchInput).toBeVisible();
+
+    // Test a real query that exists in the seeded OKF repository
+    await searchInput.fill('ProLiant');
+    await searchInput.press('Enter');
     
-    // Depending on the UI, wait for it to be visible.
-    // This is a generic check assuming there's an input on the page.
-    if (await searchInput.count() > 0) {
-      await expect(searchInput.first()).toBeVisible();
-      
-      // Perform a search
-      await searchInput.first().fill('AI Server');
-      await searchInput.first().press('Enter');
-      
-      // Wait for some results to appear, we don't know the exact class but typically lists or cards are used
-      // We will just verify that the page title or basic structure is correct
-      await expect(page.locator('body')).toContainText(/ai|server/i, { timeout: 5000 }).catch(() => {
-        console.log("Could not find search results text, possibly empty repository in test environment.");
-      });
-    }
+    // Check results containing real seeded data
+    await expect(page.locator('body')).toContainText('HPE ProLiant');
+    
   });
 });

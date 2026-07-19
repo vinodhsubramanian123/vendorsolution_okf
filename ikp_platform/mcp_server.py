@@ -109,7 +109,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
             output = "IKP Platform Status:\n"
             output += f"- Total Objects: {stats['total_nodes']}\n"
             output += f"- Relationships: {stats['total_edges']}\n"
-            if "type_counts" in stats:
+            if "type_counts" in stats and isinstance(stats["type_counts"], dict):
                 output += "- Object Types:\n"
                 for obj_type, count in stats["type_counts"].items():
                     output += f"  - {obj_type}: {count}\n"

@@ -50,14 +50,14 @@ class ValidationResult(BaseModel):
     validator_name: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_valid: bool = False
-    messages: List[ValidationMessage] = []
-    configuration_errors: List[str] = []
-    missing_components: List[str] = []
-    dependency_violations: List[str] = []
-    compatibility_issues: List[str] = []
-    licensing_issues: List[str] = []
-    firmware_issues: List[str] = []
-    portal_recommendations: List[str] = []
+    messages: List[ValidationMessage] = Field(default_factory=list)
+    configuration_errors: List[str] = Field(default_factory=list)
+    missing_components: List[str] = Field(default_factory=list)
+    dependency_violations: List[str] = Field(default_factory=list)
+    compatibility_issues: List[str] = Field(default_factory=list)
+    licensing_issues: List[str] = Field(default_factory=list)
+    firmware_issues: List[str] = Field(default_factory=list)
+    portal_recommendations: List[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------

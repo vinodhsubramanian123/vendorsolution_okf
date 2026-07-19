@@ -37,8 +37,7 @@ class WorkflowNodes:
     def parse_intent(self, state: WorkflowState) -> Dict[str, Any]:
         """Parse the unstructured customer message into strict requirements."""
         messages = state.get("messages", [])
-        last_msg = messages[-1].content if messages else ""
-
+        last_msg = str(messages[-1].content) if messages and hasattr(messages[-1], "content") else str(messages[-1]) if messages else ""
         parsed_request = self.parser.parse_request(last_msg)
 
         requirements = [r.model_dump() for r in parsed_request.requirements]
@@ -133,12 +132,32 @@ class WorkflowNodes:
     @telemetry_trace
     def live_portal_validation(self, state: WorkflowState) -> Dict[str, Any]:
         """[PLACEHOLDER] - Future dynamic validation against Vendor/Partner Portals."""
-        return {"is_valid_dynamic": True, "portal_validation_errors": []}
+        attempt = state.get("attempt_count", 1)
+        max_attempts = state.get("max_attempts", 3)
+        
+        # Simulate network logic: fail to trigger the loop, then require human on max
+        if attempt < max_attempts:
+            logger.info(f"Simulating live portal validation failure on attempt {attempt}.")
+            return {
+                "is_valid_dynamic": False,
+                "requires_human_intervention": False,
+                "portal_validation_errors": ["Simulated vendor portal rejection. Retrying drafting."]
+            }
+        else:
+            logger.warning("Max attempts reached for live portal validation. Escalating to human.")
+            return {
+                "is_valid_dynamic": False, 
+                "requires_human_intervention": True,
+                "portal_validation_errors": ["Vendor validation failed permanently. Manual engineering review required."]
+            }
 
     @telemetry_trace
     def update_knowledge_base(self, state: WorkflowState) -> Dict[str, Any]:
         """[PLACEHOLDER] - Future Knowledge Update Loop."""
-        return {}
+        # IMPORTANT: Increment attempt_count to avoid infinite loop between validate_bom and update_knowledge_base
+        current_attempts = state.get("attempt_count", 0)
+        logger.info(f"Triggering knowledge base update loop for attempt {current_attempts + 1}")
+        return {"attempt_count": current_attempts + 1}
 
     @telemetry_trace
     def human_intervention(self, state: WorkflowState) -> Dict[str, Any]:

@@ -95,7 +95,7 @@ class RepoManager:
                     if (
                         existing_desc
                         and difflib.SequenceMatcher(
-                            None, obj.description, existing_desc
+                            None, obj.description or "", existing_desc
                         ).ratio()
                         > 0.90
                     ):
@@ -123,7 +123,12 @@ class RepoManager:
             is_new = True
 
         # Persist to OKF Markdown
-        existing_path = self.reader.path_cache.get(obj.id)
+        existing_path = getattr(obj, "source_filepath", None) or self.reader.path_cache.get(obj.id)
+        if existing_path and Path(existing_path).is_absolute():
+            try:
+                existing_path = str(Path(existing_path).relative_to(self.repository_path))
+            except ValueError:
+                pass
         relative_path = self.writer.write_concept(obj, existing_path=existing_path)
         self.reader.path_cache[obj.id] = relative_path
 
@@ -197,7 +202,7 @@ class RepoManager:
         ]
 
         type_counts = stats.get("type_counts", {})
-        if type_counts:
+        if isinstance(type_counts, dict) and type_counts:
             lines.append("\n## Objects by Type\n")
             lines.append("| Type | Count |")
             lines.append("|------|-------|")

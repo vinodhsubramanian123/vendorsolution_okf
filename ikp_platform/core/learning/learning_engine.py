@@ -9,6 +9,7 @@ Learning SHALL improve knowledge while preserving history.
 Only validated learning SHALL update canonical engineering knowledge.
 """
 
+import json
 from typing import List, Optional
 import logging
 
@@ -43,6 +44,35 @@ class LearningEngine:
     def __init__(self, repo_manager: RepoManager):
         self.repo_manager = repo_manager
         self.pending_deltas: List[KnowledgeDelta] = []
+        self.deltas_dir = self.repo_manager.writer.repository_path / "deltas"
+        self.deltas_dir.mkdir(parents=True, exist_ok=True)
+        self._load_deltas()
+
+    def _load_deltas(self):
+        """Load pending deltas from disk."""
+        self.pending_deltas = []
+        for file_path in self.deltas_dir.glob("*.json"):
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    self.pending_deltas.append(KnowledgeDelta(**data))
+            except Exception as e:
+                logger.error(f"Failed to load delta {file_path}: {e}")
+
+    def _save_delta(self, delta: KnowledgeDelta):
+        """Save a single delta to disk."""
+        file_path = self.deltas_dir / f"{delta.delta_id}.json"
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(delta.model_dump(mode="json"), f, indent=2)
+        except Exception as e:
+            logger.error(f"Failed to save delta {delta.delta_id}: {e}")
+
+    def _delete_delta(self, delta_id: str):
+        """Delete a delta from disk."""
+        file_path = self.deltas_dir / f"{delta_id}.json"
+        if file_path.exists():
+            file_path.unlink()
 
     def submit_delta(self, delta: KnowledgeDelta) -> None:
         """
@@ -59,6 +89,7 @@ class LearningEngine:
             logger.info(f"Delta {delta.delta_id} queued for human review")
 
         self.pending_deltas.append(delta)
+        self._save_delta(delta)
 
     def process_validated_deltas(self, objects: List[BaseEngineeringObject]) -> int:
         """
@@ -86,6 +117,7 @@ class LearningEngine:
                         f"{len(delta.changes)} changes, "
                         f"{len(delta_objects)} objects"
                     )
+                    self._delete_delta(delta.delta_id)
 
         # Remove merged deltas from pending
         self.pending_deltas = [
@@ -107,6 +139,7 @@ class LearningEngine:
                 delta.reviewed_by = reviewer
                 delta.review_notes = notes
                 logger.info(f"Delta {delta_id} approved by {reviewer}")
+                self._save_delta(delta)
                 return True
         return False
 
@@ -118,6 +151,7 @@ class LearningEngine:
                 delta.reviewed_by = reviewer
                 delta.review_notes = reason
                 logger.info(f"Delta {delta_id} rejected by {reviewer}: {reason}")
+                self._save_delta(delta)
                 return True
         return False
 

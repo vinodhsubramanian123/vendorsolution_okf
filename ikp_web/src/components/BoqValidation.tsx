@@ -2,12 +2,14 @@ import { useState } from 'react';
 import axios from 'axios';
 import { CheckCircle2, ShieldAlert } from 'lucide-react';
 
+import type { BOQValidationResponse, ValidationMessage } from '../types/api';
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export function BoqValidation() {
   const [boqInput, setBoqInput] = useState('');
   const [platformId, setPlatformId] = useState('');
-  const [boqResult, setBoqResult] = useState<any>(null);
+  const [boqResult, setBoqResult] = useState<BOQValidationResponse | null>(null);
   const [isBoqLoading, setIsBoqLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -114,7 +116,7 @@ export function BoqValidation() {
                 <div style={{ marginBottom: '16px' }}>
                   <h4>Validation Messages</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-                    {validationMessages.map((msg: any, i: number) => {
+                    {validationMessages.map((msg: ValidationMessage, i: number) => {
                       const bgColor = msg.severity === 'Error' ? 'rgba(239, 68, 68, 0.1)' : msg.severity === 'Warning' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(59, 130, 246, 0.1)';
                       const borderColor = msg.severity === 'Error' ? '#ef4444' : msg.severity === 'Warning' ? '#eab308' : '#3b82f6';
                       return (
@@ -150,7 +152,7 @@ export function BoqValidation() {
               <div style={{ marginTop: '16px' }}>
                 <h4>Rule Evaluations</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-                  {boqResult.rule_evaluations.map((rule: any, i: number) => (
+                  {boqResult.rule_evaluations.map((rule, i: number) => (
                     <div key={i} style={{ 
                       padding: '12px', 
                       borderRadius: '6px', 

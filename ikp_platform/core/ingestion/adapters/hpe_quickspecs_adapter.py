@@ -11,8 +11,6 @@ warnings, footnotes, and captions. Ignores decorative content.
 
 import re
 import json
-import fitz  # PyMuPDF
-import hashlib
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 import logging
@@ -34,19 +32,17 @@ from ikp_platform.core.ontology.models import (
     SKU,
     Workload,
     Source,
-    KnowledgeDelta,
     DeltaChange,
     DeltaChangeType,
     SlotMapping,
     PackagingType,
 )
 
-from ikp_platform.core.ingestion.table_parser import TableParser
 
 logger = logging.getLogger("ikp.ingestion")
 
 
-from ikp_platform.core.ingestion.adapters.base_adapter import BasePDFAdapter
+from ikp_platform.core.ingestion.adapters.base_adapter import BasePDFAdapter  # noqa: E402
 
 class HPEQuickSpecsAdapter(BasePDFAdapter):
     """
@@ -63,8 +59,8 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
         return self._extract_platform_identity(text)
 
     def extract_components(self, text: str, platform: Platform, structured_components: List[dict]) -> Tuple[List[BaseEngineeringObject], List[DeltaChange]]:
-        self.extracted_objects = []
-        self.delta_changes = []
+        self.extracted_objects.clear()
+        self.delta_changes.clear()
         
         workloads = self._extract_workloads_and_requirements(text, platform)
         self.extracted_objects.extend(workloads)
@@ -112,115 +108,10 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
 
         self.llm_client = LLMClient()
         # Derive repository path from project structure instead of hardcoding
-        project_root = Path(__file__).parent.parent.parent.parent
-        repository_path = str(project_root / "repository")
+        root_path = Path(__file__).parent.parent.parent.parent
+        repository_path = str(root_path / "repository")
         self.mcp_client = ObsidianMCPClient(repository_path)
 
-    def extract(
-        self, file_path: str
-    ) -> Tuple[List[BaseEngineeringObject], KnowledgeDelta]:
-        """
-        Main extraction entry point.
-        Returns (list of engineering objects, knowledge delta).
-        """
-        logger.info(f"Extracting from PDF: {file_path}")
-        doc = fitz.open(file_path)
-
-        # 1. Deterministic Versioning (Blueprint 04)
-        if not self.source.version:
-            mod_date = doc.metadata.get("modDate")
-            if mod_date:
-                clean_date = mod_date.strip("D:").replace("'", "")
-                self.source.version = f"modDate_{clean_date}"
-            else:
-                with open(file_path, "rb") as f:
-                    file_hash = hashlib.sha256(f.read()).hexdigest()[:12]
-                self.source.version = f"sha256_{file_hash}"
-            logger.info(f"Computed Deterministic Version: {self.source.version}")
-
-        full_text = ""
-        for page in doc:
-            full_text += page.get_text() + "\n\n"
-        doc.close()
-
-        # Step 0: Unicode Shield (Normalize typography)
-        full_text = self._normalize_text(full_text)
-
-        # Step 1: Extract platform identity
-        platform = self._extract_platform_identity(full_text)
-        if platform:
-            self.extracted_objects.append(platform)
-            self._extract_topology(full_text, platform)
-            self.delta_changes.append(
-                DeltaChange(
-                    change_type=DeltaChangeType.NEW_OBJECT,
-                    object_id=platform.id,
-                    new_value=platform.title,
-                )
-            )
-
-        # Step 1.5: Extract Workloads and Customer Requirements
-        workloads = self._extract_workloads_and_requirements(full_text, platform)
-        self.extracted_objects.extend(workloads)
-        for wl in workloads:
-            self.delta_changes.append(
-                DeltaChange(
-                    change_type=DeltaChangeType.NEW_OBJECT,
-                    object_id=wl.id,
-                    new_value=wl.title,
-                )
-            )
-
-        # Step 2: Extract processors
-        processors = self._extract_processors(full_text, platform)
-        self.extracted_objects.extend(processors)
-
-        # Step 3: Extract memory specifications
-        memory_specs = self._extract_memory(full_text, platform)
-        self.extracted_objects.extend(memory_specs)
-
-        # Step 4: Extract storage/drive information
-        storage = self._extract_storage(full_text, platform)
-        self.extracted_objects.extend(storage)
-
-        # Step 5: Extract networking (OCP/NIC)
-        networking = self._extract_networking(full_text, platform)
-        self.extracted_objects.extend(networking)
-
-        # Step 6: Extract GPU/Accelerators
-        gpus = self._extract_gpus(full_text, platform)
-        self.extracted_objects.extend(gpus)
-
-        # Step 7: Extract engineering rules and constraints
-        rules = self._extract_rules(full_text, platform)
-        self.extracted_objects.extend(rules)
-
-        # Step 7.5: Extract tabular SKUs and components using robust pdfplumber parser
-        table_parser = TableParser()
-        structured_components = table_parser.parse_document(file_path)
-        tabular_objects = self._process_structured_components(
-            structured_components, platform
-        )
-        self.extracted_objects.extend(tabular_objects)
-
-        # Step 8: Extract power supplies
-        psus = self._extract_power(full_text, platform)
-        self.extracted_objects.extend(psus)
-
-        # Step 9: Post-processing (synthesize limits based on components)
-        self._post_process_limits(platform)
-
-        # Build Knowledge Delta
-        delta = KnowledgeDelta(
-            source_id=self.source.source_id,
-            changes=self.delta_changes,
-        )
-
-        logger.info(
-            f"Extracted {len(self.extracted_objects)} objects, "
-            f"{len(self.delta_changes)} changes"
-        )
-        return self.extracted_objects, delta
 
     # -------------------------------------------------------------------
     # Post-Processing
@@ -300,7 +191,7 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
         review_dir = Path("needs_review")
         review_dir.mkdir(exist_ok=True)
         review_path = review_dir / f"{self.source.source_id}.json"
-        candidate_lines = [l.strip() for l in text[:1500].split("\n") if l.strip()][:15]
+        candidate_lines = [line.strip() for line in text[:1500].split("\n") if line.strip()][:15]
         with open(review_path, "w", encoding="utf-8") as f:
             json.dump(
                 {
@@ -348,7 +239,7 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
             "Storage": storage_score,
             "Networking": networking_score,
         }
-        best_domain = max(scores, key=scores.get)
+        best_domain = max(scores, key=lambda k: scores[k])
         if scores[best_domain] < 2:
             return "Unknown"
         return best_domain
@@ -504,7 +395,7 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
         self, text: str, platform: Optional[Platform]
     ) -> List[Workload]:
         """Extract high-level Workloads (Customer Intent) and link to Platform."""
-        workloads = []
+        workloads: List[Workload] = []
         if not platform:
             return workloads
 
@@ -668,7 +559,7 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
         self, text: str, platform: Optional[Platform]
     ) -> List[BaseEngineeringObject]:
         """Extract memory specifications."""
-        objects = []
+        objects: List[BaseEngineeringObject] = []
         platform_id = platform.id if platform else "unknown"
 
         # Extract max memory capacity
@@ -791,7 +682,7 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
         self, text: str, platform: Optional[Platform]
     ) -> List[BaseEngineeringObject]:
         """Extract storage / drive cage specifications."""
-        objects = []
+        objects: List[BaseEngineeringObject] = []
         platform_id = platform.id if platform else "unknown"
 
         # Extract max drive counts
@@ -1362,6 +1253,16 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
             "Chassis",
             "Blank/Filler",
         ),
+        # Accessories - Software
+        (["Software", "License", "LTU", "Subscription", "VMware", "Windows", "Red Hat"], "Software", "License"),
+        # Accessories - Cables & Optics
+        (["Cable", "DAC", "AOC", "Transceiver", "SFP", "QSFP", "Optic"], "Networking", "Transceiver/Cable"),
+        # Accessories - Power Cords
+        (["Power Cord", "PDU", "Jumper", "C13", "C14"], "Power", "Power Cord"),
+        # Accessories - Mechanical
+        (["Rack", "Rail", "Bezel", "Blank", "Bracket", "Mount", "Hardware"], "Accessory", "Mechanical"),
+        # Catch-all for accessories
+        (["Option", "Upgrade"], "Accessory", "General"),
         (["Chassis", "Enclosure", "Frame"], "Chassis", "Enclosure"),
         # Infrastructure
         (
@@ -1456,7 +1357,7 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
         self, structured_components: List[Dict[str, Any]], platform: Optional[Platform]
     ) -> List[BaseEngineeringObject]:
         """Convert structured dictionary rows from TableParser into Component + SKU objects and CategoryLimits."""
-        objects = []
+        objects: List[BaseEngineeringObject] = []
         platform_id = platform.id if platform else "unknown"
         seen_skus = set()
 

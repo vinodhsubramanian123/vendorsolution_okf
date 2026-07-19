@@ -332,7 +332,7 @@ class GraphBuilder:
     # Graph statistics — Blueprint 02 §11 (Observability)
     # -------------------------------------------------------------------
 
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> Dict[str, Any]:
         """Return graph statistics for observability."""
         type_counts: Dict[str, int] = {}
         for _, attrs in self.graph.nodes(data=True):

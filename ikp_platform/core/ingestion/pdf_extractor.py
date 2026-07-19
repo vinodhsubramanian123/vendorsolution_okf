@@ -3,7 +3,7 @@ import fitz
 import hashlib
 import logging
 from pathlib import Path
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Optional, Dict, Any
 import pdfplumber
 
 from ikp_platform.core.ontology.models import (
@@ -124,16 +124,16 @@ class PDFExtractor:
             return self.extracted_objects, self.delta_changes
 
         # 2. Extract Platform
-        platform = active_adapter.extract_platform(full_text)
-        if not platform:
-            platform = self._human_in_the_loop_fallback(full_text)
+        platform_obj: Optional[Platform] = active_adapter.extract_platform(full_text)
+        if not platform_obj:
+            platform_obj = self._human_in_the_loop_fallback(full_text)
 
-        self.extracted_objects.append(platform)
+        self.extracted_objects.append(platform_obj)
         self.delta_changes.append(
             DeltaChange(
                 change_type=DeltaChangeType.NEW_OBJECT,
-                object_id=platform.id,
-                new_value=platform.title,
+                object_id=platform_obj.id,
+                new_value=platform_obj.title,
             )
         )
 
@@ -142,7 +142,7 @@ class PDFExtractor:
         structured_components = table_parser.parse_document(file_path)
         
         adapter_objects, adapter_deltas = active_adapter.extract_components(
-            full_text, platform, structured_components
+            full_text, platform_obj, structured_components
         )
         
         self.extracted_objects.extend(adapter_objects)

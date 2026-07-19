@@ -29,7 +29,7 @@ class SourceWatcher:
         Scan the sources directory for new files.
         Returns list of absolute paths to new files.
         """
-        new_files = []
+        new_files: List[str] = []
 
         if not self.sources_path.exists():
             logger.warning(f"Sources directory does not exist: {self.sources_path}")

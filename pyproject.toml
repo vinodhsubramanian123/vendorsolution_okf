@@ -30,6 +30,7 @@ dependencies = [
     "typing-extensions>=4.5.0",
     "python-dotenv>=1.0.0",
     "pypdfium2>=5.12.1",
+    "langfuse>=2.0.0,<3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -52,10 +53,10 @@ ignore_missing_imports = true
 ikp = "ikp_platform.cli:main"
 
 [tool.ruff]
-exclude = ["scripts", "tests/integration"]
+exclude = []
 
 [tool.ruff.lint]
-ignore = ["E402", "E741", "F841"]
+ignore = []
 
 [tool.setuptools.packages.find]
 where = ["."]

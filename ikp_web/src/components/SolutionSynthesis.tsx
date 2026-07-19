@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Send, CheckCircle2, Component } from 'lucide-react';
+import type { SolutionCandidate } from '../types/api';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -9,7 +10,7 @@ export type ChatMessage = {
   role: 'user' | 'system';
   content: string;
   type: 'text' | 'bom' | 'loading';
-  data?: any;
+  data?: SolutionCandidate;
 };
 
 export function SolutionSynthesis() {
@@ -56,11 +57,11 @@ export function SolutionSynthesis() {
       setMessages(prev => prev.filter(m => m.type !== 'loading'));
       
       if (res.data.candidates && res.data.candidates.length > 0) {
-        const topCandidate = res.data.candidates[0];
+        const topCandidate: SolutionCandidate = res.data.candidates[0];
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'system',
-          content: `Generated optimal configuration (${topCandidate.profile} profile).`,
+          content: `I've designed a solution optimized for ${topCandidate.profile || 'your requirements'}. It includes ${topCandidate.components.length} components.`,
           type: 'bom',
           data: topCandidate
         }]);
@@ -68,16 +69,17 @@ export function SolutionSynthesis() {
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'system',
-          content: 'I could not find a valid solution matching those requirements.',
+          content: "I couldn't generate a valid BOM for those requirements. Try adjusting your constraints.",
           type: 'text'
         }]);
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Failed to generate solution:', error);
       setMessages(prev => prev.filter(m => m.type !== 'loading'));
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'system',
-        content: 'Error communicating with the reasoning engine.',
+        content: error.response?.data?.detail || "An error occurred while connecting to the engine. Please try again.",
         type: 'text'
       }]);
     } finally {

@@ -52,7 +52,7 @@ class ExcelExtractor:
         here rather than a silent gap, since it isn't obvious from the
         API surface alone.
         """
-        objects = []
+        objects: List[BaseEngineeringObject] = []
         try:
             excel = pd.ExcelFile(file_path)
         except Exception as e:
@@ -149,22 +149,20 @@ class ExcelExtractor:
                         )
                     )
 
-                kwargs = {
-                    "id": comp_id,
-                    "title": str(row["Title"]).strip(),
-                    "description": str(row.get("Description", ""))
+                comp = Component(
+                    id=comp_id,
+                    title=str(row["Title"]).strip(),
+                    description=str(row.get("Description", ""))
                     if pd.notna(row.get("Description"))
                     else None,
-                    "vendor": source.vendor,
-                    "component_category": str(row.get("Category", ""))
+                    vendor=source.vendor,
+                    component_category=str(row.get("Category", ""))
                     if pd.notna(row.get("Category"))
                     else None,
-                    "evidence": evidence,
-                    "attributes": attributes,
-                    "relationships": relationships,
-                }
-
-                comp = Component(**kwargs)
+                    evidence=evidence,
+                    attributes=attributes,
+                    relationships=relationships,
+                )
                 components.append(comp)
 
             except Exception as e:
@@ -189,20 +187,18 @@ class ExcelExtractor:
 
                 pn = str(row["Part Number"]).strip()
 
-                kwargs = {
-                    "id": f"sku-{pn.lower()}",
-                    "title": str(row["Title"]).strip(),
-                    "part_number": pn,
-                    "price": float(row["Price"])
+                sku = SKU(
+                    id=f"sku-{pn.lower()}",
+                    title=str(row["Title"]).strip(),
+                    part_number=pn,
+                    price=float(row["Price"])
                     if pd.notna(row.get("Price"))
                     else None,
-                    "currency": str(row.get("Currency", "USD"))
+                    currency=str(row.get("Currency", "USD"))
                     if pd.notna(row.get("Currency"))
                     else None,
-                    "evidence": evidence,
-                }
-
-                sku = SKU(**kwargs)
+                    evidence=evidence,
+                )
                 skus.append(sku)
 
             except Exception as e:

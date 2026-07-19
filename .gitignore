@@ -23,6 +23,10 @@ build/
 .npm/
 ikp_web/dist/
 
+# Playwright Test Output
+ikp_web/playwright-report/
+ikp_web/test-results/
+
 # IDEs and OS files
 .vscode/
 .idea/

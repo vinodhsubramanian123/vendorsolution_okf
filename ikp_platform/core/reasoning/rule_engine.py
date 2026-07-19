@@ -8,7 +8,7 @@ Generates an explainable reasoning chain.
 """
 
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from ikp_platform.core.repository.graph_builder import GraphBuilder
 from ikp_platform.core.ontology.models import RuleSeverity, EngineeringObjectType
@@ -133,7 +133,7 @@ class RuleEngine:
         self, platform_id: str, component_ids: List[str], reasoning_chain: List[str]
     ) -> List[str]:
         """Evaluate platform constraints (e.g., max memory, max drives, category limits)."""
-        errors = []
+        errors: List[str] = []
 
         # Get all constraints attached to the platform
         platform_constraints = set()
@@ -143,7 +143,7 @@ class RuleEngine:
                 EngineeringObjectType.CATEGORY_LIMIT.value,
             ):
                 platform_constraints.add(other_id)
-        platform_constraints = list(platform_constraints)
+
 
         if not platform_constraints:
             reasoning_chain.append("No explicit constraints found for platform.")
@@ -154,8 +154,8 @@ class RuleEngine:
         )
 
         # Aggregate components by type and subcategory for limit checking
-        comp_categories = {}
-        comp_subcategories = {}
+        comp_categories: Dict[str, int] = {}
+        comp_subcategories: Dict[str, int] = {}
         for comp_id in component_ids:
             if comp_id in self.graph.graph:
                 node = self.graph.graph.nodes[comp_id]

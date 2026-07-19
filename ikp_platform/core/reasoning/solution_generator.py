@@ -9,6 +9,7 @@ by combining the Intent Parser and Rule Engine over the Knowledge Graph.
 
 import logging
 from typing import List, Any, Optional
+import concurrent.futures
 
 from ikp_platform.core.repository.graph_builder import GraphBuilder
 from ikp_platform.core.ontology.models import (
@@ -44,7 +45,7 @@ class SolutionGenerator:
         Blueprint 05 §13: Where appropriate, solution profiles SHOULD include:
         Lowest Cost, Balanced, Performance Optimized.
         """
-        candidates = []
+        candidates: List[SolutionCandidate] = []
 
         # 1. Reduce Search Space (Blueprint 05 §6)
         criteria = {}
@@ -78,7 +79,8 @@ class SolutionGenerator:
             logger.warning("No platforms match the basic criteria or target_platform.")
             return candidates
 
-        # For each platform, generate candidates
+        # For each platform, collect arguments for parallel generation
+        tasks = []
         for platform_id in platform_ids:
             p_data = self.graph.graph.nodes[platform_id]
 
@@ -97,24 +99,26 @@ class SolutionGenerator:
                 continue  # Platform doesn't support the workloads
             elif not request.workloads and not request.target_platform:
                 # If neither is provided, don't just pick all platforms, pick the first one to avoid noise
-                if len(candidates) > 0:
+                if len(tasks) > 0:
                     continue
 
-            # Build a "Balanced" profile candidate
-            candidate = self._build_candidate(platform_id, request, "Balanced")
-            if candidate:
-                candidates.append(candidate)
+            tasks.append((platform_id, request, "Balanced"))
+            tasks.append((platform_id, request, "Lowest Cost"))
+            tasks.append((platform_id, request, "Performance Optimized"))
 
-            # Blueprint 07 §7: Multiple optimization profiles
-            candidate_cost = self._build_candidate(platform_id, request, "Lowest Cost")
-            if candidate_cost:
-                candidates.append(candidate_cost)
+        if not tasks:
+            return candidates
 
-            candidate_perf = self._build_candidate(
-                platform_id, request, "Performance Optimized"
-            )
-            if candidate_perf:
-                candidates.append(candidate_perf)
+        # Execute candidate generation in parallel
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(10, len(tasks))) as executor:
+            futures = [
+                executor.submit(self._build_candidate, p_id, req, prof)
+                for p_id, req, prof in tasks
+            ]
+            for future in concurrent.futures.as_completed(futures):
+                candidate = future.result()
+                if candidate:
+                    candidates.append(candidate)
 
         return candidates
 
@@ -198,7 +202,7 @@ class SolutionGenerator:
             reqs_dict = [req.model_dump() for req in request.requirements]
 
             # 3. Call LLM to select components
-            selected_ids, llm_reasoning = self.llm.select_components(
+            selected_ids, llm_reasoning, newly_satisfied = self.llm.select_components(
                 platform_id, available_nodes, reqs_dict, profile
             )
 
@@ -211,8 +215,7 @@ class SolutionGenerator:
                 valid_selected = [cid for cid in selected_ids if cid in available_nodes]
 
                 components.extend(valid_selected)
-                for req in request.requirements:
-                    satisfied_reqs.append(req.name)
+                satisfied_reqs.extend(newly_satisfied)
 
                 reasoning_chain.extend(llm_reasoning)
             else:

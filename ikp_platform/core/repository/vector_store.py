@@ -73,9 +73,7 @@ class VectorStore:
             if not ids:
                 continue
             try:
-                self.collection.upsert(
-                    ids=ids, embeddings=embs, documents=docs, metadatas=metas
-                )
+                self.collection.upsert(ids=ids, embeddings=embs, documents=docs, metadatas=metas)  # type: ignore
                 indexed_count += len(ids)
                 logger.debug(f"Vectorized and indexed batch of {len(ids)} objects.")
             except Exception as e:
@@ -115,13 +113,12 @@ class VectorStore:
             return []
 
         try:
-            results = self.collection.query(
-                query_embeddings=[embedding], n_results=n_results, where=filter_metadata
-            )
+            results = self.collection.query(query_embeddings=[embedding], n_results=n_results, where=filter_metadata)  # type: ignore
 
             if results and "ids" in results and results["ids"]:
                 ids = results["ids"][0]
-                distances = results.get("distances", [[0.0] * len(ids)])[0]
+                distances_raw = results.get("distances")
+                distances = distances_raw[0] if distances_raw else [0.0] * len(ids)
 
                 # Convert L2 distance to a 0.0 - 1.0 confidence score
                 scores = [max(0.0, 1.0 - (d / 2.0)) for d in distances]
