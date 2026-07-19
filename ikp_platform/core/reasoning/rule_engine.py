@@ -11,7 +11,7 @@ import logging
 from typing import List, Tuple, Dict
 
 from ikp_platform.core.repository.graph_builder import GraphBuilder
-from ikp_platform.core.ontology.models import RuleSeverity, EngineeringObjectType
+from ikp_platform.core.ontology.models import RuleSeverity, EngineeringObjectType, ValidationFailure, ValidationFailureType
 
 logger = logging.getLogger("ikp.reasoning.rule_engine")
 
@@ -27,7 +27,7 @@ class RuleEngine:
 
     def evaluate_solution(
         self, platform_id: str, component_ids: List[str]
-    ) -> Tuple[bool, List[str], List[str]]:
+    ) -> Tuple[bool, List[str], List[ValidationFailure]]:
         """
         Evaluate if a solution is valid.
         Returns: (is_valid, reasoning_chain, errors)
@@ -43,7 +43,11 @@ class RuleEngine:
             return (
                 False,
                 reasoning_chain,
-                [f"Platform {platform_id} not found in repository"],
+                [ValidationFailure(
+                    failure_type=ValidationFailureType.INVALID_SKU,
+                    object_id=platform_id,
+                    message=f"Platform {platform_id} not found in repository"
+                )],
             )
 
         all_components = [platform_id] + component_ids
@@ -74,7 +78,7 @@ class RuleEngine:
             reasoning_chain.append(msg)
             logger.warning(msg)
             for err in errors:
-                logger.warning(f"  - {err}")
+                logger.warning(f"  - {err.message}")
         else:
             msg = "Evaluation successful. All constraints and rules satisfied."
             reasoning_chain.append(msg)
@@ -84,7 +88,7 @@ class RuleEngine:
 
     def _check_compatibility(
         self, platform_id: str, component_ids: List[str], reasoning_chain: List[str]
-    ) -> List[str]:
+    ) -> List[ValidationFailure]:
         """Check if all components are compatible with the platform, enforcing STRICT Solution Domain isolation."""
         errors = []
         platform_compatible = set(self.graph.get_compatible(platform_id))
@@ -94,7 +98,11 @@ class RuleEngine:
 
         for comp_id in component_ids:
             if comp_id not in self.graph.graph:
-                errors.append(f"Component not found: {comp_id}")
+                errors.append(ValidationFailure(
+                    failure_type=ValidationFailureType.INVALID_SKU,
+                    object_id=comp_id,
+                    message=f"Component not found: {comp_id}"
+                ))
                 continue
 
             comp_data = self.graph.graph.nodes[comp_id]
@@ -107,7 +115,11 @@ class RuleEngine:
                 "unknown",
             ):
                 err_msg = f"CROSS-DOMAIN BLEED DETECTED: Rejected {comp_id} (Domain: {comp_domain}) on Platform {platform_id} (Domain: {platform_domain})"
-                errors.append(err_msg)
+                errors.append(ValidationFailure(
+                    failure_type=ValidationFailureType.INCOMPATIBLE,
+                    object_id=comp_id,
+                    message=err_msg
+                ))
                 logger.error(err_msg)
                 continue
 
@@ -135,9 +147,9 @@ class RuleEngine:
 
     def _evaluate_constraints(
         self, platform_id: str, component_ids: List[str], reasoning_chain: List[str]
-    ) -> List[str]:
+    ) -> List[ValidationFailure]:
         """Evaluate platform constraints (e.g., max memory, max drives, category limits)."""
-        errors: List[str] = []
+        errors: List[ValidationFailure] = []
 
         # Get all constraints attached to the platform
         platform_constraints = set()
@@ -194,9 +206,12 @@ class RuleEngine:
 
                 if (target_subcat or target_cat) and isinstance(limit_value, int):
                     if current_qty > limit_value:
-                        errors.append(
-                            f"Constraint violation: {limit_name} (Max: {limit_value}, Requested: {current_qty})"
-                        )
+                        errors.append(ValidationFailure(
+                            failure_type=ValidationFailureType.CATEGORY_LIMIT_EXCEEDED,
+                            rule_id=constraint_id,
+                            category=target_cat or target_subcat,
+                            message=f"Constraint violation: {limit_name} (Max: {limit_value}, Requested: {current_qty})"
+                        ))
                     else:
                         evidence = (
                             c_data.get("evidence", [{}])[0]
@@ -226,7 +241,7 @@ class RuleEngine:
 
     def _check_dependencies(
         self, component_ids: List[str], reasoning_chain: List[str]
-    ) -> List[str]:
+    ) -> List[ValidationFailure]:
         """Check if all required dependencies are present in the solution."""
         errors = []
         comp_set = set(component_ids)
@@ -235,7 +250,11 @@ class RuleEngine:
             deps = self.graph.get_dependencies(comp_id)
             for dep_id in deps:
                 if dep_id not in comp_set:
-                    errors.append(f"Missing dependency: {comp_id} requires {dep_id}")
+                    errors.append(ValidationFailure(
+                        failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY,
+                        object_id=comp_id,
+                        message=f"Missing dependency: {comp_id} requires {dep_id}"
+                    ))
                 else:
                     reasoning_chain.append(
                         f"Dependency satisfied: {comp_id} -> {dep_id}"
@@ -245,7 +264,7 @@ class RuleEngine:
 
     def _evaluate_rules(
         self, component_ids: List[str], reasoning_chain: List[str]
-    ) -> List[str]:
+    ) -> List[ValidationFailure]:
         """Evaluate applicable engineering rules."""
         errors = []
 
@@ -345,7 +364,11 @@ class RuleEngine:
                     msg = f"Rule Violation: {rule_text} [{severity}] [Confidence: {conf}] | Trace: '{snippet}'"
                     reasoning_chain.append(msg)
                     if severity in (RuleSeverity.ERROR.value, RuleSeverity.CRITICAL.value):
-                        errors.append(f"Rule Violation: {rule_text}")
+                        errors.append(ValidationFailure(
+                            failure_type=ValidationFailureType.RULE_VIOLATION,
+                            rule_id=rule_id,
+                            message=f"Rule Violation: {rule_text}"
+                        ))
                 else:
                     msg = f"Rule satisfied: {rule_text} [Confidence: {conf}]"
                     reasoning_chain.append(msg)

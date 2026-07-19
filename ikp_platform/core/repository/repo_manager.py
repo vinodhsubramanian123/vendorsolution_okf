@@ -48,6 +48,8 @@ class RepoManager:
 
         # Initialize MCP Client
         self.mcp_client = ObsidianMCPClient(str(self.repository_path))
+        
+        self.learning_engine = None
 
     # -------------------------------------------------------------------
     # Bootstrap — load existing repository into graph

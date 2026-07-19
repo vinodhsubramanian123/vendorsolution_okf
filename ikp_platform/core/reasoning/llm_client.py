@@ -158,16 +158,18 @@ class LLMClient:
         )
         prompt = f"""
 You are an expert systems engineer. You are given a platform and a list of available components.
-Select the optimal set of component IDs that satisfies the provided customer requirements.
+Select the optimal set of component IDs that satisfies the provided customer requirements to form a complete, holistic solution.
 
-Rules:
+CRITICAL HOLISTIC RANKING RULES:
 1. You MUST include components that satisfy requirements with priority "required".
 2. You MUST include components that satisfy requirements with priority "preferred" if a suitable component is available in the list.
 3. Minimize the total number of components selected while meeting these goals.
-4. Optimize component selection for the following profile: "{profile}".
-   - If "Lowest Cost", heavily prefer components that are cheaper, base models, or lower capacity.
+4. Do NOT downgrade specifications. When substituting parts for the full solution, select alternatives that are strictly equal to or slightly higher in performance/capacity than the requested or failed component.
+5. Avoid massive unnecessary upgrades unless no closer alternative exists.
+6. Optimize component selection for the following holistic profile: "{profile}".
+   - If "Lowest Cost", select the most cost-effective components that STILL MEET OR EXCEED the baseline requirements (no downgrading).
    - If "Performance Optimized", heavily prefer components that are faster, high-end, or enterprise-grade.
-   - If "Balanced", balance cost and performance reasonably.
+   - If "Balanced", balance cost and performance reasonably without dipping below the requested baseline.
 
 Customer Requirements:
 {json.dumps(requirements, indent=2)}

@@ -73,10 +73,12 @@ def test_headless_negative_scenario_bad_sku(test_graph):
     # Wait, the WorkflowExecutor uses rule_engine. boq_validator is separate.
     # For headless synthesis, validate_bom uses rule_engine.
     # Let's intercept rule_engine to return an error for BAD-SKU-999.
+    from ikp_platform.core.ontology.models import ValidationFailure, ValidationFailureType
+    
     def mock_evaluate(platform_id, components):
         errors = []
         if "BAD-SKU-999" in [c.upper() for c in components]:
-            errors.append("Invalid SKU requested: 'BAD-SKU-999'")
+            errors.append(ValidationFailure(failure_type=ValidationFailureType.INVALID_SKU, message="Invalid SKU requested: 'BAD-SKU-999'"))
         
         # Missing categories check
         cats = [test_graph.graph.nodes[c].get("attr_component_category", "").upper() if c in test_graph.graph else "" for c in components]
@@ -85,7 +87,7 @@ def test_headless_negative_scenario_bad_sku(test_graph):
             if mandatory not in cats:
                 missing.append(mandatory)
         if missing:
-            errors.append(f"Missing core categories: {','.join(missing)}")
+            errors.append(ValidationFailure(failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY, message=f"Missing core categories: {','.join(missing)}"))
             
         is_valid = len(errors) == 0
         return is_valid, ["Mock validation run"], errors
@@ -122,6 +124,8 @@ def test_headless_neutral_scenario_missing_mandatory(test_graph):
     )
     executor.parser.parse_request = MagicMock(return_value=req)
     
+    from ikp_platform.core.ontology.models import ValidationFailure, ValidationFailureType
+
     def mock_evaluate(platform_id, components):
         errors = []
         cats = [test_graph.graph.nodes[c].get("attr_component_category", "").upper() if c in test_graph.graph else "" for c in components]
@@ -130,7 +134,7 @@ def test_headless_neutral_scenario_missing_mandatory(test_graph):
             if mandatory not in cats:
                 missing.append(mandatory)
         if missing:
-            errors.append(f"Missing core categories: {','.join(missing)}")
+            errors.append(ValidationFailure(failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY, message=f"Missing core categories: {','.join(missing)}"))
             
         is_valid = len(errors) == 0
         return is_valid, ["Mock validation run"], errors

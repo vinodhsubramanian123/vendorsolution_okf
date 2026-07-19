@@ -168,6 +168,12 @@ class SolutionGenerator:
             
             # Filter out known invalid SKUs
             compatible_ids = [cid for cid in compatible_ids if cid.upper() not in invalid_skus and cid.split("/")[-1].upper() not in invalid_skus]
+            
+            # Filter out excluded components from recovery loops
+            if hasattr(request, "excluded_component_ids") and request.excluded_component_ids:
+                excluded_set = set(request.excluded_component_ids)
+                compatible_ids = [cid for cid in compatible_ids if cid not in excluded_set]
+            
             # --- END FEEDBACK LOOP FIX ---
 
             # If we have a vector store or MCP client, use semantic/full-text search to massively reduce the search space
@@ -256,7 +262,7 @@ class SolutionGenerator:
                         f"Fallback processing requirement: {req.name} = {req.value}"
                     )
                     # Generic fallback: match requirement name or value against component metadata
-                    compatible = self.graph.get_compatible(platform_id)
+                    compatible = compatible_ids
                     matches = []
                     search_term = str(req.value).lower()
                     cat_term = req.name.lower()
@@ -313,7 +319,7 @@ class SolutionGenerator:
             reasoning_chain=reasoning_chain,
             requirements_satisfied=satisfied_reqs,
             confidence=confidence,
-            validation_status="Valid" if is_valid else "Invalid: " + "; ".join(errors),
+            validation_status="Valid" if is_valid else "Invalid: " + "; ".join(e.message for e in errors),
         )
 
         return candidate

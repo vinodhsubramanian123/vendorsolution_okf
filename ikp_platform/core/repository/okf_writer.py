@@ -105,7 +105,8 @@ class OKFWriter:
         }
 
         for k, v in raw_fm.items():
-            if v is not None and v != [] and v != "":
+            # Persist variants and slot_mapping_ids even if empty list
+            if v is not None and v != "" and (v != [] or k in ("variants", "slot_mapping_ids")):
                 if k not in fm:
                     fm[k] = v
 

@@ -45,13 +45,21 @@ class WorkflowExecutor:
             attempt_count=0,
             max_attempts=3,
             validation_errors=[],
+            validation_failures=[],
             is_valid_static=False,
+            excluded_component_ids=[],
+            tried_candidate_indices=[],
+            needs_regeneration=False,
             portal_validation_errors=[],
             is_valid_dynamic=False,
             learned_constraints=[],
             requires_human_intervention=False,
             human_feedback="",
+            human_review_payload={},
+            recovery_audit_trail=[],
             ranked_solutions=[],
+            visited_bom_hashes=[],
+            cycle_detected=False,
         )
 
         logger.info(f"Starting LangGraph workflow execution for query: '{query[:50]}...'")
@@ -65,4 +73,10 @@ class WorkflowExecutor:
             "platform": platform_result,
             "bom": bom_result,
             "ranked_solutions": result.get("ranked_solutions", []),
+            "requires_human_intervention": result.get("requires_human_intervention", False),
+            "human_review_payload": result.get("human_review_payload", {}),
+            "customer_requirements": result.get("customer_requirements", {}),
+            "attempt_count": result.get("attempt_count", 0),
+            "cycle_detected": result.get("cycle_detected", False),
+            "visited_bom_hashes": result.get("visited_bom_hashes", []),
         }

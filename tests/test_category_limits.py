@@ -67,7 +67,7 @@ class TestCategoryLimits(unittest.TestCase):
             self.platform.id, [riser1.id]
         )
         self.assertEqual(len(errors), 1)
-        self.assertIn("Constraint violation", errors[0])
+        self.assertIn("Constraint violation", errors[0].message)
 
 
 if __name__ == "__main__":

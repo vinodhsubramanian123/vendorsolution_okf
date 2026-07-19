@@ -4,8 +4,7 @@ Workflow State — Defines the TypedDict for the LangGraph orchestrator state.
 Governs: LangGraph Orchestrator Pipeline
 """
 
-from typing import List, Dict, Any
-from typing_extensions import TypedDict
+from typing import List, Dict, Any, TypedDict
 from langchain_core.messages import BaseMessage
 
 
@@ -29,7 +28,15 @@ class WorkflowState(TypedDict):
 
     # Validation (Static & Dynamic)
     validation_errors: List[str]
+    validation_failures: List[Dict[str, Any]]
     is_valid_static: bool
+    excluded_component_ids: List[str]
+    tried_candidate_indices: List[int]
+    needs_regeneration: bool
+
+    # Cycle Detection & Oscillation Prevention
+    visited_bom_hashes: List[str]
+    cycle_detected: bool
 
     # --- FUTURE: Live Partner Portal Integration ---
     portal_validation_errors: List[
@@ -45,6 +52,8 @@ class WorkflowState(TypedDict):
     # Human-In-The-Loop (HITL)
     requires_human_intervention: bool
     human_feedback: str
+    human_review_payload: Dict[str, Any]
+    recovery_audit_trail: List[Dict[str, Any]]
 
     # Final Output
     ranked_solutions: List[Dict[str, Any]]

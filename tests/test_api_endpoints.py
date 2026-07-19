@@ -29,3 +29,27 @@ def test_health_endpoint(api_client):
     assert data["status"] == "online"
     assert data["stats"]["total_nodes"] >= 2
     assert data["repository_seeded"] is True
+
+
+def test_review_queue_approve(api_client):
+    # First, get the review queue
+    response = api_client.get("/api/review-queue")
+    assert response.status_code == 200
+    queue = response.json().get("queue", [])
+    
+    if queue:
+        # If there are items, try to approve the first one
+        obj_id = queue[0]["id"]
+        approve_response = api_client.post(
+            "/api/review-queue/approve",
+            json={"object_id": obj_id}
+        )
+        assert approve_response.status_code == 200
+        assert approve_response.json()["status"] == "success"
+    else:
+        # If the queue is empty, the endpoint should return 404 for a fake object
+        approve_response = api_client.post(
+            "/api/review-queue/approve",
+            json={"object_id": "nonexistent-object"}
+        )
+        assert approve_response.status_code == 404

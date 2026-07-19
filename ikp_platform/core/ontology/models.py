@@ -150,6 +150,14 @@ class RuleSeverity(str, Enum):
     CRITICAL = "Critical"
 
 
+class ValidationFailureType(str, Enum):
+    RULE_VIOLATION = "rule_violation"
+    CATEGORY_LIMIT_EXCEEDED = "category_limit_exceeded"
+    INCOMPATIBLE = "incompatible"
+    MISSING_REQUIRED_CATEGORY = "missing_required_category"
+    INVALID_SKU = "invalid_sku"
+
+
 class ConfidenceLevel(str, Enum):
     """Confidence levels for extracted knowledge."""
 
@@ -263,6 +271,9 @@ class BaseEngineeringObject(BaseModel):
 
     relationships: List[EngineeringRelationship] = Field(default_factory=list)
     evidence: List[EvidenceRecord] = Field(default_factory=list)
+    history: List[HistoryEntry] = Field(default_factory=list)
+    confidence: ConfidenceLevel = ConfidenceLevel.UNVERIFIED
+    timestamp: datetime = Field(default_factory=_utcnow)
     version: int = 1
     
     # Internal metadata for avoiding path duplication on updates
@@ -280,8 +291,6 @@ class SlotMapping(BaseEngineeringObject):
 
     # Provenance
     evidence: List[EvidenceRecord] = Field(default_factory=list)
-    history: List[HistoryEntry] = Field(default_factory=list)
-    timestamp: datetime = Field(default_factory=_utcnow)
 
 
 # ---------------------------------------------------------------------------
@@ -308,6 +317,7 @@ class Component(BaseEngineeringObject):
     component_subcategory: Optional[str] = None  # e.g., "Riser", "Cable"
     packaging_type: PackagingType = PackagingType.STANDALONE
     inclusive_qty: Optional[int] = None
+    is_required: bool = True  # False = safe to drop entirely if causing a validation failure
 
 
 class SKU(BaseEngineeringObject):
@@ -345,7 +355,6 @@ class Rule(BaseEngineeringObject):
     type: EngineeringObjectType = EngineeringObjectType.RULE
     scope: Optional[str] = None
     severity: RuleSeverity = RuleSeverity.INFO
-    confidence: ConfidenceLevel = ConfidenceLevel.UNVERIFIED
     applicable_objects: List[str] = Field(default_factory=list)  # IDs of objects this rule applies to
     trigger_conditions: List[str] = Field(default_factory=list)
     expected_outcome: str = ""
@@ -375,6 +384,7 @@ class CategoryLimit(Constraint):
     type: EngineeringObjectType = EngineeringObjectType.CATEGORY_LIMIT
     target_category: Optional[str] = None
     target_subcategory: Optional[str] = None
+    min_qty: Optional[int] = None  # if set, dropping below this count is itself a violation
 
 
 class SolutionCategory(BaseEngineeringObject):
@@ -480,6 +490,14 @@ class CustomerRequirement(BaseModel):
     priority: Optional[str] = None  # "required", "preferred", "nice_to_have"
 
 
+class ValidationFailure(BaseModel):
+    failure_type: ValidationFailureType
+    object_id: Optional[str] = None       # the specific component/SKU at fault, if any
+    rule_id: Optional[str] = None         # which Rule/CategoryLimit fired, if any
+    category: Optional[str] = None        # e.g. "GPU", for category-level failures
+    message: str                          # human-readable, for logs/UI -- not for parsing
+
+
 class CustomerRequest(BaseModel):
     """
     Structured customer engineering request.
@@ -495,6 +513,7 @@ class CustomerRequest(BaseModel):
     target_platform: Optional[str] = None
     budget: Optional[float] = None
     previous_errors: List[str] = Field(default_factory=list)
+    excluded_component_ids: List[str] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=_utcnow)
 
 

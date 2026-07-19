@@ -1,6 +1,9 @@
 # IKP Platform State
 
-**Last Updated**: 2026-07-19 14:50:42 UTC
+**Last Updated**: 2026-07-20 00:35:00 UTC
+
+## Recent Architecture Changes
+* 2026-07-20: Hardened LangGraph Orchestrator Recovery Boundaries (`nodes.py`, `executor.py`, `graph.py`). Implemented `visited_bom_hashes` and `cycle_detected` to prevent infinite loops during recovery resolution. Fixed strict schema alignment for `ValidationFailure`. E2E headless tests verified.
 
 ## Knowledge Graph Statistics
 

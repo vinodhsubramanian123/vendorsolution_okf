@@ -195,19 +195,28 @@ async def get_status():
 @telemetry_trace
 async def query_solution(request: QueryRequest):
     repo = get_repo()
-    parser = IntentParser()
     try:
-        parsed_request = parser.parse_request(request.query)
-        generator = SolutionGenerator(repo.graph, repo.vector_store, repo.mcp_client)
-        candidates = generator.generate(parsed_request)
+        from ikp_platform.core.workflow.executor import WorkflowExecutor
+        
+        executor = WorkflowExecutor(repo.graph, repo.vector_store, repo.mcp_client)
+        result = executor.execute_query(request.query)
 
-        # Format candidate output for UI
-        formatted_candidates = [c.model_dump() for c in candidates]
+        if result.get("requires_human_intervention"):
+            return {
+                "status": "needs_human_review",
+                "message": "Automated recovery exhausted. Solution requires human intervention.",
+                "human_review_payload": result.get("human_review_payload"),
+                "candidates": [c for c in result.get("ranked_solutions", [])],
+                "parsed_intent": result.get("customer_requirements", {}).get("parsed", [])
+            }
 
         return {
-            "request_id": parsed_request.request_id,
-            "parsed_intent": parsed_request.model_dump(),
-            "candidates": formatted_candidates,
+            "status": "success",
+            "request_id": result.get("customer_requirements", {}).get("request_id", "REQ-UNKNOWN"),
+            "parsed_intent": result.get("customer_requirements", {}).get("parsed", []),
+            "candidates": [c for c in result.get("ranked_solutions", [])],
+            "platform": result.get("platform"),
+            "bom": result.get("bom")
         }
     except Exception as e:
         logger.error(f"API Error during query: {e}", exc_info=True)
@@ -378,7 +387,7 @@ async def validate_boq(request: BOQValidationRequest, background_tasks: Backgrou
     # Add errors as failures
     for err in errors:
         formatted_rules.append(
-            {"title": err, "status": "FAIL", "severity": "Error", "message": ""}
+            {"title": err.message if hasattr(err, "message") else str(err), "status": "FAIL", "severity": "Error", "message": ""}
         )
 
     is_valid = engine_valid and boq_result.is_valid
@@ -480,6 +489,8 @@ async def semantic_search(request: SearchRequest):
 
 class ApprovalRequest(BaseModel):
     object_id: str
+    reviewer: str = "Human"
+    reason: str = ""
 
 
 @app.get("/api/review-queue")
@@ -514,16 +525,37 @@ async def approve_object(request: ApprovalRequest, background_tasks: BackgroundT
         target_obj = None
         
         # Use path_cache instead of full scan
-        if request.object_id in repo.graph.path_cache:
-            file_path = repo.graph.path_cache[request.object_id]
-            target_obj = repo.reader.load(file_path)
+        rel_path = repo.reader.path_cache.get(request.object_id)
+        if rel_path:
+            full_path = repo.repository_path / rel_path
+            objs = repo.reader._parse_file(full_path)
+            target_obj = next((o for o in objs if o.id == request.object_id), None)
 
         if not target_obj:
             raise HTTPException(status_code=404, detail="Object not found")
 
-        from ikp_platform.core.ontology.models import ConfidenceLevel
+        from ikp_platform.core.ontology.models import ConfidenceLevel, HistoryEntry, DeltaChangeType
+        import datetime
 
         target_obj.confidence = ConfidenceLevel.HIGH  # type: ignore
+        
+        # Unify review surfaces: capture rationale
+        timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        msg = f"[{timestamp}] Approved by {request.reviewer}"
+        if request.reason:
+            msg += f": {request.reason}"
+        if not hasattr(target_obj, "history"):
+            target_obj.history = []
+        target_obj.history.append(
+            HistoryEntry(
+                timestamp=datetime.datetime.now(datetime.timezone.utc),
+                description=msg,
+                change_type=DeltaChangeType.UPDATED_ATTRIBUTE,
+                changes=[{"confidence": "High"}],
+                object_id=request.object_id,
+            )
+        )
+
         repo.add_concept(target_obj)
 
         background_tasks.add_task(repo.reindex_vector_store)

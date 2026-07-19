@@ -23,6 +23,10 @@ def should_loop_bom(state: WorkflowState) -> str:
         logger.info("Routing from validate_bom -> live_portal_validation (Valid static BOM)")
         return "live_portal_validation"
 
+    if state.get("cycle_detected", False):
+        logger.error("Routing from validate_bom -> human_intervention (Infinite Cycle Detected)")
+        return "human_intervention"
+
     attempt_count = state.get("attempt_count", 0)
     max_attempts = state.get("max_attempts", 3)
 
@@ -30,8 +34,18 @@ def should_loop_bom(state: WorkflowState) -> str:
         logger.warning(f"Routing from validate_bom -> human_intervention (Max attempts {attempt_count} reached)")
         return "human_intervention"
 
-    logger.info(f"Routing from validate_bom -> draft_bom (Attempt {attempt_count} failed, retrying)")
-    return "draft_bom"
+    logger.info(f"Routing from validate_bom -> select_recovery_strategy (Attempt {attempt_count} failed, selecting strategy)")
+    return "select_recovery_strategy"
+
+def route_recovery(state: WorkflowState) -> str:
+    """Conditional edge router after select_recovery_strategy."""
+    if state.get("requires_human_intervention", False):
+        return "human_intervention"
+    elif state.get("needs_regeneration", False):
+        return "draft_bom"
+    else:
+        # We substituted, dropped, or picked a new candidate; re-validate the new BOM
+        return "validate_bom"
 
 
 def should_human_intervene(state: WorkflowState) -> str:
@@ -62,6 +76,7 @@ def build_workflow_graph(
     workflow.add_node("select_platform", workflow_nodes.select_platform)
     workflow.add_node("draft_bom", workflow_nodes.draft_bom)
     workflow.add_node("validate_bom", workflow_nodes.validate_bom)
+    workflow.add_node("select_recovery_strategy", workflow_nodes.select_recovery_strategy)
     workflow.add_node("live_portal_validation", workflow_nodes.live_portal_validation)
     workflow.add_node("update_knowledge_base", workflow_nodes.update_knowledge_base)
     workflow.add_node("human_intervention", workflow_nodes.human_intervention)
@@ -77,8 +92,18 @@ def build_workflow_graph(
         should_loop_bom,
         {
             "live_portal_validation": "live_portal_validation", 
-            "draft_bom": "draft_bom",
+            "select_recovery_strategy": "select_recovery_strategy",
             "human_intervention": "human_intervention"
+        },
+    )
+
+    workflow.add_conditional_edges(
+        "select_recovery_strategy",
+        route_recovery,
+        {
+            "human_intervention": "human_intervention",
+            "draft_bom": "draft_bom",
+            "validate_bom": "validate_bom"
         },
     )
 
