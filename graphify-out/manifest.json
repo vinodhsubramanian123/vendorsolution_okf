@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/api.py": {
-    "mtime": 1784468219.681296,
-    "ast_hash": "8329f37e8040b906ada1fc1e35e6ecbc",
+    "mtime": 1784472511.2314334,
+    "ast_hash": "60f9b8cf72ea791135a161e929e9ae6a",
     "semantic_hash": ""
   },
   "ikp_platform/cli.py": {
@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/ontology/models.py": {
-    "mtime": 1784453720.3134942,
-    "ast_hash": "71cde0dd31da6da50500e507925562b3",
+    "mtime": 1784470119.453085,
+    "ast_hash": "ce001e02621e3d626151eaf72e337a47",
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/__init__.py": {
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/llm_client.py": {
-    "mtime": 1784468203.7095823,
-    "ast_hash": "bbb0b54e6cdb0f57f20af182ae8e8c96",
+    "mtime": 1784472529.9477115,
+    "ast_hash": "aef1e95681ee57bf68837ffe70ec5131",
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/rule_engine.py": {
@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/solution_generator.py": {
-    "mtime": 1784468031.977801,
-    "ast_hash": "f7da00d4efea7b1888ff7247ec73d4da",
+    "mtime": 1784469440.8118942,
+    "ast_hash": "70c6e847ec17c3ac60f139f21f9f1771",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/__init__.py": {
@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/okf_reader.py": {
-    "mtime": 1784468162.1664047,
-    "ast_hash": "2f3c94b5c8a6ad41caf2de88fe64d0e8",
+    "mtime": 1784470490.3466349,
+    "ast_hash": "d45235cfe83e3aa6f8bc1aae8962edf8",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/okf_writer.py": {
@@ -125,8 +125,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/repo_manager.py": {
-    "mtime": 1784465637.0154688,
-    "ast_hash": "5fd2c404fede07b0ce59b7eec11dd4a9",
+    "mtime": 1784470175.668167,
+    "ast_hash": "27cf82dfb0278fe945a3b4458435ac93",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/vector_store.py": {
@@ -180,23 +180,23 @@
     "semantic_hash": ""
   },
   "ikp_web/src/App.tsx": {
-    "mtime": 1784466213.867981,
-    "ast_hash": "c617cb097204eb5c6e364121fe5e83e3",
+    "mtime": 1784470286.325736,
+    "ast_hash": "cbf7e9adc8d41070a680ae6a9373c8da",
     "semantic_hash": ""
   },
   "ikp_web/src/components/BoqValidation.tsx": {
-    "mtime": 1784466187.990769,
-    "ast_hash": "a40973680dece41036df9efc1498e893",
+    "mtime": 1784470288.3738334,
+    "ast_hash": "ab7f2bf3b29510cdf49d9683d1860f8a",
     "semantic_hash": ""
   },
   "ikp_web/src/components/PlatformDashboard.tsx": {
-    "mtime": 1784466230.628758,
-    "ast_hash": "9932f04e17cf530defb57fa33867e7d4",
+    "mtime": 1784470290.4179306,
+    "ast_hash": "768ccc00c7b2285408f80a3de1ff812c",
     "semantic_hash": ""
   },
   "ikp_web/src/components/SemanticSearch.tsx": {
-    "mtime": 1784466247.9655552,
-    "ast_hash": "f27fbf616071ddd1f47e42be48c869ca",
+    "mtime": 1784470292.4780283,
+    "ast_hash": "938b17308227b0eac233bd9f0326941c",
     "semantic_hash": ""
   },
   "ikp_web/src/components/Sidebar.tsx": {
@@ -205,13 +205,13 @@
     "semantic_hash": ""
   },
   "ikp_web/src/components/SolutionSynthesis.tsx": {
-    "mtime": 1784466288.9754164,
-    "ast_hash": "2012c64e8ed3d9afd8c75d64de25cbf3",
+    "mtime": 1784470294.2261112,
+    "ast_hash": "439dcabce13db63d9db5c1892023bd19",
     "semantic_hash": ""
   },
   "ikp_web/src/components/ValidationPortal.tsx": {
-    "mtime": 1784466267.6864545,
-    "ast_hash": "441eafe61c6f9eed4147d1e0d6262281",
+    "mtime": 1784470301.3024447,
+    "ast_hash": "9b52d39063f6e2f01e8cb7de94c03b6c",
     "semantic_hash": ""
   },
   "ikp_web/src/main.tsx": {
@@ -240,8 +240,8 @@
     "semantic_hash": ""
   },
   "pyproject.toml": {
-    "mtime": 1784463122.4033837,
-    "ast_hash": "4e21ac2121f737b3b4eebae5ee907480",
+    "mtime": 1784472197.1995213,
+    "ast_hash": "b3e94808cffc91f2fafa31c48b9afdc2",
     "semantic_hash": ""
   },
   "scripts/bootstrap.sh": {
@@ -395,8 +395,8 @@
     "semantic_hash": ""
   },
   "STATE.md": {
-    "mtime": 1784456719.5722861,
-    "ast_hash": "e88b40e11b0f66ce05af5ba41b85ec63",
+    "mtime": 1784472642.0694556,
+    "ast_hash": "6382727e1b35774cecd680f56481b1a2",
     "semantic_hash": ""
   },
   "ikp_web/index.html": {
@@ -465,8 +465,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/workflow/nodes.py": {
-    "mtime": 1784468069.8686728,
-    "ast_hash": "94628a0e29d19981b40bfab25cf22773",
+    "mtime": 1784469479.9043376,
+    "ast_hash": "bf7bd1d12201af0a157bf506cdcfdb09",
     "semantic_hash": ""
   },
   "ikp_platform/core/workflow/state.py": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "tests/test_graph_field_parity.py": {
-    "mtime": 1784453396.710236,
-    "ast_hash": "14ea166f356e7a86de58a5507cc841f2",
+    "mtime": 1784470366.0133975,
+    "ast_hash": "449691d1f006f0360db426d6a937ccf1",
     "semantic_hash": ""
   },
   "tests/test_workflow.py": {
@@ -495,13 +495,13 @@
     "semantic_hash": ""
   },
   "ikp_web/tests/e2e/search.spec.ts": {
-    "mtime": 1784466311.1604092,
-    "ast_hash": "6de7d379509f315be4743efb5ca7976c",
+    "mtime": 1784470846.2993686,
+    "ast_hash": "f0873984213674d89a7b2717b844cf45",
     "semantic_hash": ""
   },
   "ikp_web/tests/e2e/validation.spec.ts": {
-    "mtime": 1784466328.957199,
-    "ast_hash": "8614a00e6c90b53e51e4d52c43f31e06",
+    "mtime": 1784470875.4443052,
+    "ast_hash": "0c8c521dac4b5597887b343412864c4b",
     "semantic_hash": ""
   },
   "ikp_platform/core/ingestion/adapters/base_adapter.py": {
@@ -514,39 +514,24 @@
     "ast_hash": "52339f1787a1477fc35136b6a1a54a72",
     "semantic_hash": ""
   },
-  "gemini_keys_test.py": {
-    "mtime": 1784467994.4030464,
-    "ast_hash": "b01272041365304bd4f4a87cd5bb6c6a",
-    "semantic_hash": ""
-  },
   "ikp_web/src/types/api.ts": {
-    "mtime": 1784466177.2382607,
-    "ast_hash": "611e1867ecf1226492feee4ceacdd57a",
+    "mtime": 1784470230.4229994,
+    "ast_hash": "5aa33b8d1bf8dd7a000593d3e93035df",
     "semantic_hash": ""
   },
-  "ikp_web/ui_lint_results.txt": {
-    "mtime": 1784463030.8300738,
-    "ast_hash": "736159b091b6a7afff3ede9885a6adce",
+  ".agents/skills/topology/topology_mapper.py": {
+    "mtime": 1784469884.0257547,
+    "ast_hash": "93a898220379fbaef1d196ac30a6cf75",
     "semantic_hash": ""
   },
-  "ikp_web/ui_lint_results2.txt": {
-    "mtime": 1784463232.8517947,
-    "ast_hash": "63ede9ea96e176652714f86ab1ca7b60",
+  "ikp_platform/core/repository/repo_watcher.py": {
+    "mtime": 1784469602.1577735,
+    "ast_hash": "8a203a03efd0650b51aaab7ffd61d8a9",
     "semantic_hash": ""
   },
-  "isolated_lint_results.txt": {
-    "mtime": 1784463059.8884554,
-    "ast_hash": "c6b9b4f79af5cc47034d668e7f21de3e",
-    "semantic_hash": ""
-  },
-  "lint_results.txt": {
-    "mtime": 1784463194.8184903,
-    "ast_hash": "5bb349d18a45b0b919cb0d0fdad235df",
-    "semantic_hash": ""
-  },
-  "typecheck_results.txt": {
-    "mtime": 1784465674.0180352,
-    "ast_hash": "d6d64bf4cb1a6aadf33bfc4d6b397d16",
+  "ikp_web/tests/e2e/boq-combinations.spec.ts": {
+    "mtime": 1784471796.6579607,
+    "ast_hash": "109f949746462e8e3bc69d0ca416ba4e",
     "semantic_hash": ""
   }
 }
