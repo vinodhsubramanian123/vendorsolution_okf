@@ -494,6 +494,7 @@ class CustomerRequest(BaseModel):
     vendor_preference: Optional[str] = None
     target_platform: Optional[str] = None
     budget: Optional[float] = None
+    previous_errors: List[str] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=_utcnow)
 
 

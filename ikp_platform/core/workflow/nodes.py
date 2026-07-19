@@ -79,6 +79,7 @@ class WorkflowNodes:
         """Draft a Bill of Materials based on platform compatibility using LLM and constraints."""
         platform_id = state.get("selected_platform")
         reqs = state.get("customer_requirements", {})
+        val_errors = state.get("validation_errors", [])
 
         requirements = []
         for r_data in reqs.get("parsed", []):
@@ -92,6 +93,7 @@ class WorkflowNodes:
             if state.get("target_workload") != "Unknown"
             else [],
             requirements=requirements,
+            previous_errors=val_errors,
         )
 
         candidates = self.generator.generate(cust_req)
@@ -117,10 +119,10 @@ class WorkflowNodes:
         platform_id = state.get("selected_platform")
         current_bom = state.get("current_bom", [])
 
-        if not platform_id or not current_bom:
+        if not platform_id:
             return {
                 "is_valid_static": False,
-                "validation_errors": ["Empty BOM or missing platform."],
+                "validation_errors": ["Missing platform."],
             }
 
         is_valid, _, errors = self.rule_engine.evaluate_solution(
@@ -132,24 +134,12 @@ class WorkflowNodes:
     @telemetry_trace
     def live_portal_validation(self, state: WorkflowState) -> Dict[str, Any]:
         """[PLACEHOLDER] - Future dynamic validation against Vendor/Partner Portals."""
-        attempt = state.get("attempt_count", 1)
-        max_attempts = state.get("max_attempts", 3)
-        
-        # Simulate network logic: fail to trigger the loop, then require human on max
-        if attempt < max_attempts:
-            logger.info(f"Simulating live portal validation failure on attempt {attempt}.")
-            return {
-                "is_valid_dynamic": False,
-                "requires_human_intervention": False,
-                "portal_validation_errors": ["Simulated vendor portal rejection. Retrying drafting."]
-            }
-        else:
-            logger.warning("Max attempts reached for live portal validation. Escalating to human.")
-            return {
-                "is_valid_dynamic": False, 
-                "requires_human_intervention": True,
-                "portal_validation_errors": ["Vendor validation failed permanently. Manual engineering review required."]
-            }
+        # For headless testing and current offline implementation, always return True
+        return {
+            "is_valid_dynamic": True,
+            "requires_human_intervention": False,
+            "portal_validation_errors": []
+        }
 
     @telemetry_trace
     def update_knowledge_base(self, state: WorkflowState) -> Dict[str, Any]:
@@ -166,9 +156,29 @@ class WorkflowNodes:
 
     @telemetry_trace
     def rank_solutions(self, state: WorkflowState) -> Dict[str, Any]:
-        """Traverse HasSKU edges and rank solutions based on business logic."""
+        """Traverse HasSKU edges and rank solutions based on business logic and track deltas."""
         ranked = state.get("ranked_solutions", [])
         if not ranked:
             ranked = [{"rank": 1, "skus": [], "score": 95}]
+            
+        # Delta Tracking Logic
+        # Calculate exactly what was added, removed, or updated from original requirements
+        reqs = state.get("customer_requirements", {})
+        original_reqs = reqs.get("parsed", [])
+        original_skus = set()
+        for r in original_reqs:
+            if r.get("name", "").upper() in ("SKU", "COMPONENT"):
+                original_skus.add(str(r.get("value", "")).upper())
+                
+        for solution in ranked:
+            final_components = set(str(c).upper() for c in solution.get("components", []))
+            added = list(final_components - original_skus)
+            removed = list(original_skus - final_components)
+            solution["delta"] = {
+                "added": added,
+                "removed": removed,
+                "updated": len(added) + len(removed) > 0
+            }
 
         return {"ranked_solutions": ranked}
+

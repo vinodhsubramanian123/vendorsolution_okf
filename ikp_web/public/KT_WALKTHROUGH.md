@@ -128,17 +128,21 @@ Important relationships:
 - `Has SKU`: component maps to a commercial SKU.
 - `Supports`: platform/component supports a workload or capability.
 
-## 6. Data Lifecycle
+## 6. Data Lifecycle & Ingestion
 
-1. A source file is registered by `SourceRegistry`.
-2. The file hash is stored so duplicate sources can be detected.
-3. PDF or Excel extraction creates ontology objects and deltas.
-4. `OKFWriter` writes canonical Markdown into `repository/`.
-5. API startup uses `RepoManager.bootstrap()` to load Markdown through `OKFReader`.
-6. `GraphBuilder` builds an in-memory NetworkX graph.
-7. `VectorStore` indexes selected objects in ChromaDB when embeddings are available.
-8. Reasoning and validation use the graph and vector index.
-9. Validated learning changes are written back to OKF.
+1. **Source Registration & Fingerprinting**: A source file is registered by `SourceRegistry`. A cryptographic SHA-256 hash (`hashlib.sha256`) is computed on the file contents. This fingerprint ensures that duplicate sources are rejected, saving redundant processing.
+2. **Parsing & Extraction boundaries**: 
+   - PDFs use `BasePDFAdapter` for extraction, with vendor-specific implementations like `HPEQuickSpecsAdapter` extracting hardware topologies, limits, and rules.
+   - Excel sheets use `ExcelExtractor` for parsing structured `Components` and `SKUs` tabs.
+3. **Semantic Deduplication**: During ingestion, difflib-based semantic matching prevents duplicate `Rule` generation if the node already exists semantically but with slightly different text.
+4. **Knowledge Writing**: `OKFWriter` writes canonical Markdown into `repository/`.
+5. **Runtime Bootstrapping**: API startup uses `RepoManager.bootstrap()` to load Markdown through `OKFReader`.
+6. **Graph & Vectorization**: `GraphBuilder` builds an in-memory NetworkX graph. `VectorStore` indexes selected objects in ChromaDB when embeddings are available.
+7. **Execution**: Reasoning and validation workflows query the graph and vector index.
+8. **Learning Engine & Knowledge Deltas**: 
+   - Any runtime corrections (e.g., SKU typos fixed by fuzzy matching, or portal rejections) are logged as `KnowledgeDelta` objects.
+   - The Learning Engine stores these deltas in `history/`. 
+   - Validated deltas are merged back into the canonical OKF markdown (updating the "What"), ensuring that static and dynamic learnings actively improve the Knowledge Graph.
 
 ## 7. Main User Flows
 
@@ -176,7 +180,15 @@ If multiple platforms are detected, the API asks for an explicit `platform_id`.
 
 The UI calls `/api/review-queue` to list low/medium/unverified objects. `/api/review-queue/approve` can mark an object high confidence. The broader reject/resume lifecycle is still partial.
 
-## 8. Rule Engine Expectations
+## 8. Observability & Telemetry (Langfuse)
+
+To ensure clarity and perfection in telemetry, the platform enforces strict observability across all reasoning and workflow nodes.
+
+- **`@telemetry_trace` Decorator**: Found in `ikp_platform/core/observability/__init__.py`, this wraps critical operations. It automatically logs execution start, success, and error events in structured JSON format.
+- **Sanitization**: Sensitive inputs (passwords, tokens) are sanitized. Kwargs and outputs are truncated to prevent log bloat while preserving execution duration and result types.
+- **Langfuse Integration**: If `LANGFUSE_PUBLIC_KEY` is configured, `@telemetry_trace` transparently wraps functions with `langfuse.decorators.observe(as_type="generation")`. This provides deep LLM pipeline tracing, visualizing agent reasoning loops, latency, and token usage in the Langfuse dashboard.
+
+## 9. Rule Engine Expectations
 
 `RuleEngine.evaluate_solution(platform_id, component_ids)` is deterministic. It should not call an LLM.
 
@@ -196,25 +208,29 @@ The expected return shape is:
 
 Use this engine for hard technical validation. Use the LLM only for interpretation, extraction, or candidate generation.
 
-## 9. Workflow Status
+## 10. LangGraph Orchestrator Integration
 
-LangGraph is implemented in `ikp_platform/core/workflow/`.
+LangGraph governs the dynamic process flow (the "How") over the static Knowledge Graph (the "What"), implemented in `ikp_platform/core/workflow/`.
 
-Current flow:
+### The Bounded Draft/Validate Loop
+The workflow state machine follows a strict sequence:
+1. **`parse_intent`**: LLM interprets the customer request into `CustomerRequirement` Pydantic models.
+2. **`select_platform`**: Traverses the Knowledge Graph to select a platform supporting the target workload.
+3. **`draft_bom`**: Generates a Bill of Materials candidate.
+4. **`validate_bom`**: Deterministically validates the BOM against the graph rules.
+5. **Looping**: If validation fails, `attempt_count` increments. The workflow loops between drafting and validating until successful or `max_attempts` (default 3) is reached.
 
-1. `parse_intent`
-2. `select_platform`
-3. `draft_bom`
-4. `validate_bom`
-5. retry while attempts remain
-6. `live_portal_validation` placeholder
-7. `update_knowledge_base` placeholder
-8. `rank_solutions`
-9. terminal human-intervention placeholder when unresolved
+### Live Partner Portal Data Integration
+6. **`live_portal_validation` (Integration boundary)**:
+   - Evaluates the validated static BOM against dynamic vendor portal data (pricing, stock, availability, or live configurator APIs).
+   - If dynamic validation fails (e.g. part out of stock, or configurator rejection), it generates temporary or permanent errors.
+   - **Static vs Dynamic Learnings**: Portal rejections are captured. Temporary errors trigger workflow retries; permanent errors create `KnowledgeDelta` objects for the Learning Engine to ingest. 
+   - *Note: While the orchestration boundary is fully implemented, actual live HTTP scraping/API calls remain a placeholder.*
 
-Important: live partner portal validation is not active. The placeholder currently returns dynamic validation success without contacting an external vendor system.
+7. **`human_intervention`**: If `max_attempts` are exhausted across static or dynamic loops, unresolved cases route to this terminal node instead of looping forever, placing the BOM in a review queue.
+8. **`rank_solutions`**: Successfully validated solutions are scored and ranked.
 
-## 10. Implemented, Partial, Planned
+## 11. Implemented, Partial, Planned
 
 Implemented:
 
@@ -250,7 +266,7 @@ Planned or placeholder:
 - persistent graph database
 - production deployment/security/observability work
 
-## 11. Development Rules For Agents
+## 12. Development Rules For Agents
 
 - Read `IKP/standards/11_CURRENT_IMPLEMENTATION_STACK.md` before changing architecture docs.
 - Use `./scripts/start_api.sh` and `./scripts/start_ui.sh` for local servers.
@@ -261,7 +277,7 @@ Planned or placeholder:
 - Do not claim partner portal validation, live pricing, or full HITL resume is implemented.
 - Keep docs synced when endpoint payloads, port defaults, or workflow edges change.
 
-## 12. Quality Commands
+## 13. Quality Commands
 
 ```bash
 uv run pytest -q
@@ -272,7 +288,7 @@ git diff --check
 
 `make typecheck` is intentionally separate because the current codebase still has a mypy backlog.
 
-## 13. Troubleshooting
+## 14. Troubleshooting
 
 Repository looks empty:
 
@@ -300,7 +316,24 @@ Rule behavior is confusing:
 - Check `ikp_platform/core/reasoning/rule_engine.py`.
 - Add or update focused tests before changing validation semantics.
 
-## 14. Documentation Map
+## 15. Headless Offline Synthesis & Feedback Loops
+
+The LangGraph orchestration pipeline possesses a crucial headless offline capability where it continuously synthesizes, tests, and repairs Bill of Materials (BOMs) against the OKF static rule engine. This enables universal, vendor-agnostic resolution of missing and invalid components.
+
+### 15.1. Contextual Error Feedback
+When `draft_bom` attempts to generate a BOM and the `validate_bom` node flags static discrepancies, the errors are actively pipelined into `CustomerRequest.previous_errors`. The system uses these historical context arrays to loop and adapt.
+
+### 15.2. Smart Component Self-Correction
+The `SolutionGenerator` aggressively patches BOM constraints during generation:
+- **Negative Scenarios (Invalid SKUs):** If an offline SKU fails validation (e.g. `Invalid SKU: BAD-SKU-999`), the generator parses the error, purges the invalid SKU from the search parameters, and dynamically finds a valid alternative that matches the customer's workloads.
+- **Neutral Scenarios (Missing Mandatories):** If the rule engine mandates specific component categories (e.g. `CPU` or `MEMORY` must be present), but the customer omitted them, the generator identifies the `Missing core categories` error. It then autonomously creates `CustomerRequirement` objects for these missing categories and triggers the heuristic fallback to select the most optimal compatible components.
+
+### 15.3. Delta Tracking & Telemetry
+In `rank_solutions`, the generator builds a differential profile:
+- Analyzes what was explicitly **added**, **removed**, or **updated** against the original BOQ to make the solution valid.
+- Profiles the successful iterations into `Lowest Cost`, `Balanced`, and `Performance Optimized` solutions, while keeping detailed telemetry of the corrections made via Langfuse.
+
+## 16. Documentation Map
 
 - Current runtime truth: `IKP/standards/11_CURRENT_IMPLEMENTATION_STACK.md`
 - Beginner KT: this file

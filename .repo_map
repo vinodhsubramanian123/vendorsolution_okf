@@ -1,0 +1,986 @@
+Topology Map for: vendorsolution_okf
+==================================================
+└── vendorsolution_okf/
+    ├── .mypy_cache/
+    │   ├── 3.11/
+    │   │   ├── cache.0.db
+    │   │   ├── cache.1.db
+    │   │   ├── cache.10.db
+    │   │   ├── cache.11.db
+    │   │   ├── cache.12.db
+    │   │   ├── cache.13.db
+    │   │   ├── cache.14.db
+    │   │   ├── cache.15.db
+    │   │   ├── cache.2.db
+    │   │   ├── cache.3.db
+    │   │   ├── cache.4.db
+    │   │   ├── cache.5.db
+    │   │   ├── cache.6.db
+    │   │   ├── cache.7.db
+    │   │   ├── cache.8.db
+    │   │   └── cache.9.db
+    │   ├── .gitignore
+    │   └── CACHEDIR.TAG
+    ├── .pytest_cache/
+    │   ├── v/
+    │   │   └── cache/
+    │   │       ├── lastfailed
+    │   │       └── nodeids
+    │   ├── .gitignore
+    │   ├── CACHEDIR.TAG
+    │   └── README.md
+    ├── .ruff_cache/
+    │   ├── 0.15.22/
+    │   │   ├── 10330758746850303983
+    │   │   ├── 1192202457577296009
+    │   │   ├── 1279227645329768446
+    │   │   ├── 15178928050856309406
+    │   │   ├── 16080184044873561041
+    │   │   ├── 16679872171285611599
+    │   │   ├── 1684678661516560760
+    │   │   ├── 17798284446935423999
+    │   │   ├── 18241783876875507024
+    │   │   ├── 18407399182019786971
+    │   │   ├── 3182118001786176341
+    │   │   ├── 3763237713275137915
+    │   │   ├── 3912278304617410387
+    │   │   ├── 4263053301135421561
+    │   │   ├── 4613010169559589391
+    │   │   ├── 5009808684541312405
+    │   │   ├── 5600116351807463130
+    │   │   ├── 626817049282455965
+    │   │   └── 9861636657967264020
+    │   ├── .gitignore
+    │   └── CACHEDIR.TAG
+    ├── history/
+    │   ├── 2026-07-15_DELTA-2ddaf57c.md
+    │   ├── 2026-07-15_DELTA-956c0ce3.md
+    │   ├── 2026-07-15_DELTA-97d226bd.md
+    │   ├── 2026-07-15_DELTA-b9716a42.md
+    │   ├── 2026-07-16_DELTA-06d08eaa.md
+    │   ├── 2026-07-16_DELTA-0c04b881.md
+    │   ├── 2026-07-16_DELTA-1e2f73da.md
+    │   ├── 2026-07-16_DELTA-5025709d.md
+    │   ├── 2026-07-16_DELTA-57710bda.md
+    │   ├── 2026-07-16_DELTA-6350698f.md
+    │   ├── 2026-07-16_DELTA-94555159.md
+    │   ├── 2026-07-16_DELTA-96ec2c42.md
+    │   ├── 2026-07-16_DELTA-aaa06948.md
+    │   ├── 2026-07-16_DELTA-b32a8af0.md
+    │   ├── 2026-07-16_DELTA-c5a55671.md
+    │   ├── 2026-07-16_DELTA-cb838aa1.md
+    │   ├── 2026-07-16_DELTA-cc64c2f7.md
+    │   ├── 2026-07-16_DELTA-dd384b7f.md
+    │   ├── 2026-07-16_DELTA-e068d633.md
+    │   ├── 2026-07-16_DELTA-f4d548a5.md
+    │   ├── 2026-07-17_DELTA-14ce5c72.md
+    │   ├── 2026-07-17_DELTA-2c20c759.md
+    │   ├── 2026-07-17_DELTA-2cb67aa7.md
+    │   ├── 2026-07-17_DELTA-34ec19da.md
+    │   ├── 2026-07-17_DELTA-704ce310.md
+    │   ├── 2026-07-17_DELTA-7136e27f.md
+    │   ├── 2026-07-17_DELTA-83b85c16.md
+    │   ├── 2026-07-17_DELTA-9b9d6f1e.md
+    │   ├── 2026-07-17_DELTA-c9ab64f4.md
+    │   ├── 2026-07-17_DELTA-cedd8486.md
+    │   ├── 2026-07-17_DELTA-e3387471.md
+    │   ├── 2026-07-17_DELTA-f97496b6.md
+    │   ├── 2026-07-18_DELTA-04fce505.md
+    │   ├── 2026-07-18_DELTA-0e6732c0.md
+    │   ├── 2026-07-18_DELTA-19c1c120.md
+    │   ├── 2026-07-18_DELTA-1a3060c1.md
+    │   ├── 2026-07-18_DELTA-3d8af192.md
+    │   ├── 2026-07-18_DELTA-4d169f2f.md
+    │   ├── 2026-07-18_DELTA-5e8520fe.md
+    │   ├── 2026-07-18_DELTA-5eaa8556.md
+    │   ├── 2026-07-18_DELTA-68834ab7.md
+    │   ├── 2026-07-18_DELTA-6d976e7d.md
+    │   ├── 2026-07-18_DELTA-728e27ca.md
+    │   ├── 2026-07-18_DELTA-aa5ead61.md
+    │   ├── 2026-07-18_DELTA-ace72290.md
+    │   ├── 2026-07-18_DELTA-ae5627c9.md
+    │   ├── 2026-07-18_DELTA-b4c240de.md
+    │   ├── 2026-07-18_DELTA-baa74406.md
+    │   ├── 2026-07-18_DELTA-c44ceed6.md
+    │   └── 2026-07-18_DELTA-d94a780a.md
+    ├── IKP/
+    │   ├── references/
+    │   │   └── OKF_SPECIFICATION.md
+    │   ├── standards/
+    │   │   ├── 01_VISION_AND_BUSINESS_PROBLEM.md
+    │   │   ├── 02_SYSTEM_ARCHITECTURE_AND_LIFECYCLE.md
+    │   │   ├── 03_ENGINEERING_ONTOLOGY_AND_INFORMATION_MODEL.md
+    │   │   ├── 04_KNOWLEDGE_ACQUISITION_PIPELINE.md
+    │   │   ├── 05_ENGINEERING_REASONING_AND_SOLUTION_SYNTHESIS.md
+    │   │   ├── 06_CANONICAL_REPOSITORY_VALIDATION_AND_LEARNING.md
+    │   │   ├── 07_IMPLEMENTATION_CONTRACT.md
+    │   │   ├── 08_REFERENCE_LIBRARY.md
+    │   │   ├── 09_ARCHITECTURE_DECISIONS_AND_EVOLUTION.md
+    │   │   ├── 10_IMPLEMENTATION_CHECKLIST.md
+    │   │   └── 11_CURRENT_IMPLEMENTATION_STACK.md
+    │   ├── QUALITY_AUDIT_GAPS.md
+    │   └── readme.md
+    ├── ikp_platform/
+    │   ├── core/
+    │   │   ├── ingestion/
+    │   │   │   ├── adapters/
+    │   │   │   │   ├── base_adapter.py
+    │   │   │   │   │   ├── ♦ class BasePDFAdapter:
+    │   │   │   │   │   ├── ♦ def can_handle(self, text):
+    │   │   │   │   │   ├── ♦ def extract_platform(self, text):
+    │   │   │   │   │   └── ♦ def extract_components(self, text, platform, structured_components):
+    │   │   │   │   └── hpe_quickspecs_adapter.py
+    │   │   │   │       ├── ♦ class HPEQuickSpecsAdapter:
+    │   │   │   │       ├── ♦ def can_handle(self, text):
+    │   │   │   │       ├── ♦ def extract_platform(self, text):
+    │   │   │   │       ├── ♦ def extract_components(self, text, platform, structured_components):
+    │   │   │   │       ├── ♦ def __init__(self, source, project_root):
+    │   │   │   │       ├── ♦ def _post_process_limits(self, platform):
+    │   │   │   │       ├── ♦ def _human_in_the_loop_fallback(self, text):
+    │   │   │   │       ├── ♦ def _infer_solution_domain(self, text):
+    │   │   │   │       ├── ♦ def _extract_platform_identity(self, text):
+    │   │   │   │       ├── ♦ def _extract_workloads_and_requirements(self, text, platform):
+    │   │   │   │       ├── ♦ def _extract_processors(self, text, platform):
+    │   │   │   │       ├── ♦ def _extract_memory(self, text, platform):
+    │   │   │   │       ├── ♦ def _extract_storage(self, text, platform):
+    │   │   │   │       ├── ♦ def _extract_networking(self, text, platform):
+    │   │   │   │       ├── ♦ def _extract_gpus(self, text, platform):
+    │   │   │   │       ├── ♦ def _extract_rules(self, text, platform):
+    │   │   │   │       ├── ♦ def _extract_power(self, text, platform):
+    │   │   │   │       ├── ♦ def _classify_component(self, description):
+    │   │   │   │       ├── ♦ def _process_structured_components(self, structured_components, platform):
+    │   │   │   │       ├── ♦ def _normalize_text(self, text):
+    │   │   │   │       ├── ♦ def _negation_shield(self, rule_text):
+    │   │   │   │       ├── ♦ def _strip_conditional(self, rule_text):
+    │   │   │   │       ├── ♦ def _extract_topology(self, text, platform):
+    │   │   │   │       ├── ♦ def _extract_description(self, text):
+    │   │   │   │       ├── ♦ def _extract_form_factor(self, text):
+    │   │   │   │       ├── ♦ def _extract_chassis_types(self, text):
+    │   │   │   │       ├── ♦ def _extract_capabilities(self, text):
+    │   │   │   │       └── ♦ def _extract_workload_tags(self, text):
+    │   │   │   ├── __init__.py
+    │   │   │   ├── excel_parser.py
+    │   │   │   │   ├── ♦ class ExcelExtractor:
+    │   │   │   │   ├── ♦ def extract(self, source, file_path, platform_id):
+    │   │   │   │   ├── ♦ def _parse_components(self, df, source, platform_id):
+    │   │   │   │   └── ♦ def _parse_skus(self, df, source):
+    │   │   │   ├── pdf_extractor.py
+    │   │   │   │   ├── ♦ class TableParser:
+    │   │   │   │   ├── ♦ class PDFExtractor:
+    │   │   │   │   ├── ♦ def __init__(self):
+    │   │   │   │   ├── ♦ def parse_document(self, file_path):
+    │   │   │   │   ├── ♦ def __init__(self, source, project_root):
+    │   │   │   │   ├── ♦ def _normalize_text(self, text):
+    │   │   │   │   ├── ♦ def _human_in_the_loop_fallback(self, text):
+    │   │   │   │   └── ♦ def extract(self, file_path):
+    │   │   │   ├── source_registry.py
+    │   │   │   │   ├── ♦ class SourceRegistry:
+    │   │   │   │   ├── ♦ def __init__(self, project_root):
+    │   │   │   │   ├── ♦ def register(self, file_path):
+    │   │   │   │   ├── ♦ def update_status(self, source_id, status):
+    │   │   │   │   ├── ♦ def _compute_hash(path):
+    │   │   │   │   ├── ♦ def _infer_vendor(filename):
+    │   │   │   │   ├── ♦ def _load_manifest(self):
+    │   │   │   │   └── ♦ def _save_manifest(self):
+    │   │   │   ├── source_watcher.py
+    │   │   │   │   ├── ♦ class SourceWatcher:
+    │   │   │   │   ├── ♦ def __init__(self, sources_path):
+    │   │   │   │   └── ♦ def scan(self):
+    │   │   │   └── table_parser.py
+    │   │   │       ├── ♦ class TableParser:
+    │   │   │       ├── ♦ def __init__(self):
+    │   │   │       └── ♦ def parse_document(self, pdf_path):
+    │   │   ├── learning/
+    │   │   │   ├── __init__.py
+    │   │   │   └── learning_engine.py
+    │   │   │       ├── ♦ class LearningEngine:
+    │   │   │       ├── ♦ def __init__(self, repo_manager):
+    │   │   │       ├── ♦ def _load_deltas(self):
+    │   │   │       ├── ♦ def _save_delta(self, delta):
+    │   │   │       ├── ♦ def _delete_delta(self, delta_id):
+    │   │   │       ├── ♦ def submit_delta(self, delta):
+    │   │   │       ├── ♦ def process_validated_deltas(self, objects):
+    │   │   │       ├── ♦ def approve_delta(self, delta_id, reviewer, notes):
+    │   │   │       ├── ♦ def reject_delta(self, delta_id, reviewer, reason):
+    │   │   │       ├── ♦ def get_pending_reviews(self):
+    │   │   │       └── ♦ def _can_auto_approve(delta):
+    │   │   ├── observability/
+    │   │   │   └── __init__.py
+    │   │   │       ├── ♦ def telemetry_trace(func):
+    │   │   │       ├── ♦ def _log_start(func_name, kwargs):
+    │   │   │       ├── ♦ def _log_success(func_name, start_time, result):
+    │   │   │       ├── ♦ def _log_error(func_name, start_time, e):
+    │   │   │       ├── ♦ def async_wrapper():
+    │   │   │       └── ♦ def sync_wrapper():
+    │   │   ├── ontology/
+    │   │   │   ├── __init__.py
+    │   │   │   └── models.py
+    │   │   │       ├── ♦ def _utcnow():
+    │   │   │       ├── ♦ class EngineeringObjectType:
+    │   │   │       ├── ♦ class RelationshipType:
+    │   │   │       ├── ♦ class SourceType:
+    │   │   │       ├── ♦ class ProcessingStatus:
+    │   │   │       ├── ♦ class LifecycleStatus:
+    │   │   │       ├── ♦ class DeltaStatus:
+    │   │   │       ├── ♦ class DeltaChangeType:
+    │   │   │       ├── ♦ class RuleSeverity:
+    │   │   │       ├── ♦ class ConfidenceLevel:
+    │   │   │       ├── ♦ class PackagingType:
+    │   │   │       ├── ♦ class EvidenceRecord:
+    │   │   │       ├── ♦ class HistoryEntry:
+    │   │   │       ├── ♦ class EngineeringRelationship:
+    │   │   │       ├── ♦ class EngineeringAttribute:
+    │   │   │       ├── ♦ class BaseEngineeringObject:
+    │   │   │       ├── ♦ class SlotMapping:
+    │   │   │       ├── ♦ class Platform:
+    │   │   │       ├── ♦ class Component:
+    │   │   │       ├── ♦ class SKU:
+    │   │   │       ├── ♦ class Workload:
+    │   │   │       ├── ♦ class Rule:
+    │   │   │       ├── ♦ class Constraint:
+    │   │   │       ├── ♦ class CategoryLimit:
+    │   │   │       ├── ♦ class SolutionCategory:
+    │   │   │       ├── ♦ class Variant:
+    │   │   │       ├── ♦ class Configuration:
+    │   │   │       ├── ♦ class Source:
+    │   │   │       ├── ♦ class DeltaChange:
+    │   │   │       ├── ♦ class KnowledgeDelta:
+    │   │   │       ├── ♦ class CustomerRequirement:
+    │   │   │       ├── ♦ class CustomerRequest:
+    │   │   │       └── ♦ class SolutionCandidate:
+    │   │   ├── reasoning/
+    │   │   │   ├── __init__.py
+    │   │   │   ├── intent_parser.py
+    │   │   │   │   ├── ♦ class IntentParser:
+    │   │   │   │   ├── ♦ def __init__(self):
+    │   │   │   │   ├── ♦ def parse_request(self, raw_text):
+    │   │   │   │   ├── ♦ def _extract_workloads(self, text_lower):
+    │   │   │   │   └── ♦ def _extract_requirements(self, text_lower):
+    │   │   │   ├── llm_client.py
+    │   │   │   │   ├── ♦ class KeyManager:
+    │   │   │   │   ├── ♦ def retry_with_key_rotation(max_retries):
+    │   │   │   │   ├── ♦ class Requirement:
+    │   │   │   │   ├── ♦ class IntentParseResult:
+    │   │   │   │   ├── ♦ class ComponentSelectionResult:
+    │   │   │   │   ├── ♦ class LLMClient:
+    │   │   │   │   ├── ♦ def __init__(self):
+    │   │   │   │   ├── ♦ def get_client(self):
+    │   │   │   │   ├── ♦ def rotate(self):
+    │   │   │   │   ├── ♦ def decorator(func):
+    │   │   │   │   ├── ♦ def __init__(self):
+    │   │   │   │   ├── ♦ def parse_intent(self, raw_text):
+    │   │   │   │   ├── ♦ def select_components(self, platform_id, available_nodes, requirements, profi...
+    │   │   │   │   ├── ♦ def generate_embeddings(self, texts):
+    │   │   │   │   ├── ♦ def extract_rules(self, text_chunk):
+    │   │   │   │   ├── ♦ def critic_review_rules(self, text_chunk):
+    │   │   │   │   └── ♦ def wrapper(self):
+    │   │   │   ├── rule_engine.py
+    │   │   │   │   ├── ♦ class RuleEngine:
+    │   │   │   │   ├── ♦ def __init__(self, graph):
+    │   │   │   │   ├── ♦ def evaluate_solution(self, platform_id, component_ids):
+    │   │   │   │   ├── ♦ def _check_compatibility(self, platform_id, component_ids, reasoning_chain):
+    │   │   │   │   ├── ♦ def _evaluate_constraints(self, platform_id, component_ids, reasoning_chain):
+    │   │   │   │   ├── ♦ def _check_dependencies(self, component_ids, reasoning_chain):
+    │   │   │   │   └── ♦ def _evaluate_rules(self, component_ids, reasoning_chain):
+    │   │   │   └── solution_generator.py
+    │   │   │       ├── ♦ class SolutionGenerator:
+    │   │   │       ├── ♦ def __init__(self, graph, vector_store, mcp_client):
+    │   │   │       ├── ♦ def generate(self, request):
+    │   │   │       └── ♦ def _build_candidate(self, platform_id, request, profile):
+    │   │   ├── repository/
+    │   │   │   ├── __init__.py
+    │   │   │   ├── graph_builder.py
+    │   │   │   │   ├── ♦ class GraphBuilder:
+    │   │   │   │   ├── ♦ def __init__(self):
+    │   │   │   │   ├── ♦ def add_concept(self, obj):
+    │   │   │   │   ├── ♦ def remove_concept(self, object_id):
+    │   │   │   │   ├── ♦ def filter_by_metadata(self, criteria):
+    │   │   │   │   ├── ♦ def filter_by_capabilities(self, required_capabilities):
+    │   │   │   │   ├── ♦ def filter_by_type(self, obj_type):
+    │   │   │   │   ├── ♦ def _matches_criteria(attrs, criteria):
+    │   │   │   │   ├── ♦ def traverse_relationships(self, node_id, relationship_type, direction):
+    │   │   │   │   ├── ♦ def find_paths(self, source_id, target_id, max_depth):
+    │   │   │   │   ├── ♦ def get_dependencies(self, object_id):
+    │   │   │   │   ├── ♦ def get_related(self, node_id, relationship_type):
+    │   │   │   │   ├── ♦ def get_compatible(self, object_id):
+    │   │   │   │   ├── ♦ def build_subgraph(self, node_ids):
+    │   │   │   │   └── ♦ def get_stats(self):
+    │   │   │   ├── mcp_client.py
+    │   │   │   │   ├── ♦ class ObsidianMCPClient:
+    │   │   │   │   ├── ♦ def __init__(self, vault_path):
+    │   │   │   │   ├── ♦ def is_available(self):
+    │   │   │   │   ├── ♦ def _search_async(self, query):
+    │   │   │   │   ├── ♦ def search(self, query):
+    │   │   │   │   └── ♦ def _run():
+    │   │   │   ├── okf_reader.py
+    │   │   │   │   ├── ♦ class OKFReader:
+    │   │   │   │   ├── ♦ def __init__(self, repository_path):
+    │   │   │   │   ├── ♦ def load_all(self):
+    │   │   │   │   ├── ♦ def _parse_file(self, file_path):
+    │   │   │   │   ├── ♦ def _build_object(self, frontmatter, body, file_path):
+    │   │   │   │   ├── ♦ def _split_frontmatter(content):
+    │   │   │   │   ├── ♦ def _extract_relationships(body):
+    │   │   │   │   ├── ♦ def _extract_evidence(body):
+    │   │   │   │   ├── ♦ def _extract_section(body, heading):
+    │   │   │   │   └── ♦ def _extract_list_section(body, heading):
+    │   │   │   ├── okf_writer.py
+    │   │   │   │   ├── ♦ class OKFWriter:
+    │   │   │   │   ├── ♦ def __init__(self, repository_path):
+    │   │   │   │   ├── ♦ def _compute_path(self, obj):
+    │   │   │   │   ├── ♦ def _slugify(text):
+    │   │   │   │   ├── ♦ def _generate_frontmatter(self, obj):
+    │   │   │   │   ├── ♦ def _generate_body(self, obj):
+    │   │   │   │   ├── ♦ def write_concept(self, obj, existing_path):
+    │   │   │   │   ├── ♦ def generate_index(self, directory):
+    │   │   │   │   ├── ♦ def append_log_entry(self, action, description, concept_path, directory):
+    │   │   │   │   └── ♦ def _read_frontmatter(file_path):
+    │   │   │   ├── repo_manager.py
+    │   │   │   │   ├── ♦ class RepoManager:
+    │   │   │   │   ├── ♦ def __init__(self, repository_path, project_root):
+    │   │   │   │   ├── ♦ def bootstrap(self):
+    │   │   │   │   ├── ♦ def add_concept(self, obj):
+    │   │   │   │   ├── ♦ def reindex_vector_store(self, batch_size):
+    │   │   │   │   ├── ♦ def apply_delta(self, delta, objects):
+    │   │   │   │   ├── ♦ def _update_state_file(self):
+    │   │   │   │   ├── ♦ def _append_root_log(self, description):
+    │   │   │   │   ├── ♦ def _record_delta(self, delta):
+    │   │   │   │   └── ♦ def update_context(self, domains, source_count):
+    │   │   │   ├── repo_watcher.py
+    │   │   │   │   ├── ♦ class RepositoryWatcher:
+    │   │   │   │   ├── ♦ def __init__(self, repo_manager, scan_interval):
+    │   │   │   │   ├── ♦ def start(self):
+    │   │   │   │   ├── ♦ def stop(self):
+    │   │   │   │   ├── ♦ def _watch_loop(self):
+    │   │   │   │   ├── ♦ def _scan_and_update(self, baseline_only):
+    │   │   │   │   └── ♦ def _fallback_walk(self, path):
+    │   │   │   └── vector_store.py
+    │   │   │       ├── ♦ class VectorStore:
+    │   │   │       ├── ♦ def __init__(self, persist_directory):
+    │   │   │       ├── ♦ def index_object(self, obj):
+    │   │   │       ├── ♦ def index_many(self, objects, batch_size):
+    │   │   │       ├── ♦ def _text_repr(obj):
+    │   │   │       └── ♦ def semantic_search(self, query, n_results, filter_metadata):
+    │   │   ├── validation/
+    │   │   │   ├── __init__.py
+    │   │   │   ├── boq_validator.py
+    │   │   │   │   ├── ♦ class BOQValidator:
+    │   │   │   │   ├── ♦ def __init__(self, graph, vector_store):
+    │   │   │   │   ├── ♦ def fuzzy_match_sku(self, requested_sku, threshold):
+    │   │   │   │   ├── ♦ def _check_completeness(self, component_ids, result):
+    │   │   │   │   └── ♦ def validate(self, solution_components, context):
+    │   │   │   └── validator.py
+    │   │   │       ├── ♦ class ValidationMessage:
+    │   │   │       ├── ♦ class ValidationResult:
+    │   │   │       ├── ♦ class VendorValidator:
+    │   │   │       ├── ♦ class ManualReviewValidator:
+    │   │   │       ├── ♦ def validate(self, solution_components, context):
+    │   │   │       ├── ♦ def to_knowledge_delta(self, result):
+    │   │   │       └── ♦ def validate(self, solution_components, context):
+    │   │   ├── workflow/
+    │   │   │   ├── __init__.py
+    │   │   │   ├── executor.py
+    │   │   │   │   ├── ♦ class WorkflowExecutor:
+    │   │   │   │   ├── ♦ def __init__(self, knowledge_graph, vector_store, mcp_client):
+    │   │   │   │   └── ♦ def execute_query(self, query):
+    │   │   │   ├── graph.py
+    │   │   │   │   ├── ♦ def should_loop_bom(state):
+    │   │   │   │   ├── ♦ def should_human_intervene(state):
+    │   │   │   │   └── ♦ def build_workflow_graph(knowledge_graph, parser, generator, rule_engine):
+    │   │   │   ├── nodes.py
+    │   │   │   │   ├── ♦ class WorkflowNodes:
+    │   │   │   │   ├── ♦ def __init__(self, graph, parser, generator, rule_engine):
+    │   │   │   │   ├── ♦ def parse_intent(self, state):
+    │   │   │   │   ├── ♦ def select_platform(self, state):
+    │   │   │   │   ├── ♦ def draft_bom(self, state):
+    │   │   │   │   ├── ♦ def validate_bom(self, state):
+    │   │   │   │   ├── ♦ def live_portal_validation(self, state):
+    │   │   │   │   ├── ♦ def update_knowledge_base(self, state):
+    │   │   │   │   ├── ♦ def human_intervention(self, state):
+    │   │   │   │   └── ♦ def rank_solutions(self, state):
+    │   │   │   └── state.py
+    │   │   │       └── ♦ class WorkflowState:
+    │   │   └── __init__.py
+    │   ├── scripts/
+    │   │   ├── ingest_catalog.py
+    │   │   │   ├── ♦ def get_file_checksum(filepath):
+    │   │   │   └── ♦ def ingest_all():
+    │   │   └── reindex.py
+    │   │       └── ♦ def main():
+    │   ├── utils/
+    │   │   └── logger.py
+    │   │       ├── ♦ def setup_logger(name, log_file, level):
+    │   │       └── ♦ def get_logger(module_name):
+    │   ├── __init__.py
+    │   ├── api.py
+    │   │   ├── ♦ def lifespan(app):
+    │   │   ├── ♦ class QueryRequest:
+    │   │   ├── ♦ class ValidationRequest:
+    │   │   ├── ♦ class BOQValidationRequest:
+    │   │   ├── ♦ class SearchRequest:
+    │   │   ├── ♦ def get_repo():
+    │   │   ├── ♦ def _infer_platforms_for_components(repo, component_ids):
+    │   │   ├── ♦ def get_status():
+    │   │   ├── ♦ def query_solution(request):
+    │   │   ├── ♦ def get_integrations_status():
+    │   │   ├── ♦ def validate_solution(request):
+    │   │   ├── ♦ def validate_boq(request, background_tasks):
+    │   │   ├── ♦ def semantic_search(request):
+    │   │   ├── ♦ class ApprovalRequest:
+    │   │   ├── ♦ def get_review_queue():
+    │   │   ├── ♦ def approve_object(request, background_tasks):
+    │   │   ├── ♦ def get_pending_deltas():
+    │   │   ├── ♦ def approve_delta(delta_id, background_tasks, reviewer):
+    │   │   └── ♦ def reject_delta(delta_id, reviewer, reason):
+    │   ├── cli.py
+    │   │   ├── ♦ def cmd_ingest(file_path, platform_id):
+    │   │   ├── ♦ def cmd_status():
+    │   │   ├── ♦ def cmd_scan():
+    │   │   ├── ♦ def cmd_query(query_text):
+    │   │   ├── ♦ def cmd_validate(solution_id):
+    │   │   ├── ♦ def cmd_learn():
+    │   │   ├── ♦ def cmd_mcp():
+    │   │   └── ♦ def main():
+    │   └── mcp_server.py
+    │       ├── ♦ def get_repo():
+    │       ├── ♦ def list_tools():
+    │       ├── ♦ def call_tool(name, arguments):
+    │       └── ♦ def main():
+    ├── ikp_platform.egg-info/
+    │   ├── dependency_links.txt
+    │   ├── entry_points.txt
+    │   ├── PKG-INFO
+    │   ├── requires.txt
+    │   ├── SOURCES.txt
+    │   └── top_level.txt
+    ├── ikp_web/
+    │   ├── playwright-report/
+    │   │   └── index.html
+    │   ├── public/
+    │   │   ├── favicon.svg
+    │   │   ├── icons.svg
+    │   │   └── KT_WALKTHROUGH.md
+    │   ├── src/
+    │   │   ├── assets/
+    │   │   │   ├── hero.png
+    │   │   │   ├── react.svg
+    │   │   │   └── vite.svg
+    │   │   ├── components/
+    │   │   │   ├── BoqValidation.tsx
+    │   │   │   │   ├── ♦ function BoqValidation()
+    │   │   │   │   ├── ♦ const handleBoqValidation = () =>
+    │   │   │   │   └── ♦ const handleFileUpload = () =>
+    │   │   │   ├── KnowledgeTransfer.tsx
+    │   │   │   │   ├── ♦ function KnowledgeTransfer()
+    │   │   │   │   └── ♦ const fetchContent = () =>
+    │   │   │   ├── PlatformDashboard.tsx
+    │   │   │   │   └── ♦ function PlatformDashboard()
+    │   │   │   ├── SemanticSearch.tsx
+    │   │   │   │   ├── ♦ function SemanticSearch()
+    │   │   │   │   └── ♦ const handleSearch = () =>
+    │   │   │   ├── Sidebar.tsx
+    │   │   │   │   └── ♦ function Sidebar()
+    │   │   │   ├── SolutionSynthesis.tsx
+    │   │   │   │   ├── ♦ function SolutionSynthesis()
+    │   │   │   │   └── ♦ const handleQuery = () =>
+    │   │   │   └── ValidationPortal.tsx
+    │   │   │       ├── ♦ function ValidationPortal()
+    │   │   │       ├── ♦ const fetchQueue = () =>
+    │   │   │       └── ♦ const handleApprove = () =>
+    │   │   ├── types/
+    │   │   │   └── api.ts
+    │   │   ├── App.css
+    │   │   ├── App.tsx
+    │   │   │   ├── ♦ const fetchStatus = () =>
+    │   │   │   └── ♦ const fetchIntegrations = () =>
+    │   │   ├── index.css
+    │   │   └── main.tsx
+    │   ├── test-results/
+    │   │   └── .last-run.json
+    │   ├── tests/
+    │   │   └── e2e/
+    │   │       ├── boq-combinations.spec.ts
+    │   │       ├── search.spec.ts
+    │   │       └── validation.spec.ts
+    │   ├── .gitignore
+    │   ├── .oxlintrc.json
+    │   ├── index.html
+    │   ├── package.json
+    │   ├── playwright.config.ts
+    │   ├── README.md
+    │   ├── tsconfig.app.json
+    │   ├── tsconfig.json
+    │   ├── tsconfig.node.json
+    │   └── vite.config.ts
+    ├── repository/
+    │   ├── compute/
+    │   │   ├── proliant/
+    │   │   │   └── gen12/
+    │   │   │       ├── hpe-proliant-dl380-gen12/
+    │   │   │       │   ├── category-limits/
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-constraints-dimm-slots.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-constraints-max-edsff-drives.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-constraints-max-lff-drives.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-constraints-max-memory.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-constraints-max-sff-drives.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-limits-max-ocp-slots.md
+    │   │   │       │   │   └── index.md
+    │   │   │       │   ├── components/
+    │   │   │       │   │   ├── accessory/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-865438.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-bd505a.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-dl380t.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-h49rse.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-h49swe.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-h49sxe.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p03178-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p25527-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p36394-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p48802-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p48803-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p72201-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p72203-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p72207-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p73282-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p76462-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p76463-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p77486-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p80997-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p83356-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-r7n87a.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-s5t74c.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-u4555e.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   ├── cpu/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6505p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6507p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6515p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6517p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6520p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6527p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6530p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6710e.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6714p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6724p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6725p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6728p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6730p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6731e.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6732p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6736p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6737p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6738p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6740e.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6740p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6745p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6746e.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6747p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6748p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6756e.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6760p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6762p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6766e.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6767p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6768p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6780e.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6787p.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-processors-xeon-6788p.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   ├── gpu/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-gpu-h200-nvl.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-gpu-l4.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-gpu-l40s.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-gpu-rtx-a1000.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-gpu-rtx-pro-4500-blackwell-server-edition.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-gpu-rtx-pro-6000-blackwell-server-edition.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-gpu-rtx-pro-6000.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-gpu-rtx-pro-6000d.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   ├── infrastructure/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p74734-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p74741-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p75807-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p77492-b21.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   ├── memory/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-6000mt.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   ├── networking/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p74757-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p74758-b21.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-sn1610q.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-sn1700q.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   ├── nic/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-ocp-3.0.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   ├── psu/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-psu-1000w.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-psu-1600w.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-psu-2200w.md
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-psu-800w.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   ├── security/
+    │   │   │       │   │   │   ├── hpe-proliant-dl380-gen12-components-p48922-b21.md
+    │   │   │       │   │   │   └── index.md
+    │   │   │       │   │   └── storage/
+    │   │   │       │   │       ├── hpe-proliant-dl380-gen12-components-p75740-b21.md
+    │   │   │       │   │       └── index.md
+    │   │   │       │   ├── rules/
+    │   │   │       │   │   ├── index.md
+    │   │   │       │   │   └── platform-rules.md
+    │   │   │       │   ├── skus/
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-6000mt.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-865438.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-bd505a.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-dl380t.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-h49rse.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-h49swe.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-h49sxe.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p03178-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p25527-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p36394-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p48802-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p48803-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p48922-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p72201-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p72203-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p72207-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p73282-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p74734-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p74741-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p74757-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p74758-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p75740-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p75807-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p76462-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p76463-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p77486-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p77492-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p80997-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-p83356-b21.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-r7n87a.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-s5t74c.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-sn1610q.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-sn1700q.md
+    │   │   │       │   │   ├── hpe-proliant-dl380-gen12-skus-u4555e.md
+    │   │   │       │   │   └── index.md
+    │   │   │       │   ├── hpe-proliant-dl380-gen12.md
+    │   │   │       │   └── index.md
+    │   │   │       └── hpe-proliant-dl580-gen12/
+    │   │   │           ├── category-limits/
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-constraints-dimm-slots.md
+    │   │   │           │   └── index.md
+    │   │   │           ├── components/
+    │   │   │           │   ├── accessory/
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-12edsff.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-16edsff.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-24edsff.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-32edsff.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-726537-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-8edsff.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-h49rse.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-h49swe.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-h49sxe.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p03178-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p36394-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p69728-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p74508-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p75399-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80380-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80381-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80387-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80388-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80389-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80390-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80391-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80393-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80394-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80395-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80396-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80397-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80398-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80399-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80408-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80409-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80417-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80418-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80419-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p80421-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p81001-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p81003-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p81004-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p811004.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-p83540-b21.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-r7n87a.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-u4555e.md
+    │   │   │           │   │   └── index.md
+    │   │   │           │   ├── cpu/
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-processors-xeon-6714p.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-processors-xeon-6724p.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-processors-xeon-6728p.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-processors-xeon-6738p.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-processors-xeon-6748p.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-processors-xeon-6768p.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-processors-xeon-6788p.md
+    │   │   │           │   │   └── index.md
+    │   │   │           │   ├── memory/
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-5200mt.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-memory-ddr5.md
+    │   │   │           │   │   └── index.md
+    │   │   │           │   ├── networking/
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-sn1610q.md
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-sn1700q.md
+    │   │   │           │   │   └── index.md
+    │   │   │           │   ├── power/
+    │   │   │           │   │   ├── hpe-proliant-dl580-gen12-components-a0k02a.md
+    │   │   │           │   │   └── index.md
+    │   │   │           │   └── thermal/
+    │   │   │           │       ├── hpe-proliant-dl580-gen12-components-s0v52a.md
+    │   │   │           │       └── index.md
+    │   │   │           ├── rules/
+    │   │   │           │   ├── index.md
+    │   │   │           │   └── platform-rules.md
+    │   │   │           ├── skus/
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-12edsff.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-16edsff.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-24edsff.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-32edsff.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-5200mt.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-726537-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-8edsff.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-a0k02a.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-h49rse.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-h49swe.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-h49sxe.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p03178-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p36394-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p69728-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p74508-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p75399-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80380-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80381-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80387-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80388-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80389-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80390-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80391-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80393-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80394-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80395-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80396-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80397-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80398-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80399-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80408-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80409-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80417-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80418-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80419-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p80421-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p81001-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p81003-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p81004-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p811004.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-p83540-b21.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-r7n87a.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-s0v52a.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-sn1610q.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-sn1700q.md
+    │   │   │           │   ├── hpe-proliant-dl580-gen12-skus-u4555e.md
+    │   │   │           │   └── index.md
+    │   │   │           ├── hpe-proliant-dl580-gen12.md
+    │   │   │           └── index.md
+    │   │   └── workloads/
+    │   │       ├── index.md
+    │   │       ├── workload-ai-machine-learning.md
+    │   │       ├── workload-analytics.md
+    │   │       ├── workload-database.md
+    │   │       └── workload-virtualization.md
+    │   ├── storage/
+    │   │   ├── alletra/
+    │   │   │   └── unknown/
+    │   │   │       └── hpe-alletra-storage-mp-b10000/
+    │   │   │           ├── components/
+    │   │   │           │   ├── accessory/
+    │   │   │           │   │   ├── hpe-alletra-storage-mp-b10000-components-b10000.md
+    │   │   │           │   │   ├── hpe-alletra-storage-mp-b10000-components-b10010.md
+    │   │   │           │   │   ├── hpe-alletra-storage-mp-b10000-components-b10120.md
+    │   │   │           │   │   ├── hpe-alletra-storage-mp-b10000-components-b10230.md
+    │   │   │           │   │   ├── hpe-alletra-storage-mp-b10000-components-r9s02a.md
+    │   │   │           │   │   ├── hpe-alletra-storage-mp-b10000-components-s0r21b.md
+    │   │   │           │   │   ├── hpe-alletra-storage-mp-b10000-components-s0s39a.md
+    │   │   │           │   │   └── index.md
+    │   │   │           │   └── storage/
+    │   │   │           │       ├── hpe-alletra-storage-mp-b10000-components-b10130.md
+    │   │   │           │       ├── hpe-alletra-storage-mp-b10000-components-b10140.md
+    │   │   │           │       ├── hpe-alletra-storage-mp-b10000-components-b10240.md
+    │   │   │           │       └── index.md
+    │   │   │           ├── rules/
+    │   │   │           │   ├── index.md
+    │   │   │           │   └── platform-rules.md
+    │   │   │           ├── skus/
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-b10000.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-b10010.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-b10120.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-b10130.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-b10140.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-b10230.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-b10240.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-r9s02a.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-s0r21b.md
+    │   │   │           │   ├── hpe-alletra-storage-mp-b10000-skus-s0s39a.md
+    │   │   │           │   └── index.md
+    │   │   │           ├── hpe-alletra-storage-mp-b10000.md
+    │   │   │           └── index.md
+    │   │   └── workloads/
+    │   │       ├── index.md
+    │   │       ├── workload-ai-machine-learning.md
+    │   │       ├── workload-analytics.md
+    │   │       ├── workload-database.md
+    │   │       └── workload-storage.md
+    │   └── log.md
+    ├── scripts/
+    │   ├── debug/
+    │   │   ├── debug_category_limit.py
+    │   │   ├── debug_concurrency.py
+    │   │   │   └── ♦ def thread_func():
+    │   │   ├── debug_limit_engine.py
+    │   │   └── debug_platform_dump.py
+    │   ├── bootstrap.sh
+    │   ├── start_api.sh
+    │   └── start_ui.sh
+    ├── sources/
+    │   ├── boqs/
+    │   ├── excel/
+    │   ├── human_feedback/
+    │   ├── pdfs/
+    │   │   ├── DL580_Gen12_QuickSpecs.pdf
+    │   │   ├── HPE Alletra Storage MP B10000 QuickSpecs-a50006985enw.pdf
+    │   │   └── HPE ProLiant Compute DL380 Gen12 QuickSpecs-a00073551enw.pdf
+    │   └── portals/
+    ├── tests/
+    │   ├── integration/
+    │   │   ├── manual_test_domain_isolation.py
+    │   │   │   └── ♦ def main():
+    │   │   ├── manual_test_gen12_ingestion.py
+    │   │   │   └── ♦ def main():
+    │   │   ├── manual_test_real_boq.py
+    │   │   │   └── ♦ def main():
+    │   │   ├── manual_test_storage_ingestion.py
+    │   │   │   └── ♦ def main():
+    │   │   └── README.md
+    │   ├── __init__.py
+    │   ├── conftest.py
+    │   │   ├── ♦ def shared_temp_dir():
+    │   │   ├── ♦ def empty_graph():
+    │   │   ├── ♦ def temp_repo(tmp_path):
+    │   │   └── ♦ def api_client(temp_repo, monkeypatch):
+    │   ├── test_api_endpoints.py
+    │   │   ├── ♦ def test_query_endpoint(api_client):
+    │   │   └── ♦ def test_health_endpoint(api_client):
+    │   ├── test_category_limits.py
+    │   │   ├── ♦ class TestCategoryLimits:
+    │   │   ├── ♦ def setUp(self):
+    │   │   ├── ♦ def test_within_limit(self):
+    │   │   └── ♦ def test_exceeds_limit(self):
+    │   ├── test_excel_parser.py
+    │   │   ├── ♦ class TestExcelIngestion:
+    │   │   └── ♦ def test_excel_extractor_creates_relationships_and_attributes(self):
+    │   ├── test_foundation.py
+    │   │   ├── ♦ def temp_dir():
+    │   │   ├── ♦ class TestOntologyModels:
+    │   │   ├── ♦ class TestOKFWriter:
+    │   │   ├── ♦ class TestOKFReader:
+    │   │   ├── ♦ class TestGraphBuilder:
+    │   │   ├── ♦ class TestRepoManager:
+    │   │   ├── ♦ def test_platform_creation(self):
+    │   │   ├── ♦ def test_rule_creation_with_full_fields(self):
+    │   │   ├── ♦ def test_source_registration(self):
+    │   │   ├── ♦ def test_knowledge_delta_creation(self):
+    │   │   ├── ♦ def test_solution_candidate(self):
+    │   │   ├── ♦ def test_writes_valid_frontmatter(self, temp_dir):
+    │   │   ├── ♦ def test_hierarchical_path(self, temp_dir):
+    │   │   ├── ♦ def test_hierarchical_path_component(self, temp_dir):
+    │   │   ├── ♦ def test_generates_index(self, temp_dir):
+    │   │   ├── ♦ def test_log_entry(self, temp_dir):
+    │   │   ├── ♦ def test_round_trip(self, temp_dir):
+    │   │   ├── ♦ def _build_test_graph(self):
+    │   │   ├── ♦ def test_filter_by_vendor(self):
+    │   │   ├── ♦ def test_filter_by_solution_domain(self):
+    │   │   ├── ♦ def test_filter_by_capabilities(self):
+    │   │   ├── ♦ def test_traverse_relationships(self):
+    │   │   ├── ♦ def test_get_dependencies(self):
+    │   │   ├── ♦ def test_stats(self):
+    │   │   ├── ♦ def test_filter_by_component_category(self):
+    │   │   ├── ♦ def test_filter_by_workload_type(self):
+    │   │   ├── ♦ def test_filter_by_custom_attributes(self):
+    │   │   ├── ♦ def test_filter_by_workload_requirements(self):
+    │   │   ├── ♦ def test_filter_by_rule_and_constraint(self):
+    │   │   ├── ♦ def test_build_subgraph(self):
+    │   │   └── ♦ def test_add_and_bootstrap(self, temp_dir):
+    │   ├── test_fuzzy_matching.py
+    │   │   ├── ♦ class TestFuzzyMatching:
+    │   │   ├── ♦ def setUp(self):
+    │   │   ├── ♦ def test_exact_match(self):
+    │   │   ├── ♦ def test_fuzzy_match(self):
+    │   │   └── ♦ def test_invalid_match(self):
+    │   ├── test_graph_field_parity.py
+    │   │   ├── ♦ def _assert_every_field_reachable(obj, node_attrs):
+    │   │   ├── ♦ def test_rule_fields_all_reach_graph(empty_graph):
+    │   │   ├── ♦ def test_category_limit_fields_all_reach_graph(empty_graph):
+    │   │   ├── ♦ def test_component_fields_all_reach_graph(empty_graph):
+    │   │   ├── ♦ def test_sku_fields_all_reach_graph(empty_graph):
+    │   │   ├── ♦ def test_workload_requirement_dicts_flatten_into_graph(empty_graph):
+    │   │   ├── ♦ def test_platform_fields_all_reach_graph(empty_graph):
+    │   │   ├── ♦ def test_compatibility_check_finds_reverse_direction_contains_edge(empty_graph):
+    │   │   └── ♦ def test_platform_id_survives_for_rule_dedup(empty_graph):
+    │   ├── test_ingestion.py
+    │   │   ├── ♦ class TestIngestion:
+    │   │   ├── ♦ class TestPlatformIdentityAgainstRealPDFs:
+    │   │   ├── ♦ def setup_method(self):
+    │   │   ├── ♦ def test_rule_extraction(self, mock_llm_class):
+    │   │   ├── ♦ def test_structured_components(self):
+    │   │   ├── ♦ def _extract_text(self, filename):
+    │   │   ├── ♦ def _identity_for(self, filename):
+    │   │   ├── ♦ def test_dl580_gen12_title_and_id(self):
+    │   │   ├── ♦ def test_dl380_gen12_title_and_id(self):
+    │   │   └── ♦ def test_alletra_mp_b10000_title_and_id(self):
+    │   ├── test_mcp_integration.py
+    │   │   ├── ♦ def test_mcp_server_parameters():
+    │   │   └── ♦ def test_mcp_client_init(mocker):
+    │   ├── test_reasoning.py
+    │   │   ├── ♦ def test_intent_parser():
+    │   │   ├── ♦ def test_solution_generator():
+    │   │   ├── ♦ def test_rule_engine():
+    │   │   └── ♦ def test_repo_graph_integration(temp_repo):
+    │   ├── test_restart_persistence.py
+    │   │   ├── ♦ def temp_repo_dir(tmp_path):
+    │   │   └── ♦ def test_okf_persistence_roundtrip(temp_repo_dir):
+    │   ├── test_topology.py
+    │   │   ├── ♦ class TestTopology:
+    │   │   └── ♦ def test_slot_mapping(self):
+    │   └── test_workflow.py
+    │       ├── ♦ def mock_graph():
+    │       └── ♦ def test_workflow_execution(mock_graph):
+    ├── tools/
+    │   ├── agy
+    │   ├── agy.cmd
+    │   ├── pip
+    │   ├── pip.cmd
+    │   ├── python
+    │   └── python.cmd
+    ├── work/
+    │   └── tmp/
+    │       ├── extracted_components.json
+    │       └── extracted_rules.json
+    ├── .env
+    ├── .env.example
+    ├── .gitignore
+    ├── AGENTS.md
+    ├── CONTEXT.md
+    ├── LOG.md
+    ├── Makefile
+    ├── pyproject.toml
+    ├── README.md
+    ├── SETUP.md
+    └── STATE.md

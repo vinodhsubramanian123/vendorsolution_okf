@@ -138,9 +138,37 @@ class SolutionGenerator:
         components = []
         satisfied_reqs = []
 
-        if request.requirements:
+        if request.requirements or request.previous_errors:
             # 1. Fetch all components compatible with platform
             compatible_ids = self.graph.get_compatible(platform_id)
+            
+            # --- START FEEDBACK LOOP FIX ---
+            # Process previous validation errors to avoid bad SKUs and add missing categories
+            invalid_skus = set()
+            missing_categories = []
+            if hasattr(request, "previous_errors") and request.previous_errors:
+                for error in request.previous_errors:
+                    if "Invalid SKU" in error or "auto-corrected" in error.lower():
+                        # Extract SKU from quotes, e.g., "Invalid SKU requested: 'BAD-SKU'"
+                        import re as regex
+                        match = regex.search(r"'([^']+)'", error)
+                        if match:
+                            invalid_skus.add(match.group(1).upper())
+                            reasoning_chain.append(f"Dropped invalid SKU '{match.group(1)}' due to previous validation failure.")
+                    elif "Missing core categories:" in error:
+                        # Extract categories
+                        cats_part = error.split("Missing core categories:")[-1].strip()
+                        cats = [c.strip() for c in cats_part.split(",")]
+                        for cat in cats:
+                            missing_categories.append(cat)
+                            reasoning_chain.append(f"Forcing selection of missing mandatory category '{cat}'")
+                            # Dynamically add to customer requirements so the LLM/fallback finds it
+                            from ikp_platform.core.ontology.models import CustomerRequirement
+                            request.requirements.append(CustomerRequirement(category="technical", name=cat, value="Any"))
+            
+            # Filter out known invalid SKUs
+            compatible_ids = [cid for cid in compatible_ids if cid.upper() not in invalid_skus and cid.split("/")[-1].upper() not in invalid_skus]
+            # --- END FEEDBACK LOOP FIX ---
 
             # If we have a vector store or MCP client, use semantic/full-text search to massively reduce the search space
             if self.vector_store or self.mcp_client:

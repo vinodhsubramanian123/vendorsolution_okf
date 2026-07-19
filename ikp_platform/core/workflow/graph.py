@@ -66,7 +66,11 @@ def build_workflow_graph(
     workflow.add_conditional_edges(
         "validate_bom",
         should_loop_bom,
-        {"live_portal_validation": "live_portal_validation", "draft_bom": "draft_bom"},
+        {
+            "live_portal_validation": "live_portal_validation", 
+            "draft_bom": "draft_bom",
+            "human_intervention": "human_intervention"
+        },
     )
 
     workflow.add_conditional_edges(
