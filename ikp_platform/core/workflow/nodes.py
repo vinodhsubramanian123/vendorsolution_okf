@@ -189,6 +189,8 @@ class WorkflowNodes:
         failure = failures[0]
         failure_type = failure.get("failure_type") if isinstance(failure, dict) else getattr(failure, "failure_type", None)
         failed_obj = failure.get("object_id") if isinstance(failure, dict) else getattr(failure, "object_id", None)
+        if not failed_obj:
+            failed_obj = failure.get("category") if isinstance(failure, dict) else getattr(failure, "category", None)
         
         # 0. Missing requirements means we need to regenerate to fill gaps
         if failure_type == "missing_required_category" or (hasattr(failure_type, "value") and failure_type.value == "missing_required_category"):

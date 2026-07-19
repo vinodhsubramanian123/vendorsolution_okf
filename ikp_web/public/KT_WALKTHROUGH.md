@@ -342,3 +342,80 @@ In `rank_solutions`, the generator builds a differential profile:
 - Knowledge Graph vs LangGraph boundary: `.agents/rules/langgraph_vs_ontology.md`
 - Audit backlog: `IKP/QUALITY_AUDIT_GAPS.md`
 - OKF external reference: `IKP/references/OKF_SPECIFICATION.md`
+
+
+# Architecture and Recovery Workflow Learnings (KT)
+
+> [!NOTE]
+> This Knowledge Transfer (KT) document captures the learnings and insights gathered during the hardening, testing, and debugging phases of the Partner Portal Recovery Workflow orchestration using LangGraph.
+
+## 1. Pydantic Model Alignment (The `ValidationFailure` Trap)
+
+During boundary testing, we encountered an infinite loop caused by a seemingly minor field mismatch between how a model was defined and how it was accessed.
+
+### The Issue
+- `ValidationFailure` is a Pydantic model defined in `ikp_platform/core/ontology/models.py`.
+- It defines the field for the offending component as `object_id`.
+- During mocking and testing, we instantiated it with `failed_object_id`. Pydantic, depending on its configuration, silently accepted the extra argument, leaving `object_id` as `None`.
+- In `select_recovery_strategy`, we used `failed_obj = failure.get("object_id") if isinstance(...) else getattr(failure, "object_id", None)`.
+- Because `object_id` was `None`, the orchestrator skipped all targeted recovery strategies (substitute, drop optional, exclude and regenerate) and returned an empty state update `{}`.
+
+### The Learning
+- **Strict Data Contracts**: In a state machine, the orchestrator relies entirely on the exact payload structure to route nodes. Always use strict Pydantic parsing and avoid accessing properties dynamically (`getattr` with `None` defaults) unless the field is genuinely optional in the business logic.
+- **Fail Fast**: If a failure is reported but `object_id` is missing when the failure type implies it should be present (e.g., `INCOMPATIBLE`), log a critical warning and route to `human_intervention` rather than silently returning `{}`.
+- **Test Alignment**: Test mocks must strictly adhere to the Pydantic models. We should enable `extra = "forbid"` in the Pydantic model configuration (`ConfigDict(extra="forbid")`) to prevent instantiation with non-existent fields.
+
+## 2. LangGraph State Mutability and Retention
+
+We observed behaviors related to how LangGraph persists keys in the `WorkflowState` TypedDict.
+
+### The Issue
+- If `select_recovery_strategy` returns `{"needs_regeneration": True}`, this flag persists in the state indefinitely unless a subsequent node explicitly returns `{"needs_regeneration": False}`.
+- In our case, `draft_bom` ran but did NOT return `needs_regeneration=False`. Consequently, the state retained `needs_regeneration=True`.
+- The router logic (`route_recovery`) checks `state.get("needs_regeneration")`. If it isn't cleared, the router can make incorrect decisions on subsequent loops.
+
+### The Learning
+- **Clear Flags After Use**: Nodes that act upon state flags (like `draft_bom` acting upon `needs_regeneration`) **must** clear the flag by returning `{"needs_regeneration": False}` in their payload.
+- **Pure Reducers**: When possible, use reducers or specific message structures rather than toggling global boolean flags. If boolean flags are necessary, strictly document which node is responsible for setting and clearing them.
+
+## 3. Oscillation and Cycle Detection
+
+The orchestrator requires robust mechanisms to prevent infinite loops when interacting with external or static rule engines.
+
+### The Solution Implemented
+- We implemented a `visited_bom_hashes` list in the state.
+- In `validate_bom`, we compute an SHA-256 hash of the `current_bom` sorted list.
+- If the hash is already in `visited_bom_hashes` and the validation fails, we set `cycle_detected=True`.
+- The `should_loop_bom` router explicitly checks for `cycle_detected` and immediately routes to `human_intervention`.
+
+### The Learning
+- **Deterministic State Signatures**: Tracking raw lists of strings is inefficient. Using cryptographic hashes (SHA-256) of the sorted component lists provides a clean, fast, and reliable way to detect identical states.
+- **Early Exit**: Do not wait for the `attempt_count` limit if a cycle is detected. Hitting the same state twice means the recovery logic is stuck. Exit to Human-in-the-Loop (HITL) immediately.
+
+## 4. Testing LangGraph Workflows with Mocks
+
+Patching nodes within a compiled LangGraph requires careful attention to method binding and side effects.
+
+### The Issue
+- When patching a class method (e.g., `WorkflowNodes.draft_bom`) and replacing its `side_effect` with a lambda, the `self` argument is often omitted by the Mock framework when called dynamically by LangGraph.
+- This resulted in `TypeError: <lambda>() missing 1 required positional argument: 'state'`.
+
+### The Learning
+- **Use `*args, **kwargs` in Mocks**: When mocking LangGraph nodes, always define the side-effect lambda/function using `*args, **kwargs` and defensively extract the state.
+  ```python
+  def _mock_draft_fn(*args, **kwargs):
+      state = args[0] if args else kwargs.get("state", {})
+      return {...}
+  ```
+- **Patch the Generator, not the Node**: Instead of mocking the entire `draft_bom` node, mock the underlying `SolutionGenerator` or `RuleEngine`. This preserves the node's internal state management (like incrementing `attempt_count` and clearing flags) while controlling the business logic output.
+
+## 5. Ingestion and Data Source Improvements (Self-Evaluation)
+
+Reflecting on the data sources and parsing logic:
+
+1. **Graph Completeness**: The recovery logic heavily relies on `graph.get_related(failed_obj, "Replaces")` and `Compatible With`. If the ingestion pipeline doesn't build these edges accurately from the raw PDFs or BOQs, the recovery engine is paralyzed. Future ingestion work should prioritize extracting bidirectional compatibility and substitute mappings.
+2. **Standardized Naming (SKU vs Component Name)**: The rule engine evaluates component names/IDs. If the ingestion pipeline creates nodes with `Part Number` but the LLM drafts a BOM with a colloquial `Name`, they won't match in the graph. Normalization (e.g., forcing all evaluations to use SKU hashes or normalized IDs) is essential.
+3. **Optionality Extraction**: The recovery step `Drop optional component` relies on `node.get("attr_is_required", True)`. The ingestion phase must rigorously parse configurations to identify what is truly mandatory versus optional.
+
+## Conclusion
+The workflow is now hardened against infinite loops, correctly respects iteration boundaries, and exposes its internal state (`attempt_count`, `cycle_detected`) for robust integration testing. These patterns should serve as the blueprint for extending the IKP platform.

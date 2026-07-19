@@ -9,8 +9,8 @@ export type ChatMessage = {
   id: string;
   role: 'user' | 'system';
   content: string;
-  type: 'text' | 'bom' | 'loading';
-  data?: SolutionCandidate;
+  type: 'text' | 'bom' | 'loading' | 'human_review';
+  data?: any;
 };
 
 export function SolutionSynthesis() {
@@ -56,7 +56,15 @@ export function SolutionSynthesis() {
       const res = await axios.post(`${API_BASE}/query`, { query });
       setMessages(prev => prev.filter(m => m.type !== 'loading'));
       
-      if (res.data.candidates && res.data.candidates.length > 0) {
+      if (res.data.status === 'needs_human_review') {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'system',
+          content: res.data.message || 'Automated recovery exhausted. Solution requires human intervention.',
+          type: 'human_review',
+          data: res.data.human_review_payload
+        }]);
+      } else if (res.data.candidates && res.data.candidates.length > 0) {
         const topCandidate: SolutionCandidate = res.data.candidates[0];
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
@@ -139,6 +147,30 @@ export function SolutionSynthesis() {
                           {msg.data.reasoning_chain.map((step: string, i: number) => (
                             <li key={i} style={{ marginBottom: '6px', display: 'flex', gap: '8px' }}>
                               <span style={{ color: 'var(--secondary)' }}>{'>'}</span> {step}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {msg.type === 'human_review' && msg.data && (
+                    <div style={{ marginTop: '16px', background: 'rgba(239, 68, 68, 0.1)', padding: '16px', borderRadius: '8px', border: '1px solid #ef4444' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                        <ShieldAlert color="#ef4444" size={20} />
+                        <h3 style={{ margin: 0, color: '#ef4444' }}>Human Intervention Required</h3>
+                      </div>
+                      
+                      <div style={{ marginBottom: '12px', fontSize: '0.9rem' }}>
+                        <strong>Infinite Loop Detected:</strong> {msg.data.cycle_detected ? 'Yes' : 'No'}
+                      </div>
+                      
+                      <div style={{ marginTop: '16px' }}>
+                        <h4 style={{ fontSize: '0.9rem', color: '#ef4444', marginBottom: '8px', textTransform: 'uppercase' }}>Recovery Audit Trail</h4>
+                        <ul style={{ listStyleType: 'none', padding: 0, margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                          {(msg.data.recovery_audit_trail || []).map((step: string, i: number) => (
+                            <li key={i} style={{ marginBottom: '6px', display: 'flex', gap: '8px' }}>
+                              <span style={{ color: '#ef4444' }}>{'>'}</span> {step}
                             </li>
                           ))}
                         </ul>
