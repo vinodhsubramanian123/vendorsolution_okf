@@ -1,256 +1,311 @@
-# Intelligent Knowledge Platform (IKP) - Comprehensive KT Guide
+# Intelligent Knowledge Platform KT Guide
 
-Welcome to the `vendorsolution_okf` project! This Knowledge Transfer (KT) document is designed to give Developers, Testers, and Architects a comprehensive, end-to-end understanding of the system. It covers the current architecture, data models, workflows, testing paradigms, scripts, integrations, and architectural gaps discovered via reverse engineering.
+Last reviewed: 2026-07-19
 
----
+This guide explains `vendorsolution_okf` from first principles. It is written for a new developer, tester, architect, or AI agent who needs to understand what the project does before changing it.
 
-## 1. Executive Summary
-The Intelligent Knowledge Platform (IKP) is a dual-layer system that continuously acquires, reasons over, and validates engineering knowledge for hardware configurations (e.g., servers, networking). Unlike traditional search engines or chatbots, IKP uses an **Engineering Canonical Ontology** and a **Rule Engine** backed by LLMs to parse unstructured vendor documentation (PDFs, Excel) into deterministic, explainable solutions.
+## 1. Mental Model
 
----
+IKP turns vendor engineering documents into a structured knowledge system for hardware solution design.
 
-## 2. System Architecture & Components
+The system has three layers:
+
+- Canonical knowledge: OKF Markdown files under `repository/`.
+- Reasoning engines: Python code that reads the graph, validates rules, and proposes solutions.
+- User/API surfaces: FastAPI, React/Vite UI, CLI, and optional MCP.
+
+The important distinction:
+
+- Knowledge Graph means static facts: platforms, components, SKUs, rules, limits, compatibility, evidence.
+- LangGraph means workflow process: parse a customer request, choose a platform, draft a BOM, validate it, rank it, or stop for human review.
+
+## 2. Current Architecture
 
 ```mermaid
-graph TD
-    UI[IKP Web: React + Vite]
-    API[FastAPI Backend]
-    Workflow[LangGraph]
-    LLM[Gemini LLM]
-    Graph[NetworkX Graph]
-    Ingestion[Data Ingestion: PDF/Excel]
-    Repo[OKF Repository + ChromaDB]
-    MCP[MCP Server via stdio]
-    
-    UI -->|HTTP POST| API
-    API --> Workflow
-    MCP --> Workflow
-    Workflow --> LLM
-    Workflow --> Graph
-    Ingestion --> Repo
-    Repo --> Graph
+flowchart TD
+    PDFs[Vendor PDFs / Excel files] --> Ingestion[Ingestion pipeline]
+    Ingestion --> OKF[OKF Markdown repository]
+    OKF --> Reader[OKFReader]
+    Reader --> Graph[NetworkX knowledge graph]
+    Reader --> Vector[ChromaDB vector index]
+    UI[React Vite UI] --> API[FastAPI API]
+    API --> Reasoning[Intent parser / solution generator / rule engine]
+    API --> Validation[BOQ validator / review queue]
+    Reasoning --> Graph
+    Reasoning --> Vector
+    Validation --> Graph
+    Validation --> Learning[Learning engine]
+    Learning --> OKF
 ```
 
-### 2.1 Backend (IKP Platform Core)
-Located in `ikp_platform/`, built with **Python 3.11** and **FastAPI**.
-*   **Data Ingestion (`core/ingestion/`)**: Parses complex vendor data from PDFs (`pdf_extractor.py`) and Excel into canonical Open Knowledge Format (OKF).
-*   **Repository (`core/repository/`)**: `GraphBuilder` maintains an in-memory NetworkX directed graph. `OKFWriter/Reader` serialize this graph to Markdown files on disk.
-*   **Reasoning (`core/reasoning/`, `core/validation/`)**: 
-    *   **IntentParser**: Uses Gemini to translate natural language into structured requirements.
-    *   **RuleEngine**: A deterministic engine that enforces strict architectural limits.
-*   **Orchestration (`core/workflow/`)**: Uses **LangGraph** to model multi-step reasoning.
-*   **Observability**: Uses a `@telemetry_trace` decorator to wrap workflows and API endpoints, capturing duration, payloads, and preventing LLM quota exhaustion.
+## 3. Quick Start
 
-### 2.2 Frontend (IKP Web)
-Located in `ikp_web/`, built with **React**, **Vite**, and **TypeScript**.
-*   **Semantic Search (`SemanticSearch.tsx`)**: Queries `/api/search`. Groups results dynamically.
-*   **BOQ Validation (`BoqValidation.tsx`)**: Submits raw SKUs to `/api/boq/validate`. Renders per-rule Pass/Fail statuses.
+Install dependencies:
 
----
+```bash
+uv sync --extra dev
+npm install --prefix ikp_web
+```
 
-## 3. Canonical Data Models (The Ontology)
-The single source of truth lies in `ikp_platform/core/ontology/models.py`. Key entities:
-*   **BaseEngineeringObject**: The root for all knowledge, requiring an ID, type, and title.
-*   **Platform & Component**: Represents deployable infrastructure (e.g., "DL380 Gen11") and its modular parts (CPUs, Drives).
-*   **SKU**: Commercially orderable representations of Components. 
-*   **Rule & Constraint**: Explicit limits (e.g., CategoryLimit) extracted from vendor docs.
+Seed the generated OKF repository on a fresh clone:
 
----
+```bash
+./scripts/bootstrap.sh
+```
 
-## 4. Execution Workflows & Integration Points
+Run the backend and frontend:
 
-### 4.1 BOQ Validation Workflow
-1.  **Trigger**: User submits a textual list of SKUs.
-2.  **API**: Frontend sends HTTP POST to `/api/boq/validate`.
-3.  **Orchestrator**: `build_workflow_graph()` initiates the LangGraph state machine.
-4.  **Reasoning**: `RuleEngine.evaluate_solution()` executes a 4-step pipeline: Strict Domain Isolation → Category Limits → Dependencies → Rules.
-5.  **Response**: The system returns structured JSON indicating valid/invalid components.
+```bash
+./scripts/start_api.sh
+./scripts/start_ui.sh
+```
 
-## 5. Method Level Expectations & Flow Clarity
+Defaults:
 
-To understand exactly how the system reasons, you must understand the expectations and constraints of the core methods. 
+- API: `http://127.0.0.1:8000/api`
+- UI: `http://127.0.0.1:5173`
 
-### 5.1 `RuleEngine.evaluate_solution(platform_id, component_ids)`
-*   **Location**: `ikp_platform/core/reasoning/rule_engine.py`
-*   **Flow**:
-    1.  **Strict Domain Isolation**: Checks if components share the same `solution_domain`. Violations trigger immediate hard failures.
-    2.  **Category Limit Evaluation**: Sums component quantities (using `inclusive_qty`) and validates them against `CategoryLimit` constraints (e.g., Max Drives = 24).
-    3.  **Dependency Checks**: Traverses `Requires` edges in the graph to ensure prerequisites exist.
-    4.  **Rule Evaluation**: Uses bidirectional substring matching (as defined in ADR-001) to identify applicable rules, evaluating their severity and logging the evidence trace.
-*   **Expectations**: Must return a deterministic `(is_valid, reasoning_chain, errors)` tuple. It does not use the LLM; it is purely deterministic graph traversal.
+Custom ports:
 
-### 5.2 `GraphBuilder.add_concept(obj)` and `GraphBuilder.get_compatible(node_id)`
-*   **Location**: `ikp_platform/core/repository/graph_builder.py`
-*   **Flow (`add_concept`)**: Converts Pydantic models (e.g., `Component`, `Rule`) into NetworkX nodes. It ensures critical fields like `applicable_objects` and `description` are correctly mapped to graph attributes (`node_attrs`).
-*   **Flow (`get_compatible`)**: Traverses `Compatible With` and `Contains` edges. 
-*   **Expectations**: The Graph is the absolute source of truth. It assumes the graph was cleanly rebuilt from Markdown (`OKFReader`) upon startup and holds accurate provenance/evidence metadata.
+```bash
+./scripts/start_api.sh 8001
+./scripts/start_ui.sh 5174 8001
+```
 
-### 5.3 LangGraph Orchestrator (`build_workflow_graph()`)
-*   **Location**: `ikp_platform/core/workflow/graph.py` & `executor.py`
-*   **Flow**:
-    1.  Starts at `parse_intent` to determine what the user actually wants.
-    2.  Transitions to `search_catalog` to fetch actual component IDs from ChromaDB.
-    3.  Transitions to `validate_solution` which calls the `RuleEngine`.
-    4.  If failures occur, uses conditional edges to loop back or escalate to human review.
-*   **Expectations**: Nodes must accept core engines via constructor injection (Dependency Injection) to prevent tight coupling, allowing fully mocked testing without exhausting LLM API limits (ADR-004).
+The scripts normalize accidental leading-`1` ports. If an agent passes `15173`, the UI runs on `5173`; if it passes `18000`, the API runs on `8000`.
 
-### 5.4 `IntentParser.parse_intent(raw_text)`
-*   **Location**: `ikp_platform/core/reasoning/intent_parser.py`
-*   **Flow**: Sends the user's raw text to the Gemini LLM with a strictly defined JSON schema.
-*   **Expectations**: Must reliably identify the `target_platform` to map queries correctly.
+## 4. Key Folders
 
----
+| Path | Purpose |
+|---|---|
+| `ikp_platform/api.py` | FastAPI app and HTTP endpoint contracts |
+| `ikp_platform/cli.py` | CLI commands for ingest, query, scan, and learn workflows |
+| `ikp_platform/mcp_server.py` | Optional MCP server entry point |
+| `ikp_platform/core/ontology/models.py` | Canonical Pydantic models |
+| `ikp_platform/core/ingestion/` | PDF, Excel, source registry, and parser code |
+| `ikp_platform/core/repository/` | OKF reader/writer, graph builder, vector store, MCP client |
+| `ikp_platform/core/reasoning/` | Intent parsing, LLM client, solution generation, rule engine |
+| `ikp_platform/core/validation/` | BOQ validator and manual review validator |
+| `ikp_platform/core/workflow/` | LangGraph state, nodes, executor, and graph wiring |
+| `ikp_platform/core/learning/` | Knowledge delta application loop |
+| `ikp_web/src/` | React UI |
+| `scripts/` | Bootstrap and start helpers |
+| `tests/` | Backend tests |
+| `IKP/standards/` | Architecture standards and current implementation truth |
+| `IKP/references/` | External OKF format reference |
 
-## 6. Testing & Quality Assurance
+Generated or local-runtime paths:
 
-> [!TIP]
-> The system utilizes a dual testing approach to isolate UI rendering from backend LLM flakiness.
+| Path | Purpose |
+|---|---|
+| `repository/` | Generated OKF Markdown knowledge repository |
+| `repository/manifest.json` | Source registry manifest |
+| `needs_review/` | Extraction fallback files for human review |
+| `history/` | Knowledge delta history |
+| `api_server.log`, `ui_server.log` | Local server logs from start scripts |
+| `.api_pid`, `.ui_pid` | Local process IDs from start scripts |
 
-*   **Backend Pytest (`tests/`)**: Runs via `make test` or `uv run pytest`. Contains heavily mocked E2E tests to prevent LLM Rate Limits (429 errors).
-*   **Frontend Playwright (`ikp_web/tests/e2e/`)**: Runs via `npm run test:e2e`. Spins up Chromium workers to validate DOM elements.
+## 5. Ontology Basics
 
-### Interactive Browser Test Demonstrations
-![Semantic Search Execution](/home/vinodh/.gemini/antigravity-ide/brain/48156682-156a-4419-959b-bc158bb40325/semantic_search_test_1784447987687.webp)
+The ontology is defined in `ikp_platform/core/ontology/models.py`.
 
-![BOQ Validation Execution](/home/vinodh/.gemini/antigravity-ide/brain/48156682-156a-4419-959b-bc158bb40325/boq_validation_test_1784448082904.webp)
+Important object types:
 
----
+- `Platform`: a hardware platform such as a server family.
+- `Component`: an engineering item that can be part of a solution.
+- `SKU`: a commercial/orderable part number.
+- `Rule`: a compatibility, requirement, warning, or exclusion.
+- `CategoryLimit`: count or capacity limits for a component category.
+- `Source`: a vendor document or structured file used as evidence.
+- `KnowledgeDelta`: a proposed change to the knowledge repository.
 
-## 6. Peripheral Scripts & CLI Tooling
+Important relationships:
 
-A reverse engineering of the repository reveals several critical standalone utility scripts that govern operations outside the standard API context.
+- `Contains`: platform or category contains an object.
+- `Compatible With`: object can be used with another object.
+- `Requires`: selecting one object requires another.
+- `Incompatible With`: objects must not be selected together.
+- `Has SKU`: component maps to a commercial SKU.
+- `Supports`: platform/component supports a workload or capability.
 
-### 6.1 Debugging Utilities (`scripts/debug/`)
-*   `debug_limit_engine.py`: Used by developers to test the `RuleEngine` category limits against mock components without standing up the full API.
-*   `debug_concurrency.py`: A stress-testing script to validate thread-safety.
-*   `debug_category_limit.py`: Tests boundary conditions for category constraints.
-*   `debug_platform_dump.py`: Dumps the in-memory graph to stdout for manual review.
+## 6. Data Lifecycle
 
-### 6.2 Data Ingestion & Indexing (`ikp_platform/scripts/`)
-*   `ingest_catalog.py`: A standalone script to ingest raw vendor catalogs into the internal OKF structure. Bypasses the API.
-*   `reindex.py`: A utility to force-rebuild the ChromaDB vector indices from the markdown repository files.
+1. A source file is registered by `SourceRegistry`.
+2. The file hash is stored so duplicate sources can be detected.
+3. PDF or Excel extraction creates ontology objects and deltas.
+4. `OKFWriter` writes canonical Markdown into `repository/`.
+5. API startup uses `RepoManager.bootstrap()` to load Markdown through `OKFReader`.
+6. `GraphBuilder` builds an in-memory NetworkX graph.
+7. `VectorStore` indexes selected objects in ChromaDB when embeddings are available.
+8. Reasoning and validation use the graph and vector index.
+9. Validated learning changes are written back to OKF.
 
-### 6.3 Command-Line Interface (`ikp_platform/cli.py`)
-Provides direct CLI commands for CI/CD pipelines or manual operation:
-*   `cmd_ingest()`: Ingest a single engineering source file.
-*   `cmd_status()`: Boots the `RepoManager` and prints graph object statistics.
-*   `cmd_scan()`: Daemonized scanner that watches a directory for new source files to automatically process.
-*   `cmd_query()`: Headless natural language querying bypassing the web UI.
-*   `cmd_learn()`: Runs the continuous learning loop, processing pending Knowledge Deltas in the `history/` directory.
+## 7. Main User Flows
 
----
+### Dashboard
 
-## 7. MCP Integration & Agent Tooling
+The UI calls `/api/status` to show whether the repository is seeded and to summarize platforms, SKUs, categories, and rules.
 
-### 7.1 Model Context Protocol (`mcp_server.py`)
-The system explicitly includes an MCP (Model Context Protocol) Server implementation (`ikp_platform/mcp_server.py`).
-*   **Transport**: Runs over standard input/output (`stdio_server`), allowing IDEs like Cursor or Claude Desktop to attach directly to it.
-*   **Exposed Tools**:
-    1.  `query_ikp_solution`: Allows external agents to query the LangGraph orchestrator natively.
-    2.  `get_platform_status`: Returns graph metrics to external consumers.
+### Semantic Search
 
-### 7.2 Agent Proxies (`tools/`)
-The `tools/` directory contains proxy scripts (`agy`, `pip`, `python`) designed specifically as an OS-agnostic command execution environment. These provide localized sandboxing so autonomous subagents running on the system don't accidentally pollute the host OS.
+The UI calls `/api/search`. The backend embeds the query through Gemini, searches ChromaDB, then enriches result IDs with graph metadata.
 
----
+If `GEMINI_API_KEY` is missing, embedding calls degrade and search may return empty results.
 
-## 8. Build Targets (`Makefile`)
+### Solution Synthesis
 
-The project utilizes a structured Makefile to standardize execution:
-*   `make install`: Synchronizes environments using `uv sync --extra dev`.
-*   `make test`: Executes all pytest definitions via `uv run`.
-*   `make lint`: Enforces code standards utilizing both `ruff check .` (formatting/linting) and `mypy` (static type checking).
-*   `make run`: Starts the FastAPI uvicorn backend.
-*   `make ui-install` / `make ui-dev` / `make ui-test`: Wrappers to execute NPM scripts inside the `ikp_web` directory.
+The UI calls `/api/query`. The backend parses the request, generates candidate solutions from graph/vector data, and returns ranked candidates.
 
----
+LLM-assisted parsing and component selection use Gemini. Fallback behavior exists, but quality is lower without the key.
 
-## 9. Architectural Gaps & Missing Capabilities
+### BOQ Validation
 
-By reverse engineering the source code, several explicit gaps and technical debts are evident that a new Architect must account for before pushing this to an enterprise production environment:
+The UI calls `/api/boq/validate` with SKUs/components, optional `platform_id`, workloads, and number of alternatives.
 
-> [!WARNING]
-> The following infrastructure is missing from the codebase.
+The backend:
 
-1.  **Missing Persistent Graph Database Layer**:
-    *   **Evidence**: `okf_reader.py` natively parses Markdown files upon boot to instantiate a `NetworkX` directed graph object (`graph_builder.py`).
-    *   **Gap**: While highly auditable, this architecture does not horizontally scale. It requires a dedicated persistent DB (e.g., Neo4j, Amazon Neptune) for distributed query routing.
-2.  **Missing Production Observability Sinks**:
-    *   **Evidence**: The `ikp_platform/core/observability/__init__.py` `@telemetry_trace` decorator currently only structures local JSON logs.
-    *   **Gap**: No OpenTelemetry (OTLP) sink is wired. Without pushing metrics to Datadog, Prometheus, or Grafana, LLM token usage and latency cannot be monitored in real-time.
-3.  **Missing Identity, AuthN, & Multitenancy (RBAC)**:
-    *   **Evidence**: `api.py` contains fully unauthenticated endpoints (`/search`, `/boq/validate`).
-    *   **Gap**: The system lacks OAuth2/OIDC integration. Furthermore, rules and configurations cannot be isolated by tenant or customer (e.g., Customer A sees Customer B's internal engineering guidelines).
-4.  **Missing Human-in-the-Loop Feedback Portal**:
-    *   **Evidence**: The data models support a `DeltaStatus.NEEDS_REVIEW` phase, and `cli.py` has a `cmd_learn()` loop.
-    *   **Gap**: There is no Frontend UI portal (within `ikp_web`) for Senior Engineers to actually click "Approve" or "Reject" on LLM-extracted rules before they are committed.
-5.  **Missing Cloud-Native Artifacts**:
-    *   **Evidence**: Reliance on `bootstrap.sh` and local `Makefile` commands.
-    *   **Gap**: The repository is missing `Dockerfiles` for containerization, Kubernetes `Helm` charts, and automated GitHub Actions / GitLab CI workflows for deployment.
+1. Fuzzy matches input SKUs.
+2. Records useful typo corrections as learning deltas.
+3. Infers platform from explicit platform nodes or compatibility links when `platform_id` is missing.
+4. Runs `RuleEngine.evaluate_solution()`.
+5. Returns fuzzy matches, invalid SKUs, rule evaluations, corrected components, and alternatives.
 
----
+If multiple platforms are detected, the API asks for an explicit `platform_id`.
 
-## 10. Advanced Orchestration: LLMs, State Management & Continuous Learning
+### Review Queue
 
-The architecture achieves cognitive autonomy through strict separation of State, Reasoning (LLMs), and Persistence. This design ensures that LLM hallucinations cannot permanently corrupt the canonical repository.
+The UI calls `/api/review-queue` to list low/medium/unverified objects. `/api/review-queue/approve` can mark an object high confidence. The broader reject/resume lifecycle is still partial.
 
-### 10.1 LangGraph State Management (`WorkflowState`)
-*   **Orchestration**: Built on LangChain's `StateGraph`, the workflow (`ikp_platform/core/workflow/graph.py`) models a state machine that drives customer intent to a finalized BOM (Bill of Materials).
-*   **State Dictionary**: The orchestrator passes a `WorkflowState` dictionary between nodes (`parse_intent` → `select_platform` → `draft_bom` → `validate_bom`).
-*   **Cyclic Edges**: Conditional edges like `should_loop_bom()` inspect the state (e.g., `state["is_valid_static"]`). If the `RuleEngine` flags a constraint violation, the graph loops back to `draft_bom` to self-correct.
-*   **E2E Decoupling (ADR-004)**: To prevent infinite recursive loops causing Gemini 429 Rate Limits during Pytest runs, node actions receive `IntentParser` and `RuleEngine` via Dependency Injection.
+## 8. Rule Engine Expectations
 
-### 10.2 External Tools & Graphify Integration
-*   **Graphify Context**: External tools like `graphify` are used by the autonomous subagents (and developers) to generate topological views (`GRAPH_REPORT.md`) of the Python source codebase. This ensures architectural drift is monitored, identifying how `LearningEngine` connects to `RepoManager`, or `PDFExtractor` to `BaseEngineeringObject`.
-*   **Seekstone MCP**: Through the Model Context Protocol (`mcp_server.py`), external tools (like Claude Desktop) can invoke `query_ikp_solution` directly, bypassing the UI.
+`RuleEngine.evaluate_solution(platform_id, component_ids)` is deterministic. It should not call an LLM.
 
-### 10.3 The Continuous Learning Loop (`LearningEngine`)
-Governed by Blueprint 02, the platform is designed to learn from failed configurations and new vendor PDFs without requiring manual code changes.
-1.  **Delta Generation**: Whenever a new PDF is parsed (`PDFExtractor`) or a failed BOQ is analyzed, a `KnowledgeDelta` is created containing proposed `DeltaChange` operations.
-2.  **Learning Queue**: Deltas are submitted to the `LearningEngine`. High-confidence extraction may auto-approve; ambiguous data triggers a `DeltaStatus.NEEDS_REVIEW` state.
-3.  **The CLI Loop**: The `cmd_learn()` workflow in `cli.py` routinely processes the `history/` directory. 
-4.  **Serialization (`OKFWriter`)**: Once a Delta is validated, `RepoManager` applies the change to the `GraphBuilder`. Crucially, `OKFWriter` immediately serializes the modified objects back into the filesystem as `.md` files in the `repository/` directory. This creates a permanent, git-trackable audit trail of "what the system learned and when it learned it."
+It validates:
 
----
+- platform/component compatibility
+- solution-domain isolation
+- category limits
+- dependency requirements
+- explicit rules and incompatible relationships
 
-## 11. Project Workspace & Directory Drill-Down
+The expected return shape is:
 
-To ensure coding clarity, here is the exact mapping of where everything lives inside the `vendorsolution_okf/` project workspace. This acts as your navigational compass for contributing.
+```text
+(is_valid, reasoning_chain, errors)
+```
 
-### `ikp_platform/` (The Brain)
-The entire Backend intelligence layer.
-*   **`api.py`**: The FastAPI entry point. Defines `/search` and `/boq/validate` HTTP routes.
-*   **`cli.py`**: Command-line interface definitions (`cmd_ingest`, `cmd_query`).
-*   **`mcp_server.py`**: The Stdio Model Context Protocol integration.
-*   **`core/ontology/models.py`**: **CRITICAL FILE.** Defines the canonical data models (`BaseEngineeringObject`, `Component`, `Rule`). Every piece of data in the system adheres to these Pydantic schemas.
-*   **`core/workflow/`**: Contains the LangGraph orchestration.
-    *   `graph.py`: Wires the conditional edges and nodes.
-    *   `nodes.py`: The concrete actions executed during a state transition.
-*   **`core/reasoning/`**: The intelligence engines.
-    *   `rule_engine.py`: Deterministically traverses the graph to enforce constraints.
-    *   `intent_parser.py`: Wraps the Gemini LLM to parse raw text into structured intents.
-*   **`core/repository/`**: The persistent storage layer.
-    *   `graph_builder.py`: In-memory NetworkX directed graph logic.
-    *   `okf_writer.py` / `okf_reader.py`: Serializes and deserializes the graph to Markdown files.
-*   **`core/observability/__init__.py`**: Contains the `@telemetry_trace` decorator wrapping all major executions.
+Use this engine for hard technical validation. Use the LLM only for interpretation, extraction, or candidate generation.
 
-### `ikp_web/` (The Face)
-The React + Vite frontend application.
-*   **`src/App.tsx`**: The main router, managing the tabs (Dashboard, BOQ, Semantic Search, Knowledge Transfer).
-*   **`src/components/BoqValidation.tsx`**: Renders the Pass/Fail rules for Bill of Quantities queries.
-*   **`src/components/SemanticSearch.tsx`**: Performs dynamic vector searches against ChromaDB.
-*   **`public/KT_WALKTHROUGH.md`**: Where this exact Knowledge Transfer document is stored and version-controlled.
+## 9. Workflow Status
 
-### `repository/` & `history/` (The Memory)
-*   **`repository/`**: Contains raw `.md` files. This is the canonical source of truth for the system. `OKFWriter` writes here, `OKFReader` reads from here.
-*   **`history/`**: Stores pending `KnowledgeDeltas` waiting to be ingested by the `LearningEngine`.
+LangGraph is implemented in `ikp_platform/core/workflow/`.
 
-### `scripts/` & `tools/` (The Utilities)
-*   **`scripts/debug/`**: Isolated testing scripts to validate rules (`debug_limit_engine.py`) without running FastAPI.
-*   **`tools/`**: OS-agnostic command proxies (`agy`, `pip`, `python`) used to sandbox autonomous agents when they interact with the workspace.
+Current flow:
 
-### Core Configuration Files
-*   **`Makefile`**: Centralizes build targets (`make run`, `make test`, `make lint`, `make ui-dev`).
-*   **`pyproject.toml`** / `uv.lock`: Python dependencies managed via `uv`.
-*   **`ikp_web/package.json`**: NPM dependencies for the frontend.
-*   **`IKP/standards/`**: The Markdown architectural blueprints (like ADR-004) dictating how this platform evolves.
+1. `parse_intent`
+2. `select_platform`
+3. `draft_bom`
+4. `validate_bom`
+5. retry while attempts remain
+6. `live_portal_validation` placeholder
+7. `update_knowledge_base` placeholder
+8. `rank_solutions`
+9. terminal human-intervention placeholder when unresolved
+
+Important: live partner portal validation is not active. The placeholder currently returns dynamic validation success without contacting an external vendor system.
+
+## 10. Implemented, Partial, Planned
+
+Implemented:
+
+- OKF repository reader/writer
+- source registry manifest
+- PDF extraction adapter boundary
+- HPE QuickSpecs adapter
+- Excel `Components` and `SKUs` parsing
+- NetworkX graph build/traversal
+- ChromaDB vector store
+- Gemini LLM and embedding wrapper
+- deterministic rule engine
+- BOQ fuzzy matching and platform inference
+- FastAPI endpoints
+- React/Vite UI tabs
+- bounded LangGraph workflow
+- backend pytest and Ruff lint workflow
+
+Partial:
+
+- human review lifecycle
+- learning delta lifecycle
+- broad vendor adapter coverage
+- semantic quality without embeddings
+- solution cost/ranking realism
+- mypy/typecheck cleanup
+
+Planned or placeholder:
+
+- live partner portal integration
+- live pricing and availability
+- portal parser
+- persistent graph database
+- production deployment/security/observability work
+
+## 11. Development Rules For Agents
+
+- Read `IKP/standards/11_CURRENT_IMPLEMENTATION_STACK.md` before changing architecture docs.
+- Use `./scripts/start_api.sh` and `./scripts/start_ui.sh` for local servers.
+- Keep API `8000` and UI `5173` unless a task needs different local ports.
+- Use `uv run` for Python commands.
+- Use `npm run <script>` inside `ikp_web/` or `npm run <script> --prefix ikp_web`.
+- Do not edit generated `repository/` artifacts unless the task is explicitly about generated knowledge output.
+- Do not claim partner portal validation, live pricing, or full HITL resume is implemented.
+- Keep docs synced when endpoint payloads, port defaults, or workflow edges change.
+
+## 12. Quality Commands
+
+```bash
+uv run pytest -q
+make lint
+npm run build --prefix ikp_web
+git diff --check
+```
+
+`make typecheck` is intentionally separate because the current codebase still has a mypy backlog.
+
+## 13. Troubleshooting
+
+Repository looks empty:
+
+- Run `./scripts/bootstrap.sh`.
+- Check `/api/status` and confirm `repository_seeded` is true.
+
+Search returns no results:
+
+- Confirm `GEMINI_API_KEY` is set.
+- Rebuild or reseed the repository if source files changed.
+
+UI cannot reach API:
+
+- Confirm API is on `127.0.0.1:8000`.
+- Confirm `VITE_API_BASE_URL` if using custom ports.
+- Restart with `./scripts/start_api.sh` and `./scripts/start_ui.sh`.
+
+BOQ validation says multiple platforms:
+
+- Provide `platform_id` explicitly.
+
+Rule behavior is confusing:
+
+- Inspect relationships and rule nodes in `repository/`.
+- Check `ikp_platform/core/reasoning/rule_engine.py`.
+- Add or update focused tests before changing validation semantics.
+
+## 14. Documentation Map
+
+- Current runtime truth: `IKP/standards/11_CURRENT_IMPLEMENTATION_STACK.md`
+- Beginner KT: this file
+- Setup: `SETUP.md`
+- Toolchain rules: `.agents/rules/toolchain.md`
+- Knowledge Graph vs LangGraph boundary: `.agents/rules/langgraph_vs_ontology.md`
+- Audit backlog: `IKP/QUALITY_AUDIT_GAPS.md`
+- OKF external reference: `IKP/references/OKF_SPECIFICATION.md`

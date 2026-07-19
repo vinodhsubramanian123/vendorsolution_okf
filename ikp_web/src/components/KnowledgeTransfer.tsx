@@ -39,7 +39,6 @@ export function KnowledgeTransfer() {
           <ReactMarkdown
             components={{
               code({ node, inline, className, children, ...props }: any) {
-                const match = /language-(\w+)/.exec(className || '');
                 return !inline ? (
                   <div className="code-block-wrapper">
                     <pre className={className}>

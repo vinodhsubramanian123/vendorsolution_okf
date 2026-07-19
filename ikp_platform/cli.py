@@ -18,8 +18,6 @@ Usage:
 """
 
 import sys
-import os
-import logging
 from pathlib import Path
 
 from ikp_platform.utils.logger import setup_logger
@@ -44,7 +42,7 @@ from ikp_platform.core.reasoning.solution_generator import SolutionGenerator
 
 def cmd_ingest(file_path: str, platform_id: str = None):
     """Ingest a single engineering source file."""
-    logger.info(f"=== IKP Ingestion Pipeline ===")
+    logger.info("=== IKP Ingestion Pipeline ===")
     logger.info(f"Source: {file_path}")
 
     # 1. Initialize repository manager
@@ -65,7 +63,9 @@ def cmd_ingest(file_path: str, platform_id: str = None):
         objects, delta = extractor.extract(file_path)
 
         logger.info(f"Extracted {len(objects)} engineering objects")
-        logger.info(f"Knowledge Delta: {delta.delta_id} with {len(delta.changes)} changes")
+        logger.info(
+            f"Knowledge Delta: {delta.delta_id} with {len(delta.changes)} changes"
+        )
 
         # 4. Persist to dual-layer repository
         registry.update_status(source.source_id, ProcessingStatus.NORMALIZING)
@@ -78,21 +78,20 @@ def cmd_ingest(file_path: str, platform_id: str = None):
         repo._record_delta(delta)
 
         # 6. Update context
-        domains = list(set(
-            obj.solution_domain for obj in objects
-            if obj.solution_domain
-        ))
+        domains = list(
+            set(obj.solution_domain for obj in objects if obj.solution_domain)
+        )
         repo.update_context(domains, len(registry.sources))
 
         registry.update_status(source.source_id, ProcessingStatus.COMPLETED)
 
         # 7. Print summary
         stats = repo.graph.get_stats()
-        logger.info(f"=== Ingestion Complete ===")
+        logger.info("=== Ingestion Complete ===")
         logger.info(f"Total nodes in graph: {stats['total_nodes']}")
         logger.info(f"Total edges in graph: {stats['total_edges']}")
-        logger.info(f"Objects by type:")
-        for obj_type, count in sorted(stats.get('type_counts', {}).items()):
+        logger.info("Objects by type:")
+        for obj_type, count in sorted(stats.get("type_counts", {}).items()):
             logger.info(f"  {obj_type}: {count}")
     elif source.source_type == SourceType.EXCEL:
         registry.update_status(source.source_id, ProcessingStatus.EXTRACTING)
@@ -101,7 +100,9 @@ def cmd_ingest(file_path: str, platform_id: str = None):
         objects, delta = extractor.extract(source, file_path, platform_id=platform_id)
 
         logger.info(f"Extracted {len(objects)} engineering objects")
-        logger.info(f"Knowledge Delta: {delta.delta_id} with {len(delta.changes)} changes")
+        logger.info(
+            f"Knowledge Delta: {delta.delta_id} with {len(delta.changes)} changes"
+        )
 
         registry.update_status(source.source_id, ProcessingStatus.NORMALIZING)
 
@@ -111,16 +112,15 @@ def cmd_ingest(file_path: str, platform_id: str = None):
 
         repo._record_delta(delta)
 
-        domains = list(set(
-            obj.solution_domain for obj in objects
-            if obj.solution_domain
-        ))
+        domains = list(
+            set(obj.solution_domain for obj in objects if obj.solution_domain)
+        )
         repo.update_context(domains, len(registry.sources))
 
         registry.update_status(source.source_id, ProcessingStatus.COMPLETED)
 
         stats = repo.graph.get_stats()
-        logger.info(f"=== Ingestion Complete ===")
+        logger.info("=== Ingestion Complete ===")
         logger.info(f"Total nodes in graph: {stats['total_nodes']}")
         logger.info(f"Total edges in graph: {stats['total_edges']}")
     else:
@@ -133,19 +133,19 @@ def cmd_status():
     count = repo.bootstrap()
 
     stats = repo.graph.get_stats()
-    print(f"\n{'='*50}")
-    print(f"  IKP Platform Status")
-    print(f"{'='*50}")
+    print(f"\n{'=' * 50}")
+    print("  IKP Platform Status")
+    print(f"{'=' * 50}")
     print(f"  Repository objects: {stats['total_nodes']}")
     print(f"  Relationships:      {stats['total_edges']}")
     print()
 
-    type_counts = stats.get('type_counts', {})
+    type_counts = stats.get("type_counts", {})
     if type_counts:
-        print(f"  Objects by type:")
+        print("  Objects by type:")
         for obj_type, count in sorted(type_counts.items()):
             print(f"    {obj_type}: {count}")
-    print(f"{'='*50}\n")
+    print(f"{'=' * 50}\n")
 
 
 def cmd_scan():
@@ -167,30 +167,32 @@ def cmd_scan():
         except Exception as e:
             logger.error(f"Failed to ingest {f}: {e}")
             failed += 1
-    logger.info(f"Scan complete: {success} succeeded, {failed} failed out of {len(new_files)} files")
+    logger.info(
+        f"Scan complete: {success} succeeded, {failed} failed out of {len(new_files)} files"
+    )
 
 
 def cmd_query(query_text: str):
     """Query the knowledge base with natural language."""
-    logger.info(f"=== IKP Query ===")
+    logger.info("=== IKP Query ===")
     logger.info(f"Query: {query_text}")
-    
+
     # Bootstrap repository
     repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
     repo.bootstrap()
-    
+
     # Parse intent
     parser = IntentParser()
     request = parser.parse_request(query_text)
-    
+
     # Generate solutions
     generator = SolutionGenerator(repo.graph, repo.vector_store, repo.mcp_client)
     candidates = generator.generate(request)
-    
+
     if not candidates:
         logger.warning("No valid solutions found for the request.")
         return
-        
+
     logger.info(f"Found {len(candidates)} solution candidates:")
     for i, candidate in enumerate(candidates, 1):
         print(f"\n--- Candidate {i} [{candidate.profile}] ---")
@@ -207,20 +209,21 @@ def cmd_query(query_text: str):
 
 def cmd_validate(solution_id: str):
     """Validate a solution candidate against engineering rules/vendor systems."""
-    logger.info(f"=== IKP Vendor Validation ===")
+    logger.info("=== IKP Vendor Validation ===")
     logger.info(f"Validating Solution: {solution_id}")
-    
+
     from ikp_platform.core.validation.validator import ManualReviewValidator
+
     validator = ManualReviewValidator()
-    
+
     # In V1.0, this generates a manual review request delta
     result = validator.validate([], {"solution_id": solution_id})
     logger.info(f"Validation Result: Valid={result.is_valid}")
     for msg in result.messages:
         logger.info(f"[{msg.severity}] {msg.message}")
-        
+
     delta = validator.to_knowledge_delta(result)
-    
+
     repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
     repo._record_delta(delta)
     logger.info(f"Recorded Knowledge Delta: {delta.delta_id} in history/")
@@ -228,24 +231,27 @@ def cmd_validate(solution_id: str):
 
 def cmd_learn():
     """Run the continuous learning loop to process pending knowledge deltas."""
-    logger.info(f"=== IKP Learning Loop ===")
+    logger.info("=== IKP Learning Loop ===")
     history_dir = PROJECT_ROOT / "history"
     if not history_dir.exists():
         logger.info("No pending deltas in history/")
         return
-        
+
     count = 0
     for file in history_dir.glob("*.md"):
         count += 1
-        
+
     logger.info(f"Found {count} delta records in history/")
-    logger.info("Manual review required for V1.0 deltas before merging into canonical knowledge.")
+    logger.info(
+        "Manual review required for V1.0 deltas before merging into canonical knowledge."
+    )
 
 
 def cmd_mcp():
     """Start the MCP server over stdio."""
     # We must run it as a subprocess or import and run asyncio
     import subprocess
+
     logger.info("Starting IKP MCP Server...")
     server_script = PROJECT_ROOT / "ikp_platform" / "mcp_server.py"
     subprocess.run([sys.executable, str(server_script)])

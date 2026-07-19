@@ -28,9 +28,7 @@ If this test starts failing, the most likely cause is that someone
 reintroduced a manual allowlist (or an `exclude=...` that's too broad) in
 `GraphBuilder.add_concept`. See .agents/rules/graph_serialization.md.
 """
-from datetime import datetime, timezone
 
-from ikp_platform.core.repository.graph_builder import GraphBuilder
 from ikp_platform.core.ontology.models import (
     Rule,
     RuleSeverity,
@@ -81,10 +79,14 @@ def _assert_every_field_reachable(obj, node_attrs: dict):
         # into req_perf_*/req_cap_* keys rather than kept as a single dict --
         # spot-check flattening happened instead of an exact-value compare.
         if field_name in ("performance_requirements", "capacity_requirements"):
-            prefix = "req_perf_" if field_name == "performance_requirements" else "req_cap_"
+            prefix = (
+                "req_perf_" if field_name == "performance_requirements" else "req_cap_"
+            )
             for sub_key in expected[field_name]:
                 if f"{prefix}{sub_key}" not in node_attrs:
-                    missing.append(f"{field_name}.{sub_key} (expected under node_attrs[{prefix}{sub_key!r}])")
+                    missing.append(
+                        f"{field_name}.{sub_key} (expected under node_attrs[{prefix}{sub_key!r}])"
+                    )
             continue
 
         assert node_attrs[key] == expected[field_name], (
@@ -240,7 +242,9 @@ def test_compatibility_check_finds_reverse_direction_contains_edge(empty_graph):
         title="Component Y",
         solution_domain="Compute",
         relationships=[
-            EngineeringRelationship(target_id=platform.id, relationship_type=RelationshipType.CONTAINS)
+            EngineeringRelationship(
+                target_id=platform.id, relationship_type=RelationshipType.CONTAINS
+            )
         ],
     )
 

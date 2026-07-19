@@ -1,4 +1,4 @@
-.PHONY: install test lint clean run ui-install ui-test ui-dev
+.PHONY: install test lint typecheck clean run ui-install ui-test ui-dev
 
 install:
 	uv sync --extra dev
@@ -8,6 +8,8 @@ test:
 
 lint:
 	uv run --python 3.11 ruff check .
+
+typecheck:
 	uv run --python 3.11 mypy ikp_platform/
 
 clean:
@@ -17,7 +19,7 @@ clean:
 	rm -rf .coverage htmlcov/
 
 run:
-	uv run --python 3.11 python -m ikp_platform.api
+	./scripts/start_api.sh
 
 ui-install:
 	cd ikp_web && npm install

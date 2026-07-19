@@ -1,5 +1,5 @@
 from ikp_platform.core.repository.graph_builder import GraphBuilder
-from ikp_platform.core.ontology.models import CategoryLimit, Platform, Component
+from ikp_platform.core.ontology.models import CategoryLimit, Component
 
 g = GraphBuilder()
 limit = CategoryLimit(
@@ -8,10 +8,16 @@ limit = CategoryLimit(
     limit_name="Maximum Riser",
     limit_value=2,
     target_category="Infrastructure",
-    target_subcategory="Riser"
+    target_subcategory="Riser",
 )
 g.add_concept(limit)
-riser1 = Component(id="riser1", title="Riser 1", component_category="Infrastructure", component_subcategory="Riser", inclusive_qty=3)
+riser1 = Component(
+    id="riser1",
+    title="Riser 1",
+    component_category="Infrastructure",
+    component_subcategory="Riser",
+    inclusive_qty=3,
+)
 g.add_concept(riser1)
 
 print("Limit node data:")

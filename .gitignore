@@ -1,4 +1,4 @@
-# Environments
+# Environments and local secrets
 .venv/
 .env
 env/
@@ -7,60 +7,56 @@ ENV/
 env.bak/
 venv.bak/
 
-# Byte-compiled / optimized / DLL files
+# Python bytecode, caches, and build metadata
 __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Node
+# Node / frontend build output
 node_modules/
 dist/
 build/
 .npm/
+ikp_web/dist/
 
-# IDEs
+# IDEs and OS files
 .vscode/
 .idea/
 .DS_Store
 
-# Logs and Databases
+# Logs, local runtime state, and local databases
 *.log
-/repository/
 logs/
 *.sqlite3
+.chroma/
+.*_pid
 
-# Temp
+# Generated knowledge/runtime artifacts
+/repository/
+history/
+work/
 tmp/
 .temp/
 hash.*
-history/
 
-# Graphify
+# Graphify / Obsidian generated artifacts
 **/graphify-out/*
 graphify-out/*
 !/graphify-out/GRAPH_REPORT.md
 !/graphify-out/graph.json
 !/graphify-out/manifest.json
-
 .obsidian/
 .graphify_obsidian_manifest.json
 graph.canvas
 
-# Ignore all auto-generated markdown nodes in the root
+# Ignore auto-generated root markdown nodes, but keep project docs tracked.
 /*.md
-
-# But explicitly whitelist your actual root documentation
 !/README.md
 !/CONTEXT.md
 !/STATE.md
 !/LOG.md
 !/SETUP.md
-ikp.log
-mcp_server.log
-graph.canvas
-.graphify_obsidian_manifest.json
-work/tmp/
-ikp_web/dist/
-.chroma/
-.*_pid

@@ -202,6 +202,9 @@ The implementation SHALL enforce a **3-Pillar Deterministic Versioning Strategy*
 
 The resulting deterministic string (e.g., `modDate_...` or `sha256_...`) SHALL become the `version`. The pipeline leverages this to skip heavy extraction entirely if the incoming version string exactly matches the active graph representation.
 
+### 5.2 Source Persistence
+The `SourceRegistry` SHALL persist all registered sources and their extraction states to `repository/manifest.json`. This acts as the authoritative ledger of every file that has been processed by the pipeline, guaranteeing that restarts do not trigger redundant extractions.
+
 The implementation SHALL preserve the original source unchanged.
 
 ---
@@ -293,12 +296,13 @@ Examples:
 * Power
 * Dimensions
 
-### 7.1 Implementation Constraints for Extraction
-The implementation SHALL employ a **Multi-Pass Strategy** to guarantee high-fidelity extraction:
-1. **Pass 1 (Structured)**: Extract tabular data with boundary definitions.
-2. **Pass 2 (Layout Fallback)**: Extract layout-based SKUs (often missed by raw tabular logic).
-3. **Attribute Normalization**: The implementation SHALL run a dedicated regex sweep across all SKUs (even unstructured ones) to extract core attributes (`Cores`, `GHz`, `TDP`, `Capacity`, `DDR Type`, `Speed`).
-4. **Description Cleansing**: Descriptions SHALL be parsed using look-ahead/look-back logic if they fall below a strict threshold (e.g. `< 30` characters). Noise prefixes MUST be stripped to prevent garbage entity creation.
+### 7.1 Implementation Constraints for Extraction (Adapter Pattern)
+The implementation SHALL NOT use a monolithic script for all vendors. Instead, it MUST employ a **Vendor-Agnostic Adapter Pattern**:
+1. **Base Adapter Interface (`BasePDFAdapter`)**: Defines standard abstract methods (`can_handle`, `extract_platform`, `extract_components`).
+2. **Vendor Implementations (e.g., `HPEQuickSpecsAdapter`)**: Concrete classes that encapsulate vendor-specific heuristics, regexes, and layout assumptions (e.g., parsing specific HPE tables or Dell configuration grids).
+3. **Common Utilities**: Adapters MAY share utilities like `TableParser` (powered by robust underlying parsers like `pdfplumber`) to handle generic structural extraction.
+
+The extractor class (`PDFExtractor`) SHALL iterate through available adapters, query `can_handle()`, and delegate processing to the matching vendor strategy. If no adapter matches, it MUST trigger a Human-In-The-Loop (HITL) fallback.
 
 ---
 

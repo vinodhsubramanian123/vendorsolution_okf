@@ -7,7 +7,7 @@ Governs: Dynamic Intent Parsing and Intelligent Component Selection (Phase 6).
 import os
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from google import genai
 from dotenv import load_dotenv
 
@@ -21,7 +21,9 @@ class LLMClient:
         load_dotenv()
         api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
-            logger.warning("GEMINI_API_KEY not found in environment. LLM reasoning will fail.")
+            logger.warning(
+                "GEMINI_API_KEY not found in environment. LLM reasoning will fail."
+            )
             self.client = None
         else:
             self.client = genai.Client(api_key=api_key)
@@ -58,10 +60,9 @@ Output ONLY valid JSON.
             logger.debug(f"LLM parse_intent prompt: {prompt}")
             if not self.client:
                 raise ValueError("No Gemini API client configured")
-            
+
             response = self.client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=prompt
+                model="gemini-2.0-flash", contents=prompt
             )
             # Try to parse the JSON output
             text = response.text.strip()
@@ -69,14 +70,26 @@ Output ONLY valid JSON.
 
             if text.startswith("```json"):
                 text = text.replace("```json", "", 1).rstrip("```").strip()
-            
+
             return json.loads(text)
         except Exception as e:
             logger.error(f"LLM parse_intent failed: {e}")
             # Fallback to empty if LLM fails
-            return {"workloads": [], "vendor_preference": None, "target_platform": None, "budget": None, "requirements": []}
+            return {
+                "workloads": [],
+                "vendor_preference": None,
+                "target_platform": None,
+                "budget": None,
+                "requirements": [],
+            }
 
-    def select_components(self, platform_id: str, available_nodes: Dict[str, Any], requirements: List[Dict[str, Any]], profile: str = "Balanced") -> List[str]:
+    def select_components(
+        self,
+        platform_id: str,
+        available_nodes: Dict[str, Any],
+        requirements: List[Dict[str, Any]],
+        profile: str = "Balanced",
+    ) -> List[str]:
         """
         Ask Gemini to select the optimal subset of components from a given list that satisfies the requirements.
         """
@@ -111,20 +124,21 @@ Output ONLY valid JSON in the following format:
             logger.debug(f"LLM select_components prompt: {prompt}")
             if not self.client:
                 raise ValueError("No Gemini API client configured")
-                
+
             response = self.client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=prompt
+                model="gemini-2.0-flash", contents=prompt
             )
             text = response.text.strip()
             logger.info(f"LLM select_components response: {text}")
-            
+
             if text.startswith("```json"):
                 text = text.replace("```json", "", 1).rstrip("```").strip()
-                
+
             result = json.loads(text)
-            
-            return result.get("selected_component_ids", []), result.get("reasoning_steps", [])
+
+            return result.get("selected_component_ids", []), result.get(
+                "reasoning_steps", []
+            )
         except Exception as e:
             logger.error(f"LLM select_components failed: {e}")
             return [], [f"LLM failure: {e}"]
@@ -134,12 +148,11 @@ Output ONLY valid JSON in the following format:
         try:
             if not self.client:
                 raise ValueError("No Gemini API client configured")
-                
+
             response = self.client.models.embed_content(
-                model='gemini-embedding-2',
-                contents=texts
+                model="gemini-embedding-2", contents=texts
             )
-            # The response from google.genai has an 'embeddings' attribute which is a list of objects 
+            # The response from google.genai has an 'embeddings' attribute which is a list of objects
             # where each object has a 'values' list.
             return [e.values for e in response.embeddings]
         except Exception as e:
@@ -149,7 +162,7 @@ Output ONLY valid JSON in the following format:
     def extract_rules(self, text_chunk: str) -> List[Dict[str, Any]]:
         """
         Ask Gemini via local Antigravity CLI to extract explicit engineering rules from a text chunk.
-        
+
         NOTE: We intentionally use the `antigravity-cli` here instead of the `google-genai`
         SDK to leverage specialized local extraction prompts and parallel processing configurations
         that the CLI provides for rule mining.
@@ -172,38 +185,41 @@ Text:
 {text_chunk[:8000]}
 """
         import subprocess
+
         try:
             logger.info("Calling antigravity-cli for rule extraction...")
             result = subprocess.run(
                 ["antigravity-cli", "-p", prompt],
                 capture_output=True,
                 text=True,
-                timeout=60
+                timeout=60,
             )
-            
+
             if result.returncode != 0:
                 logger.error(f"antigravity-cli failed: {result.stderr}")
                 return []
-                
+
             text = result.stdout.strip()
-            
+
             # Clean up potential markdown formatting from CLI output
             if "```json" in text:
                 text = text.split("```json")[1].split("```")[0].strip()
             elif text.startswith("```"):
                 text = text.replace("```", "", 1).rstrip("```").strip()
-            
+
             # Sometimes CLI prepends chatter
             json_start = text.find("{")
             json_end = text.rfind("}")
             if json_start != -1 and json_end != -1:
-                text = text[json_start:json_end+1]
-                
+                text = text[json_start : json_end + 1]
+
             try:
                 parsed = json.loads(text)
                 return parsed.get("rules", [])
             except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse JSON from antigravity-cli output: {e}\nOutput was: {text[:200]}")
+                logger.error(
+                    f"Failed to parse JSON from antigravity-cli output: {e}\nOutput was: {text[:200]}"
+                )
                 return []
         except subprocess.TimeoutExpired:
             logger.error("LLM extract_rules timed out calling antigravity-cli")
@@ -215,8 +231,8 @@ Text:
     def critic_review_rules(self, text_chunk: str) -> List[Dict[str, Any]]:
         """
         Ask Gemini via local Antigravity CLI to find edge-case constraints or subtle dependencies in the text chunk.
-        
-        NOTE: Similar to extract_rules, we intentionally shell out to `antigravity-cli` 
+
+        NOTE: Similar to extract_rules, we intentionally shell out to `antigravity-cli`
         to leverage specialized critic prompts and local execution options.
         """
         prompt = f"""
@@ -237,36 +253,39 @@ Text:
 {text_chunk[:8000]}
 """
         import subprocess
+
         try:
             logger.info("Calling antigravity-cli for critic review...")
             result = subprocess.run(
                 ["antigravity-cli", "-p", prompt],
                 capture_output=True,
                 text=True,
-                timeout=60
+                timeout=60,
             )
-            
+
             if result.returncode != 0:
                 logger.error(f"antigravity-cli failed: {result.stderr}")
                 return []
-                
+
             text = result.stdout.strip()
-            
+
             if "```json" in text:
                 text = text.split("```json")[1].split("```")[0].strip()
             elif text.startswith("```"):
                 text = text.replace("```", "", 1).rstrip("```").strip()
-                
+
             json_start = text.find("{")
             json_end = text.rfind("}")
             if json_start != -1 and json_end != -1:
-                text = text[json_start:json_end+1]
-            
+                text = text[json_start : json_end + 1]
+
             try:
                 parsed = json.loads(text)
                 return parsed.get("rules", [])
             except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse JSON from antigravity-cli output: {e}\nOutput was: {text[:200]}")
+                logger.error(
+                    f"Failed to parse JSON from antigravity-cli output: {e}\nOutput was: {text[:200]}"
+                )
                 return []
         except subprocess.TimeoutExpired:
             logger.error("LLM critic_review_rules timed out calling antigravity-cli")
@@ -274,4 +293,3 @@ Text:
         except Exception as e:
             logger.error(f"LLM critic_review_rules failed: {e}")
             return []
-

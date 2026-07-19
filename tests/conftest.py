@@ -11,6 +11,7 @@ importing `api.app` directly) -- if you're adding a new test that
 touches RepoManager, use `temp_repo` / `api_client` below rather than
 pointing at PROJECT_ROOT or the real repository/ directory.
 """
+
 import pytest
 import tempfile
 import shutil
@@ -53,7 +54,9 @@ def temp_repo(tmp_path):
 
     repo = RepoManager(str(repo_dir), str(project_root))
 
-    evidence = [EvidenceRecord(source_id="test_fixture", confidence=ConfidenceLevel.HIGH)]
+    evidence = [
+        EvidenceRecord(source_id="test_fixture", confidence=ConfidenceLevel.HIGH)
+    ]
 
     gpu = Component(
         id="fixture-dl380-gen12/gpu/nvidia-h100",

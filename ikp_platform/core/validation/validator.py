@@ -28,8 +28,10 @@ import uuid
 # Validation Result Models
 # ---------------------------------------------------------------------------
 
+
 class ValidationMessage(BaseModel):
     """A single message from a validation check."""
+
     severity: str  # "Error", "Warning", "Info", "Recommendation"
     code: Optional[str] = None
     message: str
@@ -42,6 +44,7 @@ class ValidationResult(BaseModel):
     Complete result of validating a solution candidate.
     Blueprint 06 §9: Portal advice SHALL be treated as engineering evidence.
     """
+
     validation_id: str = Field(default_factory=lambda: f"VAL-{str(uuid.uuid4())[:8]}")
     solution_id: str
     validator_name: str
@@ -61,6 +64,7 @@ class ValidationResult(BaseModel):
 # Abstract Validator
 # ---------------------------------------------------------------------------
 
+
 class VendorValidator(ABC):
     """
     Abstract base class for vendor validation.
@@ -68,7 +72,9 @@ class VendorValidator(ABC):
     """
 
     @abstractmethod
-    def validate(self, solution_components: List[str], context: dict) -> ValidationResult:
+    def validate(
+        self, solution_components: List[str], context: dict
+    ) -> ValidationResult:
         """
         Validate a solution against vendor systems.
 
@@ -90,17 +96,19 @@ class VendorValidator(ABC):
 
         for msg in result.messages:
             if msg.severity in ("Error", "Warning"):
-                changes.append(DeltaChange(
-                    change_type=DeltaChangeType.NEW_RULE,
-                    object_id=msg.affected_object or result.solution_id,
-                    field_name=f"validation_{msg.severity.lower()}",
-                    new_value=msg.message,
-                    evidence=EvidenceRecord(
-                        source_id=result.validator_name,
-                        confidence=ConfidenceLevel.HIGH,
-                        description=f"Vendor validation: {msg.message}",
-                    ),
-                ))
+                changes.append(
+                    DeltaChange(
+                        change_type=DeltaChangeType.NEW_RULE,
+                        object_id=msg.affected_object or result.solution_id,
+                        field_name=f"validation_{msg.severity.lower()}",
+                        new_value=msg.message,
+                        evidence=EvidenceRecord(
+                            source_id=result.validator_name,
+                            confidence=ConfidenceLevel.HIGH,
+                            description=f"Vendor validation: {msg.message}",
+                        ),
+                    )
+                )
 
         return KnowledgeDelta(
             source_id=f"validation:{result.validator_name}",
@@ -112,13 +120,16 @@ class VendorValidator(ABC):
 # Manual Review Validator (V1.0 default)
 # ---------------------------------------------------------------------------
 
+
 class ManualReviewValidator(VendorValidator):
     """
     V1.0 implementation: flags solutions for human engineering review.
     Blueprint 02 §10: Human engineers remain responsible for engineering judgment.
     """
 
-    def validate(self, solution_components: List[str], context: dict) -> ValidationResult:
+    def validate(
+        self, solution_components: List[str], context: dict
+    ) -> ValidationResult:
         return ValidationResult(
             solution_id=context.get("solution_id", "unknown"),
             validator_name="ManualReview",

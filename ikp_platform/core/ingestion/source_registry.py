@@ -6,13 +6,12 @@ Governs: Blueprint 04 §5 (Source Registration), Blueprint 07 §3
 Every source receives a permanent identity. The original source is preserved.
 """
 
-import os
 import hashlib
 from pathlib import Path
-from datetime import datetime
 from typing import List, Optional
 import logging
 
+import json
 from ikp_platform.core.ontology.models import (
     Source,
     SourceType,
@@ -39,8 +38,11 @@ class SourceRegistry:
     Blueprint 04 §5: Every source SHALL receive a permanent identity.
     """
 
-    def __init__(self):
+    def __init__(self, project_root: str = "."):
         self.sources: List[Source] = []
+        self.project_root = Path(project_root)
+        self.manifest_path = self.project_root / "repository" / "manifest.json"
+        self._load_manifest()
 
     def register(self, file_path: str) -> Source:
         """
@@ -62,7 +64,9 @@ class SourceRegistry:
         # Check for duplicates
         for existing in self.sources:
             if existing.file_hash == file_hash:
-                logger.warning(f"Duplicate source detected: {file_path} matches {existing.source_id}")
+                logger.warning(
+                    f"Duplicate source detected: {file_path} matches {existing.source_id}"
+                )
                 return existing
 
         # Infer metadata from filename
@@ -80,7 +84,11 @@ class SourceRegistry:
         )
 
         self.sources.append(source)
-        logger.info(f"Registered source {source.source_id}: {title} ({source_type.value})")
+        self._save_manifest()
+
+        logger.info(
+            f"Registered source {source.source_id}: {title} ({source_type.value})"
+        )
         return source
 
     def update_status(self, source_id: str, status: ProcessingStatus) -> None:
@@ -88,6 +96,7 @@ class SourceRegistry:
         for source in self.sources:
             if source.source_id == source_id:
                 source.processing_status = status
+                self._save_manifest()
                 return
 
     @staticmethod
@@ -116,3 +125,23 @@ class SourceRegistry:
             if key in lower:
                 return vendor
         return None
+
+    def _load_manifest(self) -> None:
+        if self.manifest_path.exists():
+            try:
+                with open(self.manifest_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    for item in data.get("sources", []):
+                        self.sources.append(Source(**item))
+                logger.info(f"Loaded {len(self.sources)} sources from {self.manifest_path}")
+            except Exception as e:
+                logger.error(f"Failed to load manifest {self.manifest_path}: {e}")
+
+    def _save_manifest(self) -> None:
+        self.manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        data = {"sources": [s.model_dump() for s in self.sources]}
+        try:
+            with open(self.manifest_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+        except Exception as e:
+            logger.error(f"Failed to save manifest to {self.manifest_path}: {e}")

@@ -11,17 +11,13 @@ Responsibilities:
 - Includes full metadata in frontmatter for search-space reduction (Blueprint 06 §5)
 """
 
-import os
 import yaml
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
-    EngineeringRelationship,
     Rule,
-    Constraint,
-    EvidenceRecord,
 )
 
 
@@ -63,21 +59,17 @@ class OKFWriter:
             if not type_dir.endswith("s"):
                 type_dir += "s"
             parts.append(type_dir)
-            
+
             # Sub-group components by their specific category (cpu, memory, etc.)
-            if obj.type.value == "Component" and hasattr(obj, "component_category") and obj.component_category:
+            if (
+                obj.type.value == "Component"
+                and hasattr(obj, "component_category")
+                and obj.component_category
+            ):
                 parts.append(self._slugify(obj.component_category))
 
         # Filename is the slugified id to prevent collisions across platforms
-        if obj.type.value == "Rule":
-            cat = getattr(obj, "component_category", None)
-            if cat:
-                parts.append(f"{self._slugify(cat)}-rules")
-            else:
-                parts.append("platform-rules")
-            filename = self._slugify(obj.id)
-        else:
-            filename = self._slugify(obj.id)
+        filename = self._slugify(obj.id)
 
         return self.repository_path / Path(*parts) / f"{filename}.md"
 
@@ -111,7 +103,7 @@ class OKFWriter:
             "type": obj.type.value,
             "title": obj.title or obj.id,
         }
-        
+
         for k, v in raw_fm.items():
             if v is not None and v != [] and v != "":
                 if k not in fm:
@@ -120,9 +112,15 @@ class OKFWriter:
         # Ensure timestamp (last_updated defaults to now if missing)
         last_updated = getattr(obj, "last_updated", None) or datetime.now(timezone.utc)
         if isinstance(last_updated, str):
-            fm["timestamp"] = last_updated if last_updated.endswith("Z") or "+" in last_updated else last_updated + "Z"
+            fm["timestamp"] = (
+                last_updated
+                if last_updated.endswith("Z") or "+" in last_updated
+                else last_updated + "Z"
+            )
         else:
-            fm["timestamp"] = last_updated.isoformat() + ("Z" if not last_updated.isoformat().endswith("Z") else "")
+            fm["timestamp"] = last_updated.isoformat() + (
+                "Z" if not last_updated.isoformat().endswith("Z") else ""
+            )
 
         # Structured attributes as frontmatter extensions
         for attr in obj.attributes:
@@ -130,7 +128,7 @@ class OKFWriter:
             fm[key] = attr.value
             if attr.unit:
                 fm[f"{key}_unit"] = attr.unit
-                
+
         # Rule specific override for version naming to match existing expectations
         if isinstance(obj, Rule) and "version" in fm:
             fm["rule_version"] = fm.pop("version")
@@ -194,7 +192,7 @@ class OKFWriter:
     # Write concept — main entry point
     # -------------------------------------------------------------------
 
-    def write_concept(self, obj: BaseEngineeringObject) -> str:
+    def write_concept(self, obj: BaseEngineeringObject, existing_path: Optional[str] = None) -> str:
         """
         Writes a single engineering concept to disk as an OKF Markdown file.
         Returns the path relative to the repository root.
@@ -202,11 +200,13 @@ class OKFWriter:
         frontmatter = self._generate_frontmatter(obj)
         body = self._generate_body(obj)
 
-        file_path = self._compute_path(obj)
+        if existing_path:
+            file_path = self.repository_path / existing_path
+        else:
+            file_path = self._compute_path(obj)
+
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        import re
-        
         block = "---\n"
         block += yaml.dump(frontmatter, default_flow_style=False, sort_keys=False)
         block += "---\n\n"
@@ -319,7 +319,9 @@ class OKFWriter:
                     + existing[title_end:]
                 )
             else:
-                updated = f"# Repository Update Log\n\n{date_heading}\n{entry}\n" + existing
+                updated = (
+                    f"# Repository Update Log\n\n{date_heading}\n{entry}\n" + existing
+                )
 
         with open(log_path, "w", encoding="utf-8") as f:
             f.write(updated)

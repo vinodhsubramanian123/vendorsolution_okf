@@ -1,12 +1,11 @@
 import chromadb
-from chromadb.config import Settings
-from pathlib import Path
 import logging
 from typing import List, Dict, Any, Optional, Tuple
 from ikp_platform.core.ontology.models import BaseEngineeringObject
 from ikp_platform.core.reasoning.llm_client import LLMClient
 
 logger = logging.getLogger("ikp.repository.vector")
+
 
 class VectorStore:
     def __init__(self, persist_directory: str):
@@ -23,20 +22,25 @@ class VectorStore:
         blocking network round-trips."""
         return self.index_many([obj], batch_size=1)
 
-    def index_many(self, objects: List[BaseEngineeringObject], batch_size: int = 20) -> int:
+    def index_many(
+        self, objects: List[BaseEngineeringObject], batch_size: int = 20
+    ) -> int:
         """Vectorize and index a list of objects, batching embedding API
         calls in groups of `batch_size` instead of one call per object.
         Returns the number of objects successfully indexed."""
         indexable = [
-            o for o in objects
-            if o is not None and o.type.value in ["Platform", "Component", "SKU", "Rule", "SolutionCategory"]
+            o
+            for o in objects
+            if o is not None
+            and o.type.value
+            in ["Platform", "Component", "SKU", "Rule", "SolutionCategory"]
         ]
         if not indexable:
             return 0
 
         indexed_count = 0
         for start in range(0, len(indexable), batch_size):
-            batch = indexable[start:start + batch_size]
+            batch = indexable[start : start + batch_size]
             text_reprs = [self._text_repr(o) for o in batch]
 
             embeddings = self.llm.generate_embeddings(text_reprs)
@@ -44,7 +48,9 @@ class VectorStore:
             ids, docs, metas, embs = [], [], [], []
             for obj, text_repr, embedding in zip(batch, text_reprs, embeddings):
                 if all(v == 0.0 for v in embedding):
-                    logger.warning(f"Skipping vector index for {obj.id} due to embedding failure.")
+                    logger.warning(
+                        f"Skipping vector index for {obj.id} due to embedding failure."
+                    )
                     continue
                 metadata = {"type": obj.type.value, "title": obj.title or obj.id}
                 if hasattr(obj, "component_category") and obj.component_category:
@@ -67,7 +73,9 @@ class VectorStore:
             if not ids:
                 continue
             try:
-                self.collection.upsert(ids=ids, embeddings=embs, documents=docs, metadatas=metas)
+                self.collection.upsert(
+                    ids=ids, embeddings=embs, documents=docs, metadatas=metas
+                )
                 indexed_count += len(ids)
                 logger.debug(f"Vectorized and indexed batch of {len(ids)} objects.")
             except Exception as e:
@@ -81,7 +89,10 @@ class VectorStore:
         if hasattr(obj, "component_category") and obj.component_category:
             text_repr += f"Category: {obj.component_category}\n"
         if hasattr(obj, "attributes") and obj.attributes:
-            attr_strings = [f"{attr.name}: {attr.value}{' ' + attr.unit if attr.unit else ''}" for attr in obj.attributes]
+            attr_strings = [
+                f"{attr.name}: {attr.value}{' ' + attr.unit if attr.unit else ''}"
+                for attr in obj.attributes
+            ]
             text_repr += "Attributes:\n- " + "\n- ".join(attr_strings) + "\n"
         if hasattr(obj, "capabilities") and obj.capabilities:
             text_repr += "Capabilities:\n- " + "\n- ".join(obj.capabilities) + "\n"
@@ -89,26 +100,29 @@ class VectorStore:
             text_repr += f"Tags: {', '.join(obj.tags)}\n"
         return text_repr
 
-    def semantic_search(self, query: str, n_results: int = 50, filter_metadata: Optional[Dict[str, Any]] = None) -> List[Tuple[str, float]]:
+    def semantic_search(
+        self,
+        query: str,
+        n_results: int = 50,
+        filter_metadata: Optional[Dict[str, Any]] = None,
+    ) -> List[Tuple[str, float]]:
         """Search the vector database and return a list of matching IDs with confidence scores."""
         embeddings = self.llm.generate_embeddings([query])
         embedding = embeddings[0]
-        
+
         if all(v == 0.0 for v in embedding):
             logger.warning("Query embedding failed. Falling back to empty results.")
             return []
-            
+
         try:
             results = self.collection.query(
-                query_embeddings=[embedding],
-                n_results=n_results,
-                where=filter_metadata
+                query_embeddings=[embedding], n_results=n_results, where=filter_metadata
             )
-            
+
             if results and "ids" in results and results["ids"]:
                 ids = results["ids"][0]
                 distances = results.get("distances", [[0.0] * len(ids)])[0]
-                
+
                 # Convert L2 distance to a 0.0 - 1.0 confidence score
                 scores = [max(0.0, 1.0 - (d / 2.0)) for d in distances]
                 return list(zip(ids, scores))

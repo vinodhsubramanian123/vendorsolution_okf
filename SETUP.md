@@ -60,7 +60,7 @@ Re-run this any time `sources/pdfs/` changes.
 ## 5. Run the API
 
 ```bash
-uv run uvicorn ikp_platform.api:app --reload --port 8000
+./scripts/start_api.sh
 ```
 
 If `repository/` wasn't seeded, the API still starts, but logs a
@@ -68,17 +68,34 @@ If `repository/` wasn't seeded, the API still starts, but logs a
 `/api/status`'s `repository_seeded` field will be `false`. Run step 4
 first.
 
+The default API address is `http://127.0.0.1:8000/api`. To use a
+different local port, pass it as the first argument:
+
+```bash
+./scripts/start_api.sh 8001
+```
+
 ## 6. Run the frontend
 
 ```bash
-cd ikp_web
-npm install
-npm run dev
+npm install --prefix ikp_web
+./scripts/start_ui.sh
 ```
 
-The frontend expects the API at `http://localhost:8000/api` by
-default; override with `VITE_API_BASE_URL` (see `.env.example`) if
-you're running the API elsewhere.
+The default UI address is `http://127.0.0.1:5173`. To run the UI on a
+different port and point it at a different API port:
+
+```bash
+./scripts/start_ui.sh 5174 8001
+```
+
+Both start scripts normalize accidental five-digit local ports with a
+leading `1`, so `15173` becomes `5173` and `18000` becomes `8000`.
+This keeps agent-generated scripts easy to recover.
+
+The frontend expects the API at `http://localhost:8000/api` by default;
+override with `VITE_API_BASE_URL` (see `.env.example`) if you're running
+the API elsewhere.
 
 ## 7. Run tests
 
@@ -100,6 +117,18 @@ trusting a "fix" here again, run the suite 2-3 times in a row and diff
 `tests/integration/manual_*.py` and `scripts/debug/*.py` are plain
 scripts (`def main()`), not pytest tests -- run them directly with
 `uv run python <path>`, not via pytest.
+
+Useful quality commands:
+
+```bash
+uv run pytest -q
+make lint
+npm run build --prefix ikp_web
+git diff --check
+```
+
+`make typecheck` runs mypy separately. It is useful for backlog work, but
+it is not currently clean.
 
 ## Project layout
 

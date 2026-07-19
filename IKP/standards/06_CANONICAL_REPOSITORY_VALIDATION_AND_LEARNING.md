@@ -304,6 +304,8 @@ Portal Advice SHALL be treated as engineering evidence.
 
 Portal logic SHALL gradually become reusable engineering knowledge.
 
+*(Note: Live Partner Portal integration is currently a planned stub in the validation architecture, simulating external vendor APIs until direct access is provisioned).*
+
 ---
 
 # 10. Knowledge Delta
@@ -344,6 +346,9 @@ be traceable
 
 Knowledge SHALL continuously evolve.
 
+### 10.1 Semantic Alias Learning
+A critical feature of the Knowledge Delta is organic learning from validation failures. When the BOQ Validator flags an unrecognized SKU or typo, and a semantic fallback or human correction maps it to an existing canonical object, the `LearningEngine` MUST receive a `KnowledgeDelta`. This delta automatically appends the typo/unrecognized string into the canonical object's `aliases` property. Future reasoning loops WILL natively recognize the typo as the canonical object.
+
 ---
 
 # 11. Human Engineering Review
@@ -363,6 +368,9 @@ new ontology concepts appear
 cross-product contamination is suspected
 
 approved human decisions become future engineering knowledge.
+
+### 11.1 The Validation Portal (HITL Interface)
+The implementation SHALL provide a dedicated Human-In-The-Loop interface (e.g., the React/Vite **ValidationPortal**) to handle these scenarios. The portal SHALL visualize the LangGraph state, highlight missing components or failed rules, and allow the engineer to inject corrections (which immediately generate `KnowledgeDelta` objects to resume the workflow).
 
 ---
 

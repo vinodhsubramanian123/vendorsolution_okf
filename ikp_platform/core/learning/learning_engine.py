@@ -10,16 +10,12 @@ Only validated learning SHALL update canonical engineering knowledge.
 """
 
 from typing import List, Optional
-from datetime import datetime
 import logging
 
 from ikp_platform.core.ontology.models import (
     KnowledgeDelta,
     DeltaStatus,
-    DeltaChange,
-    DeltaChangeType,
     BaseEngineeringObject,
-    HistoryEntry,
 )
 from ikp_platform.core.repository.repo_manager import RepoManager
 
@@ -77,7 +73,8 @@ class LearningEngine:
             if delta.status == DeltaStatus.VALIDATED:
                 # Find objects that belong to this delta
                 delta_objects = [
-                    obj for obj in objects
+                    obj
+                    for obj in objects
                     if any(c.object_id == obj.id for c in delta.changes)
                 ]
 
@@ -92,13 +89,14 @@ class LearningEngine:
 
         # Remove merged deltas from pending
         self.pending_deltas = [
-            d for d in self.pending_deltas
-            if d.status != DeltaStatus.MERGED
+            d for d in self.pending_deltas if d.status != DeltaStatus.MERGED
         ]
 
         return merged_count
 
-    def approve_delta(self, delta_id: str, reviewer: str, notes: Optional[str] = None) -> bool:
+    def approve_delta(
+        self, delta_id: str, reviewer: str, notes: Optional[str] = None
+    ) -> bool:
         """
         Human approves a pending delta.
         Blueprint 02 §10: Approved decisions become future engineering knowledge.
@@ -125,10 +123,7 @@ class LearningEngine:
 
     def get_pending_reviews(self) -> List[KnowledgeDelta]:
         """Get all deltas awaiting human review."""
-        return [
-            d for d in self.pending_deltas
-            if d.status == DeltaStatus.NEEDS_REVIEW
-        ]
+        return [d for d in self.pending_deltas if d.status == DeltaStatus.NEEDS_REVIEW]
 
     @staticmethod
     def _can_auto_approve(delta: KnowledgeDelta) -> bool:

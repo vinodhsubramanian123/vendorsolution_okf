@@ -6,11 +6,12 @@ Governs: Blueprint 02 §11 (Observability & Telemetry)
 
 import logging
 import sys
-from datetime import datetime
 from pathlib import Path
 
 
-def setup_logger(name: str, log_file: str = "ikp.log", level: int = logging.INFO) -> logging.Logger:
+def setup_logger(
+    name: str, log_file: str = "ikp.log", level: int = logging.INFO
+) -> logging.Logger:
     """Configure a structured logger with both console and file handlers."""
     logger = logging.getLogger(name)
     logger.setLevel(level)

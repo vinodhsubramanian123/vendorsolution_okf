@@ -9,7 +9,7 @@ impossible with file-based operations alone.
 """
 
 import networkx as nx
-from typing import List, Dict, Any, Optional, Set
+from typing import List, Dict, Any, Optional
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
     RelationshipType,
@@ -220,34 +220,46 @@ class GraphBuilder:
 
         if direction in ("outbound", "both") and node_id in self.graph:
             for _, target, data in self.graph.out_edges(node_id, data=True):
-                if relationship_type and data.get("relationship_type") != relationship_type:
+                if (
+                    relationship_type
+                    and data.get("relationship_type") != relationship_type
+                ):
                     continue
-                results.append({
-                    "source": node_id,
-                    "target": target,
-                    "relationship_type": data.get("relationship_type"),
-                    "evidence": data.get("evidence", []),
-                })
+                results.append(
+                    {
+                        "source": node_id,
+                        "target": target,
+                        "relationship_type": data.get("relationship_type"),
+                        "evidence": data.get("evidence", []),
+                    }
+                )
 
         if direction in ("inbound", "both") and node_id in self.graph:
             for source, _, data in self.graph.in_edges(node_id, data=True):
-                if relationship_type and data.get("relationship_type") != relationship_type:
+                if (
+                    relationship_type
+                    and data.get("relationship_type") != relationship_type
+                ):
                     continue
-                results.append({
-                    "source": source,
-                    "target": node_id,
-                    "relationship_type": data.get("relationship_type"),
-                    "evidence": data.get("evidence", []),
-                })
+                results.append(
+                    {
+                        "source": source,
+                        "target": node_id,
+                        "relationship_type": data.get("relationship_type"),
+                        "evidence": data.get("evidence", []),
+                    }
+                )
 
         return results
 
-    def find_paths(self, source_id: str, target_id: str, max_depth: int = 10) -> List[List[str]]:
+    def find_paths(
+        self, source_id: str, target_id: str, max_depth: int = 10
+    ) -> List[List[str]]:
         """Find all simple paths between two engineering concepts."""
         if source_id in self.graph and target_id in self.graph:
-            return list(nx.all_simple_paths(
-                self.graph, source_id, target_id, cutoff=max_depth
-            ))
+            return list(
+                nx.all_simple_paths(self.graph, source_id, target_id, cutoff=max_depth)
+            )
         return []
 
     def get_dependencies(self, object_id: str) -> List[str]:
@@ -260,15 +272,19 @@ class GraphBuilder:
                     results.append(target)
         return results
 
-    def get_related(self, node_id: str, relationship_type: Optional[str] = None) -> List[str]:
+    def get_related(
+        self, node_id: str, relationship_type: Optional[str] = None
+    ) -> List[str]:
         """
         Get all related node IDs traversing both inbound and outbound edges.
-        
+
         This prevents bugs where relationship direction is inconsistent
         (e.g., Contains can be platform->component or component->platform).
         """
         related = set()
-        for r in self.traverse_relationships(node_id, relationship_type, direction="both"):
+        for r in self.traverse_relationships(
+            node_id, relationship_type, direction="both"
+        ):
             other_id = r["target"] if r["source"] == node_id else r["source"]
             if other_id != node_id:
                 related.add(other_id)
@@ -303,10 +319,10 @@ class GraphBuilder:
         Return an induced subgraph containing only the specified nodes and the
         edges between them. This is useful for passing a narrowed context to
         the LLM reasoning engine.
-        
+
         Args:
             node_ids: List of node IDs to include.
-            
+
         Returns:
             A new NetworkX DiGraph containing the induced subgraph.
         """

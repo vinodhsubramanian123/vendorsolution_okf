@@ -6,6 +6,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api
 
 export function BoqValidation() {
   const [boqInput, setBoqInput] = useState('');
+  const [platformId, setPlatformId] = useState('');
   const [boqResult, setBoqResult] = useState<any>(null);
   const [isBoqLoading, setIsBoqLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -18,7 +19,10 @@ export function BoqValidation() {
     setErrorMsg('');
     try {
       const components = boqInput.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
-      const res = await axios.post(`${API_BASE}/boq/validate`, { components });
+      const res = await axios.post(`${API_BASE}/boq/validate`, {
+        components,
+        platform_id: platformId.trim() || undefined,
+      });
       setBoqResult(res.data);
     } catch (error: any) {
       console.error('Failed to validate BOQ:', error);
@@ -73,6 +77,14 @@ export function BoqValidation() {
             onChange={(e) => setBoqInput(e.target.value)}
             disabled={isBoqLoading}
           />
+          <input
+            type="text"
+            className="glass-input"
+            placeholder="Optional platform ID, e.g. hpe-proliant-dl380-gen12"
+            value={platformId}
+            onChange={(e) => setPlatformId(e.target.value)}
+            disabled={isBoqLoading}
+          />
           <button type="submit" className="btn-primary" disabled={isBoqLoading || !boqInput.trim()}>
             {isBoqLoading ? 'Validating...' : 'Validate BOQ'}
           </button>
@@ -93,6 +105,34 @@ export function BoqValidation() {
         
         {boqResult && !errorMsg && (
           <div style={{ marginTop: '24px' }}>
+            {(() => {
+              const validationMessages = [
+                ...(boqResult.fuzzy_matches || []),
+                ...(boqResult.invalid_skus || []),
+              ];
+              return validationMessages.length > 0 ? (
+                <div style={{ marginBottom: '16px' }}>
+                  <h4>Validation Messages</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                    {validationMessages.map((msg: any, i: number) => {
+                      const bgColor = msg.severity === 'Error' ? 'rgba(239, 68, 68, 0.1)' : msg.severity === 'Warning' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(59, 130, 246, 0.1)';
+                      const borderColor = msg.severity === 'Error' ? '#ef4444' : msg.severity === 'Warning' ? '#eab308' : '#3b82f6';
+                      return (
+                        <div key={i} style={{
+                          padding: '12px',
+                          borderRadius: '6px',
+                          background: bgColor,
+                          borderLeft: `4px solid ${borderColor}`
+                        }}>
+                          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{msg.severity}</div>
+                          <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{msg.message}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null;
+            })()}
             <div style={{ 
               padding: '16px', 
               borderRadius: '8px', 
@@ -105,29 +145,6 @@ export function BoqValidation() {
                 {boqResult.is_valid ? 'Validation Passed' : 'Validation Failed'}
               </h3>
             </div>
-            
-            {boqResult.messages && boqResult.messages.length > 0 && (
-              <div style={{ marginTop: '16px' }}>
-                <h4>Validation Messages</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-                  {boqResult.messages.map((msg: any, i: number) => {
-                    const bgColor = msg.severity === 'Error' ? 'rgba(239, 68, 68, 0.1)' : msg.severity === 'Warning' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(59, 130, 246, 0.1)';
-                    const borderColor = msg.severity === 'Error' ? '#ef4444' : msg.severity === 'Warning' ? '#eab308' : '#3b82f6';
-                    return (
-                      <div key={i} style={{ 
-                        padding: '12px', 
-                        borderRadius: '6px', 
-                        background: bgColor,
-                        borderLeft: `4px solid ${borderColor}`
-                      }}>
-                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{msg.severity}</div>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{msg.message}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
             
             {boqResult.rule_evaluations && boqResult.rule_evaluations.length > 0 && (
               <div style={{ marginTop: '16px' }}>

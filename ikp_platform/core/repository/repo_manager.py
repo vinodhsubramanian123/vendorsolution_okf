@@ -11,7 +11,7 @@ Responsibilities:
 
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List
 import difflib
 
 from ikp_platform.core.ontology.models import (
@@ -40,7 +40,7 @@ class RepoManager:
         self.reader = OKFReader(repository_path)
         self.writer = OKFWriter(repository_path)
         self.graph = GraphBuilder()
-        
+
         # Initialize Vector Store
         vector_db_path = self.project_root / ".chroma"
         vector_db_path.mkdir(exist_ok=True)
@@ -87,9 +87,18 @@ class RepoManager:
         # Perform local semantic text similarity (difflib) to prevent duplicates without LLM I/O
         if obj.type.value == "Rule" and obj.platform_id:
             for existing_id, data in self.graph.graph.nodes(data=True):
-                if data.get("type") == "Rule" and data.get("platform_id") == obj.platform_id:
+                if (
+                    data.get("type") == "Rule"
+                    and data.get("platform_id") == obj.platform_id
+                ):
                     existing_desc = data.get("description", "")
-                    if existing_desc and difflib.SequenceMatcher(None, obj.description, existing_desc).ratio() > 0.90:
+                    if (
+                        existing_desc
+                        and difflib.SequenceMatcher(
+                            None, obj.description, existing_desc
+                        ).ratio()
+                        > 0.90
+                    ):
                         # Semantic duplicate found. Align IDs to merge them.
                         obj.id = existing_id
                         break
@@ -108,12 +117,15 @@ class RepoManager:
                         existing_ev.append(ev.model_dump())
                 # Update the object's evidence list before writing
                 from ikp_platform.core.ontology.models import EvidenceRecord
+
                 obj.evidence = [EvidenceRecord(**e) for e in existing_ev]
         else:
             is_new = True
 
         # Persist to OKF Markdown
-        relative_path = self.writer.write_concept(obj)
+        existing_path = self.reader.path_cache.get(obj.id)
+        relative_path = self.writer.write_concept(obj, existing_path=existing_path)
+        self.reader.path_cache[obj.id] = relative_path
 
         # Add to in-memory graph
         self.graph.add_concept(obj)
@@ -148,7 +160,9 @@ class RepoManager:
         objects = self.reader.load_all()
         return self.vector_store.index_many(objects, batch_size=batch_size)
 
-    def apply_delta(self, delta: KnowledgeDelta, objects: List[BaseEngineeringObject]) -> None:
+    def apply_delta(
+        self, delta: KnowledgeDelta, objects: List[BaseEngineeringObject]
+    ) -> None:
         """
         Apply a validated Knowledge Delta — persist all objects and record the delta.
 
@@ -176,8 +190,8 @@ class RepoManager:
             "# IKP Platform State\n",
             f"**Last Updated**: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n",
             "## Knowledge Graph Statistics\n",
-            f"| Metric | Value |",
-            f"|--------|-------|",
+            "| Metric | Value |",
+            "|--------|-------|",
             f"| Total Nodes | {stats['total_nodes']} |",
             f"| Total Edges | {stats['total_edges']} |",
         ]
@@ -235,7 +249,7 @@ class RepoManager:
 
         lines = [
             "---",
-            f"type: Knowledge Delta",
+            "type: Knowledge Delta",
             f"title: {delta.delta_id}",
             f"description: Delta from source {delta.source_id}",
             f"timestamp: {delta.timestamp.isoformat()}Z",

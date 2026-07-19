@@ -8,14 +8,12 @@ and structured configuration rules. This parser converts rows into Pydantic mode
 """
 
 import pandas as pd
-from typing import List, Dict, Any, Optional, Tuple
-from datetime import datetime
+from typing import List, Optional, Tuple
 import logging
 
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
     Component,
-    Platform,
     SKU,
     EngineeringObjectType,
     EngineeringAttribute,
@@ -79,13 +77,18 @@ class ExcelExtractor:
                 "%s were added to the repository with no COMPATIBLE_WITH "
                 "relationship. They will be ingested but never selected by "
                 "solution generation until linked to a platform.",
-                len(objects), file_path,
+                len(objects),
+                file_path,
             )
 
         # Create delta records for the extracted objects
         changes = []
         for obj in objects:
-            ctype = DeltaChangeType.NEW_COMPONENT if obj.type == EngineeringObjectType.COMPONENT else DeltaChangeType.NEW_SKU
+            ctype = (
+                DeltaChangeType.NEW_COMPONENT
+                if obj.type == EngineeringObjectType.COMPONENT
+                else DeltaChangeType.NEW_SKU
+            )
             changes.append(
                 DeltaChange(
                     change_type=ctype,
@@ -93,15 +96,12 @@ class ExcelExtractor:
                     evidence=EvidenceRecord(
                         source_id=source.source_id,
                         confidence=ConfidenceLevel.HIGH,
-                        description=f"Extracted {obj.type.value} from Excel {source.source_id}"
-                    )
+                        description=f"Extracted {obj.type.value} from Excel {source.source_id}",
+                    ),
                 )
             )
-            
-        delta = KnowledgeDelta(
-            source_id=source.source_id,
-            changes=changes
-        )
+
+        delta = KnowledgeDelta(source_id=source.source_id, changes=changes)
 
         logger.info(f"ExcelExtractor extracted {len(objects)} objects from {file_path}")
         return objects, delta
@@ -111,11 +111,13 @@ class ExcelExtractor:
     ) -> List[Component]:
         """Parse a dataframe of components."""
         components = []
-        evidence = [EvidenceRecord(
-            source_id=source.source_id,
-            confidence=ConfidenceLevel.HIGH,
-            description=f"Extracted from Excel row in {source.source_id}",
-        )]
+        evidence = [
+            EvidenceRecord(
+                source_id=source.source_id,
+                confidence=ConfidenceLevel.HIGH,
+                description=f"Extracted from Excel row in {source.source_id}",
+            )
+        ]
         attr_columns = [c for c in df.columns if str(c).lower().startswith("attr_")]
 
         for _, row in df.iterrows():
@@ -130,25 +132,33 @@ class ExcelExtractor:
                 for col in attr_columns:
                     val = row.get(col)
                     if pd.notna(val):
-                        attributes.append(EngineeringAttribute(
-                            name=str(col)[len("attr_"):],
-                            value=val.item() if hasattr(val, "item") else val,
-                        ))
+                        attributes.append(
+                            EngineeringAttribute(
+                                name=str(col)[len("attr_") :],
+                                value=val.item() if hasattr(val, "item") else val,
+                            )
+                        )
 
                 relationships = []
                 if platform_id:
-                    relationships.append(EngineeringRelationship(
-                        target_id=platform_id,
-                        relationship_type=RelationshipType.COMPATIBLE_WITH,
-                        evidence=evidence,
-                    ))
+                    relationships.append(
+                        EngineeringRelationship(
+                            target_id=platform_id,
+                            relationship_type=RelationshipType.COMPATIBLE_WITH,
+                            evidence=evidence,
+                        )
+                    )
 
                 kwargs = {
                     "id": comp_id,
                     "title": str(row["Title"]).strip(),
-                    "description": str(row.get("Description", "")) if pd.notna(row.get("Description")) else None,
+                    "description": str(row.get("Description", ""))
+                    if pd.notna(row.get("Description"))
+                    else None,
                     "vendor": source.vendor,
-                    "component_category": str(row.get("Category", "")) if pd.notna(row.get("Category")) else None,
+                    "component_category": str(row.get("Category", ""))
+                    if pd.notna(row.get("Category"))
+                    else None,
                     "evidence": evidence,
                     "attributes": attributes,
                     "relationships": relationships,
@@ -165,24 +175,30 @@ class ExcelExtractor:
     def _parse_skus(self, df: pd.DataFrame, source: Source) -> List[SKU]:
         """Parse a dataframe of SKUs."""
         skus = []
-        evidence = [EvidenceRecord(
-            source_id=source.source_id,
-            confidence=ConfidenceLevel.HIGH,
-            description=f"Extracted from Excel row in {source.source_id}",
-        )]
+        evidence = [
+            EvidenceRecord(
+                source_id=source.source_id,
+                confidence=ConfidenceLevel.HIGH,
+                description=f"Extracted from Excel row in {source.source_id}",
+            )
+        ]
         for _, row in df.iterrows():
             try:
                 if pd.isna(row.get("Part Number")) or pd.isna(row.get("Title")):
                     continue
 
                 pn = str(row["Part Number"]).strip()
-                
+
                 kwargs = {
                     "id": f"sku-{pn.lower()}",
                     "title": str(row["Title"]).strip(),
                     "part_number": pn,
-                    "price": float(row["Price"]) if pd.notna(row.get("Price")) else None,
-                    "currency": str(row.get("Currency", "USD")) if pd.notna(row.get("Currency")) else None,
+                    "price": float(row["Price"])
+                    if pd.notna(row.get("Price"))
+                    else None,
+                    "currency": str(row.get("Currency", "USD"))
+                    if pd.notna(row.get("Currency"))
+                    else None,
                     "evidence": evidence,
                 }
 

@@ -13,7 +13,6 @@ import pytest
 import tempfile
 import shutil
 from pathlib import Path
-from datetime import datetime
 
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
@@ -36,8 +35,6 @@ from ikp_platform.core.ontology.models import (
     DeltaChange,
     DeltaChangeType,
     DeltaStatus,
-    CustomerRequest,
-    CustomerRequirement,
     SolutionCandidate,
     Workload,
 )
@@ -58,6 +55,7 @@ def temp_dir():
 # -----------------------------------------------------------------------
 # 1. Ontology Model Tests
 # -----------------------------------------------------------------------
+
 
 class TestOntologyModels:
     def test_platform_creation(self):
@@ -89,11 +87,13 @@ class TestOntologyModels:
             trigger_conditions=["controller_count > 4"],
             expected_outcome="Reject configurations exceeding 4 controllers",
             version=2,
-            evidence=[EvidenceRecord(
-                source_id="SRC-quickspec-001",
-                confidence=ConfidenceLevel.HIGH,
-                description="HPE QuickSpecs page 42",
-            )],
+            evidence=[
+                EvidenceRecord(
+                    source_id="SRC-quickspec-001",
+                    confidence=ConfidenceLevel.HIGH,
+                    description="HPE QuickSpecs page 42",
+                )
+            ],
         )
         assert rule.scope == "Platform"
         assert rule.confidence == ConfidenceLevel.HIGH
@@ -158,6 +158,7 @@ class TestOntologyModels:
 # -----------------------------------------------------------------------
 # 2. OKF Writer Tests
 # -----------------------------------------------------------------------
+
 
 class TestOKFWriter:
     def test_writes_valid_frontmatter(self, temp_dir):
@@ -253,6 +254,7 @@ class TestOKFWriter:
 # 3. OKF Reader Tests (Round-trip)
 # -----------------------------------------------------------------------
 
+
 class TestOKFReader:
     def test_round_trip(self, temp_dir):
         """Write an object, read it back, verify key fields match."""
@@ -285,6 +287,7 @@ class TestOKFReader:
 # -----------------------------------------------------------------------
 # 4. Graph Builder Tests
 # -----------------------------------------------------------------------
+
 
 class TestGraphBuilder:
     def _build_test_graph(self):
@@ -370,119 +373,125 @@ class TestGraphBuilder:
 
     def test_filter_by_component_category(self):
         graph = self._build_test_graph()
-        
+
         gpu = Component(
             id="gpu-h100",
             title="NVIDIA H100",
             vendor="NVIDIA",
-            component_category="GPU"
+            component_category="GPU",
         )
         graph.add_concept(gpu)
-        
+
         results = graph.filter_by_metadata({"component_category": "GPU"})
         assert "gpu-h100" in results
         assert len(results) == 1
 
     def test_filter_by_workload_type(self):
         graph = self._build_test_graph()
-        
+
         workload = Workload(
             id="wl-ai-training",
             title="AI Training",
-            performance_requirements={"tflops": 1000}
+            performance_requirements={"tflops": 1000},
         )
         graph.add_concept(workload)
-        
-        results = graph.filter_by_metadata({"type": EngineeringObjectType.WORKLOAD.value})
+
+        results = graph.filter_by_metadata(
+            {"type": EngineeringObjectType.WORKLOAD.value}
+        )
         assert "wl-ai-training" in results
-        
+
         type_results = graph.filter_by_type(EngineeringObjectType.WORKLOAD.value)
         assert "wl-ai-training" in type_results
 
     def test_filter_by_custom_attributes(self):
         graph = self._build_test_graph()
-        
+
         platform = Platform(
             id="server-1",
             title="Server with Attributes",
             attributes=[
                 EngineeringAttribute(name="Rack Units", value=2),
-                EngineeringAttribute(name="Form Factor", value="Rack")
-            ]
+                EngineeringAttribute(name="Form Factor", value="Rack"),
+            ],
         )
         graph.add_concept(platform)
-        
+
         results = graph.filter_by_metadata({"attr_rack_units": 2})
         assert "server-1" in results
-        
+
         results2 = graph.filter_by_metadata({"attr_form_factor": "Rack"})
         assert "server-1" in results2
 
     def test_filter_by_workload_requirements(self):
         graph = self._build_test_graph()
-        
+
         workload = Workload(
             id="wl-ai",
             title="AI Workload",
             performance_requirements={"tflops": 1000},
-            capacity_requirements={"storage_tb": 50}
+            capacity_requirements={"storage_tb": 50},
         )
         graph.add_concept(workload)
-        
+
         results_perf = graph.filter_by_metadata({"req_perf_tflops": 1000})
         assert "wl-ai" in results_perf
-        
+
         results_cap = graph.filter_by_metadata({"req_cap_storage_tb": 50})
         assert "wl-ai" in results_cap
 
     def test_filter_by_rule_and_constraint(self):
         graph = self._build_test_graph()
-        
+
         rule = Rule(
             id="rule-1",
             title="Max Drives Rule",
             scope="Storage",
-            severity=RuleSeverity.CRITICAL
+            severity=RuleSeverity.CRITICAL,
         )
         graph.add_concept(rule)
-        
+
         constraint = Constraint(
             id="const-1",
             title="Max Drives Constraint",
             limit_name="max_drives",
-            limit_value=24
+            limit_value=24,
         )
         graph.add_concept(constraint)
-        
-        res_rule = graph.filter_by_metadata({"scope": "Storage", "severity": RuleSeverity.CRITICAL.value})
+
+        res_rule = graph.filter_by_metadata(
+            {"scope": "Storage", "severity": RuleSeverity.CRITICAL.value}
+        )
         assert "rule-1" in res_rule
-        
-        res_const = graph.filter_by_metadata({"limit_name": "max_drives", "limit_value": 24})
+
+        res_const = graph.filter_by_metadata(
+            {"limit_name": "max_drives", "limit_value": 24}
+        )
         assert "const-1" in res_const
 
     def test_build_subgraph(self):
         graph = self._build_test_graph()
-        
+
         # Test creating a subgraph with a subset of nodes
         subgraph = graph.build_subgraph(["alletra-6050", "controller-a"])
-        
+
         # Verify the subgraph only contains the requested nodes
         assert subgraph.number_of_nodes() == 2
         assert "alletra-6050" in subgraph.nodes
         assert "controller-a" in subgraph.nodes
-        
+
         # Verify edges are preserved in the induced subgraph
         assert subgraph.has_edge("alletra-6050", "controller-a")
-        
+
         # Verify excluded nodes and their edges are missing
         assert "dl380-gen11" not in subgraph.nodes
         assert not subgraph.has_edge("alletra-6050", "firmware-1.30")
 
 
-
 # -----------------------------------------------------------------------
 # 5. Repository Manager Tests
 # -----------------------------------------------------------------------
+
 
 class TestRepoManager:
     def test_add_and_bootstrap(self, temp_dir):

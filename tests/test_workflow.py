@@ -2,24 +2,34 @@ import pytest
 from unittest.mock import MagicMock
 from ikp_platform.core.workflow.executor import WorkflowExecutor
 from ikp_platform.core.repository.graph_builder import GraphBuilder
-from ikp_platform.core.ontology.models import Platform, Workload, EngineeringRelationship, RelationshipType
-from ikp_platform.core.ontology.models import CustomerRequest, CustomerRequirement, SolutionCandidate, ConfidenceLevel
+from ikp_platform.core.ontology.models import (
+    Platform,
+    Workload,
+    EngineeringRelationship,
+    RelationshipType,
+)
+from ikp_platform.core.ontology.models import (
+    CustomerRequest,
+    SolutionCandidate,
+    ConfidenceLevel,
+)
+
 
 @pytest.fixture
 def mock_graph():
     """Create a minimal mocked Knowledge Graph for testing the workflow."""
     graph = GraphBuilder()
-    
+
     # Add Workload
     wl = Workload(
         id="workload-ai-and-machine-learning",
         title="AI/ML",
         description="AI/ML Workload",
         vendor="Generic",
-        solution_domain="Compute"
+        solution_domain="Compute",
     )
     graph.add_concept(wl)
-    
+
     # Add Platform
     plat = Platform(
         id="dl380",
@@ -30,14 +40,15 @@ def mock_graph():
         relationships=[
             EngineeringRelationship(
                 target_id="workload-ai-and-machine-learning",
-                relationship_type=RelationshipType.SUPPORTS
+                relationship_type=RelationshipType.SUPPORTS,
             )
-        ]
+        ],
     )
     graph.add_concept(plat)
-    
+
     # Add Component
     from ikp_platform.core.ontology.models import Component
+
     comp = Component(
         id="cpu-1",
         title="Intel CPU",
@@ -47,29 +58,30 @@ def mock_graph():
         component_category="CPU",
         relationships=[
             EngineeringRelationship(
-                target_id="dl380",
-                relationship_type=RelationshipType.COMPATIBLE_WITH
+                target_id="dl380", relationship_type=RelationshipType.COMPATIBLE_WITH
             )
-        ]
+        ],
     )
     graph.add_concept(comp)
-    
+
     # Mock rule engine to always say valid for the test
     graph.rule_engine = MagicMock()
     graph.rule_engine.evaluate_solution.return_value = (True, [], [])
-    
+
     return graph
 
 
 def test_workflow_execution(mock_graph):
     """Test the LangGraph pipeline from intent to ranked solutions."""
     executor = WorkflowExecutor(mock_graph)
-    
+
     # Mock parser and generator to avoid real LLM calls and infinite loops
     executor.parser.parse_request = MagicMock()
-    req = CustomerRequest(request_id="req-1", workloads=["workload-ai-and-machine-learning"])
+    req = CustomerRequest(
+        request_id="req-1", workloads=["workload-ai-and-machine-learning"]
+    )
     executor.parser.parse_request.return_value = req
-    
+
     executor.generator.generate = MagicMock()
     candidate = SolutionCandidate(
         request_id="req-1",
@@ -78,16 +90,16 @@ def test_workflow_execution(mock_graph):
         reasoning_chain=["mocked"],
         requirements_satisfied=[],
         confidence=ConfidenceLevel.HIGH,
-        validation_status="Valid"
+        validation_status="Valid",
     )
     executor.generator.generate.return_value = [candidate]
-    
+
     result = executor.execute_query("I need an AI server")
-    
+
     assert "platform" in result
     assert "bom" in result
     assert "ranked_solutions" in result
-    
+
     ranked = result["ranked_solutions"]
     assert len(ranked) == 1
     assert ranked[0]["profile"] == "Balanced"

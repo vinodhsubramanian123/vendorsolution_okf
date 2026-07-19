@@ -11,7 +11,7 @@ losing all knowledge.
 import yaml
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from datetime import datetime, timezone
+from datetime import datetime
 
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
@@ -43,6 +43,7 @@ class OKFReader:
 
     def __init__(self, repository_path: str):
         self.repository_path = Path(repository_path)
+        self.path_cache: Dict[str, str] = {}
 
     def load_all(self) -> List[BaseEngineeringObject]:
         """
@@ -84,33 +85,38 @@ class OKFReader:
         # yaml2
         # ---
         # body2
-        
+
         # We can split by "\n---\n" and handle chunks.
         import re
+
         # Find all frontmatter blocks
         pattern = re.compile(r"(?:^|\n)---\n(.*?)\n---\n(.*?)(?=\n---\n|\Z)", re.DOTALL)
-        
+
         matches = pattern.findall(content)
         if not matches:
             # Fallback to single block parser if regex misses
             fm, body = self._split_frontmatter(content)
             if fm:
                 obj = self._build_object(fm, body, file_path)
-                if obj: objects.append(obj)
+                if obj:
+                    objects.append(obj)
             return objects
-            
+
         for yaml_content, body_content in matches:
             try:
                 fm = yaml.safe_load(yaml_content) or {}
                 if fm:
                     obj = self._build_object(fm, body_content.strip(), file_path)
-                    if obj: objects.append(obj)
+                    if obj:
+                        objects.append(obj)
             except yaml.YAMLError:
                 continue
-                
+
         return objects
 
-    def _build_object(self, frontmatter: Dict[str, Any], body: str, file_path: Path) -> Optional[BaseEngineeringObject]:
+    def _build_object(
+        self, frontmatter: Dict[str, Any], body: str, file_path: Path
+    ) -> Optional[BaseEngineeringObject]:
         """Helper to build a Pydantic object from frontmatter and body."""
 
         obj_type_str = frontmatter.get("type")
@@ -136,11 +142,13 @@ class OKFReader:
         for key in attr_keys:
             attr_name = key[5:].replace("_", " ").title()
             unit_key = f"{key}_unit"
-            attributes.append(EngineeringAttribute(
-                name=attr_name,
-                value=frontmatter[key],
-                unit=frontmatter.get(unit_key),
-            ))
+            attributes.append(
+                EngineeringAttribute(
+                    name=attr_name,
+                    value=frontmatter[key],
+                    unit=frontmatter.get(unit_key),
+                )
+            )
 
         # Parse lifecycle status
         lifecycle_str = frontmatter.get("lifecycle_status", "Unknown")
@@ -155,15 +163,16 @@ class OKFReader:
         if ts:
             try:
                 if isinstance(ts, datetime):
-                    timestamp = ts
+                    _ = ts
                 else:
-                    timestamp = datetime.fromisoformat(ts.rstrip("Z"))
+                    _ = datetime.fromisoformat(ts.rstrip("Z"))
             except (ValueError, AttributeError):
-                timestamp = None
+                _ = None
 
         # Derive ID from frontmatter if available, otherwise fallback to file path
         relative = file_path.relative_to(self.repository_path)
         obj_id = frontmatter.get("id", str(relative.with_suffix("")))
+        self.path_cache[obj_id] = str(relative)
 
         # Build common kwargs
         kwargs = {
@@ -181,6 +190,7 @@ class OKFReader:
             "relationships": relationships,
             "capabilities": frontmatter.get("capabilities", []),
             "tags": frontmatter.get("tags", []),
+            "aliases": frontmatter.get("aliases", []),
             "evidence": evidence,
         }
 
@@ -205,8 +215,13 @@ class OKFReader:
                 confidence=confidence,
                 applicable_objects=frontmatter.get("applicable_objects", []),
                 expected_outcome=self._extract_section(body, "Expected Outcome"),
-                trigger_conditions=self._extract_list_section(body, "Trigger Conditions"),
+                trigger_conditions=self._extract_list_section(
+                    body, "Trigger Conditions"
+                ),
                 version=frontmatter.get("rule_version", 1),
+                negated=frontmatter.get("negated", False),
+                scaling_factor=frontmatter.get("scaling_factor"),
+                dependency_targets=frontmatter.get("dependency_targets", []),
             )
 
         if obj_type == EngineeringObjectType.CONSTRAINT:
@@ -218,10 +233,18 @@ class OKFReader:
             )
 
         if obj_type == EngineeringObjectType.COMPONENT:
+            pkg_type_str = frontmatter.get("packaging_type")
+            pkg_type = (
+                PackagingType(pkg_type_str)
+                if pkg_type_str
+                else PackagingType.STANDALONE
+            )
             return Component(
                 **kwargs,
                 component_category=frontmatter.get("component_category"),
                 component_subcategory=frontmatter.get("component_subcategory"),
+                packaging_type=pkg_type,
+                inclusive_qty=frontmatter.get("inclusive_qty"),
             )
 
         if obj_type == EngineeringObjectType.PLATFORM:
@@ -233,7 +256,11 @@ class OKFReader:
 
         if obj_type == EngineeringObjectType.SKU:
             pkg_type_str = frontmatter.get("packaging_type")
-            pkg_type = PackagingType(pkg_type_str) if pkg_type_str else PackagingType.STANDALONE
+            pkg_type = (
+                PackagingType(pkg_type_str)
+                if pkg_type_str
+                else PackagingType.STANDALONE
+            )
             return SKU(
                 **kwargs,
                 part_number=frontmatter.get("part_number", ""),
@@ -246,7 +273,9 @@ class OKFReader:
         if obj_type == EngineeringObjectType.WORKLOAD:
             return Workload(
                 **kwargs,
-                performance_requirements=frontmatter.get("performance_requirements", {}),
+                performance_requirements=frontmatter.get(
+                    "performance_requirements", {}
+                ),
                 capacity_requirements=frontmatter.get("capacity_requirements", {}),
             )
 
@@ -271,20 +300,21 @@ class OKFReader:
 
         if obj_type == EngineeringObjectType.SOLUTION_CATEGORY:
             return SolutionCategory(**kwargs)
-            
+
         if obj_type == EngineeringObjectType.VARIANT:
             return Variant(
                 **kwargs,
                 base_platform_id=frontmatter.get("base_platform_id", ""),
                 differentiators=frontmatter.get("differentiators", []),
             )
-            
+
         if obj_type == EngineeringObjectType.CONFIGURATION:
             return Configuration(
                 **kwargs,
                 base_platform_id=frontmatter.get("base_platform_id", ""),
                 included_components=frontmatter.get("included_components", []),
                 validated=frontmatter.get("validated", False),
+                validation_source=frontmatter.get("validation_source"),
             )
 
         return BaseEngineeringObject(**kwargs)
@@ -338,10 +368,12 @@ class OKFReader:
                     except ValueError:
                         continue
 
-                    relationships.append(EngineeringRelationship(
-                        target_id=target_id,
-                        relationship_type=rel_type,
-                    ))
+                    relationships.append(
+                        EngineeringRelationship(
+                            target_id=target_id,
+                            relationship_type=rel_type,
+                        )
+                    )
                 except (IndexError, ValueError):
                     continue
 
@@ -365,7 +397,7 @@ class OKFReader:
                     # Parse: [1] [description](url) — _snippet_
                     # or:    [1] description
                     bracket_end = stripped.index("]", 1)
-                    rest = stripped[bracket_end + 1:].strip()
+                    rest = stripped[bracket_end + 1 :].strip()
 
                     desc = rest
                     url = None
@@ -382,12 +414,14 @@ class OKFReader:
                     if "— _" in rest and rest.endswith("_"):
                         snippet = rest.split("— _")[1].rstrip("_")
 
-                    evidence.append(EvidenceRecord(
-                        source_id=desc,
-                        description=desc,
-                        url=url,
-                        original_text_snippet=snippet,
-                    ))
+                    evidence.append(
+                        EvidenceRecord(
+                            source_id=desc,
+                            description=desc,
+                            url=url,
+                            original_text_snippet=snippet,
+                        )
+                    )
                 except (IndexError, ValueError):
                     continue
 

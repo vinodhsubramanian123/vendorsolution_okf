@@ -7,6 +7,7 @@ Requires GEMINI_API_KEY to do anything useful -- without it, every
 embedding call fails and this indexes 0 objects (loudly, via logging,
 not silently).
 """
+
 import sys
 from pathlib import Path
 import logging

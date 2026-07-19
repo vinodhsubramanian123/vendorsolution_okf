@@ -33,19 +33,20 @@ LangGraph represents the dynamic orchestration pipeline that queries the Knowled
 
 As we continue development, refer to this checklist to understand what parts of the multi-step solution are complete versus pending.
 
-### ✅ IMPLEMENTED (The Foundation)
+### IMPLEMENTED (The Foundation)
 1.  **Ingestion Pipeline**: Automated extraction from PDF sources (`pdf_extractor.py`, `table_parser.py`). Populates the graph.
 2.  **Knowledge Graph Storage**: The Open Knowledge Format (OKF) repository markdown writer and reader (`okf_writer.py`, `okf_reader.py`).
 3.  **In-Memory Graph**: NetworkX-based `GraphBuilder` for fast traversal and filtering, complete with bidirectional traversal helpers (`get_related`).
 4.  **Deterministic Validation**: The `RuleEngine` that traverses the graph to validate constraints, category limits, rules, and compatibility strictly within solution domains.
 5.  **Semantic Search & Deduplication**: Vector storage and difflib matching to prevent duplicate rule creation.
+6.  **LangGraph Orchestrator**: Implemented under `ikp_platform/core/workflow/` with bounded attempts and placeholder nodes for live portal/HITL behavior.
+7.  **Customer Intent Mapping**: Implemented through `IntentParser`, using Gemini when configured and deterministic fallback behavior when it is not.
+8.  **Solution Synthesis And Ranking**: Implemented through `SolutionGenerator` with profile-based candidates; pricing remains placeholder-level.
 
-### ❌ NOT YET IMPLEMENTED (The Next Steps)
-1.  **The LangGraph Orchestrator**: The actual LangGraph state machine, nodes, and edges that drive the multi-step AI workflow. Currently, we just have the underlying reasoning tools.
-2.  **Customer Intent Mapping**: The pipeline step that takes unstructured customer requests and maps them to `Workload` nodes to begin the traversal.
-3.  **SKU Ranking System**: The logic to generate 5 valid solutions and rank them based on non-technical customer preferences (budget, vendor, etc.) by traversing `HasSKU` edges.
-4.  **Advanced Ingestion Extractors**: The Excel and Portal parsers needed to dynamically extract `Variant`, `SolutionCategory`, and `Configuration` objects (flagged in the audit).
-5.  **Live Partner Portal Integration**: The dynamic validation loop that checks a statically-valid BOM against live vendor APIs for global supply chain limits, temporary/permanent error classification, and Knowledge Graph updates (see placeholders in `ikp_platform/core/workflow/nodes.py`).
-6.  **Human-in-the-Loop (HITL)**: Workflow pausing for engineer intervention during difficult vendor API rejections or unresolvable cyclic constraints.
+### NOT YET IMPLEMENTED OR PARTIAL
+1.  **Live Partner Portal Integration**: The dynamic validation loop is a placeholder and does not call live vendor systems.
+2.  **Human-in-the-Loop (HITL) Resume Flow**: Review queue support exists, but full approve/reject/resume coverage for every `KnowledgeDelta` is still partial.
+3.  **Advanced Extractors**: PDF and Excel exist; portal extraction and broader vendor-specific adapters are still backlog.
+4.  **Live Pricing/Availability Ranking**: Alternative estimates use static placeholders until real pricing or portal data is integrated.
 
-When you build out the LangGraph components, place them in a dedicated workflow directory (e.g., `ikp_platform/core/workflow/`) to keep the separation of concerns absolute.
+Current runtime truth is maintained in `IKP/standards/11_CURRENT_IMPLEMENTATION_STACK.md`.

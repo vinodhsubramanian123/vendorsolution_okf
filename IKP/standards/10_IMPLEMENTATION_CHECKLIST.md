@@ -4,7 +4,7 @@
 
 [x] PDF parser implemented
 
-[ ] Excel parser implemented (Pending)
+[x] Excel parser implemented (Components/SKUs sheets; platform link recommended)
 
 [ ] Portal parser implemented (Pending)
 

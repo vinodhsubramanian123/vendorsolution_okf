@@ -225,6 +225,12 @@ Confidence
 
 Every recommendation SHALL be explainable.
 
+### 7.1 Workflow Orchestration (LangGraph)
+The implementation SHALL NOT use linear execution scripts. It MUST use an Agentic State Machine (e.g., **LangGraph**) to orchestrate the engineering reasoning lifecycle.
+1. **Workflow State**: The pipeline MUST maintain a structured, immutable state object (e.g. `WorkflowState`) tracking customer intent, current BOM draft, missing components, validation errors, and retry attempts.
+2. **Conditional Routing**: Nodes MUST NOT hardcode next steps. The pipeline MUST use conditional edges (e.g., `should_loop_bom`) to evaluate the state dynamically and route back to drafting, to validation, or to human fallback.
+3. **Bounded Retries**: To prevent infinite autonomous loops during complex engineering conflict resolution, the state machine MUST enforce strict retry limits (`attempt_count < max_attempts`). Once limits are exceeded, the workflow MUST cleanly route to a `human_intervention` node to safely halt execution without destroying progress.
+
 ---
 
 # 8. Knowledge Graph Traversal

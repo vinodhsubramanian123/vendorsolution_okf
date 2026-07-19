@@ -1,14 +1,16 @@
 import threading
-import time
 from ikp_platform.api import get_repo
 
 results = []
+
+
 def thread_func():
     try:
         repo = get_repo()
         results.append(id(repo))
     except Exception as e:
         results.append(e)
+
 
 threads = []
 for _ in range(20):
