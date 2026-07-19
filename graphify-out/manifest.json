@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/intent_parser.py": {
-    "mtime": 1784489365.2370138,
-    "ast_hash": "e4a6d4ceb0b87c86598548e06ba0e64e",
+    "mtime": 1784489997.5508876,
+    "ast_hash": "77361105001dace1cec321c01c860187",
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/llm_client.py": {
@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/solution_generator.py": {
-    "mtime": 1784489776.5331447,
-    "ast_hash": "51a8d2b22d1d8cad2445ec812135ec9e",
+    "mtime": 1784490237.894472,
+    "ast_hash": "d1a9810f524d5c1a5efac26e8ab43c6f",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/__init__.py": {
@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/okf_reader.py": {
-    "mtime": 1784488585.8633533,
-    "ast_hash": "5c26038a1e48e58e47bfbe4179cedb98",
+    "mtime": 1784490005.398981,
+    "ast_hash": "4c0e04852a1078841f16111062513bbf",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/okf_writer.py": {
@@ -175,8 +175,8 @@
     "semantic_hash": ""
   },
   "ikp_web/package.json": {
-    "mtime": 1784448841.559013,
-    "ast_hash": "eb78ce1eb77641e4da28f1e1793af335",
+    "mtime": 1784490343.9924383,
+    "ast_hash": "c63d73f020eb8f11bce274ed24b149ce",
     "semantic_hash": ""
   },
   "ikp_web/src/App.tsx": {
@@ -240,8 +240,8 @@
     "semantic_hash": ""
   },
   "pyproject.toml": {
-    "mtime": 1784472197.1995213,
-    "ast_hash": "b3e94808cffc91f2fafa31c48b9afdc2",
+    "mtime": 1784490260.1108675,
+    "ast_hash": "73cb97571ec9facdf763d312fcda41a9",
     "semantic_hash": ""
   },
   "scripts/bootstrap.sh": {
@@ -395,8 +395,8 @@
     "semantic_hash": ""
   },
   "STATE.md": {
-    "mtime": 1784487983.8281448,
-    "ast_hash": "371748c6eedb54387f724551ced5412f",
+    "mtime": 1784489879.8017282,
+    "ast_hash": "24867f8aca46c561f5bd1aea6d97e8ff",
     "semantic_hash": ""
   },
   "ikp_web/index.html": {
@@ -547,6 +547,31 @@
   "tests/integration/test_recovery_boundaries.py": {
     "mtime": 1784487102.5052724,
     "ast_hash": "18ea9600b3549fc5f4ba2b5f2891fb6c",
+    "semantic_hash": ""
+  },
+  "ikp_web/tests/unit/Sidebar.test.tsx": {
+    "mtime": 1784490334.9322631,
+    "ast_hash": "c9df22e1714017ec49b9bded67cf4c55",
+    "semantic_hash": ""
+  },
+  "ikp_web/tests/unit/setup.ts": {
+    "mtime": 1784490332.2802122,
+    "ast_hash": "00e47f7b9836e8f731101981fa2bb2de",
+    "semantic_hash": ""
+  },
+  "ikp_web/vitest.config.ts": {
+    "mtime": 1784490370.1729517,
+    "ast_hash": "7e9f219b116f1fa15a61f18b7706472f",
+    "semantic_hash": ""
+  },
+  "tests/integration/test_llm_chaos.py": {
+    "mtime": 1784490208.0059547,
+    "ast_hash": "4ac9c6064424b2d7a70245f2d53eaf54",
+    "semantic_hash": ""
+  },
+  "tests/performance/locustfile.py": {
+    "mtime": 1784490275.247142,
+    "ast_hash": "84dd3d94ccaf0b5c29086caf776519e1",
     "semantic_hash": ""
   }
 }
