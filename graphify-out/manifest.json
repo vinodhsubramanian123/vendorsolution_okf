@@ -5,13 +5,13 @@
     "semantic_hash": ""
   },
   "ikp_platform/api.py": {
-    "mtime": 1784485975.354319,
-    "ast_hash": "15f5ac1b8ba02f625d040c2667fe1cbd",
+    "mtime": 1784488559.922122,
+    "ast_hash": "695e4dc0935fc4842210b2881258ceb7",
     "semantic_hash": ""
   },
   "ikp_platform/cli.py": {
-    "mtime": 1784468264.640573,
-    "ast_hash": "9ece87837d52124445b7587db5fa4bd9",
+    "mtime": 1784488558.9780772,
+    "ast_hash": "0244bfb2ef9b47cb72b9a77e4ed3bb96",
     "semantic_hash": ""
   },
   "ikp_platform/core/__init__.py": {
@@ -35,13 +35,13 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/ingestion/source_registry.py": {
-    "mtime": 1784456807.2038019,
-    "ast_hash": "a3d6bd5792b3f1e6608f25ecd6b6b43d",
+    "mtime": 1784489385.5645041,
+    "ast_hash": "3dc0d939ab0586a2f7be7faea4ef1ff0",
     "semantic_hash": ""
   },
   "ikp_platform/core/ingestion/source_watcher.py": {
-    "mtime": 1784484932.2326448,
-    "ast_hash": "b36b37b1cdf4b1f43f1be1efcc584f9d",
+    "mtime": 1784488484.05048,
+    "ast_hash": "06312949695ca7b63c77e918cf2b1596",
     "semantic_hash": ""
   },
   "ikp_platform/core/ingestion/table_parser.py": {
@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/ontology/models.py": {
-    "mtime": 1784484796.9928699,
-    "ast_hash": "01d3238b73def2c4c47eb53f79f36b9a",
+    "mtime": 1784489830.3053923,
+    "ast_hash": "4022eb9b9d2eda480048cc8223e048a0",
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/__init__.py": {
@@ -80,23 +80,23 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/intent_parser.py": {
-    "mtime": 1784453396.714236,
-    "ast_hash": "942fc9f5002167ea3ac8a4bcd54127c5",
+    "mtime": 1784489365.2370138,
+    "ast_hash": "e4a6d4ceb0b87c86598548e06ba0e64e",
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/llm_client.py": {
-    "mtime": 1784485803.6204793,
-    "ast_hash": "c48153d26bd3a4dc0630c1c87d53fda7",
+    "mtime": 1784488566.906454,
+    "ast_hash": "468fc117b9490ed0ab5fdd3ff8404445",
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/rule_engine.py": {
-    "mtime": 1784485068.162699,
-    "ast_hash": "f71f119c4f311a0555fa68ca83bb2d13",
+    "mtime": 1784488872.7165992,
+    "ast_hash": "f4b09da92f0e4858c182b192308d715e",
     "semantic_hash": ""
   },
   "ikp_platform/core/reasoning/solution_generator.py": {
-    "mtime": 1784486183.8529658,
-    "ast_hash": "d92cc496b0307465712fc4bd89d1ff1d",
+    "mtime": 1784489776.5331447,
+    "ast_hash": "51a8d2b22d1d8cad2445ec812135ec9e",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/__init__.py": {
@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/okf_reader.py": {
-    "mtime": 1784470490.3466349,
-    "ast_hash": "d45235cfe83e3aa6f8bc1aae8962edf8",
+    "mtime": 1784488585.8633533,
+    "ast_hash": "5c26038a1e48e58e47bfbe4179cedb98",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/okf_writer.py": {
@@ -125,8 +125,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/repo_manager.py": {
-    "mtime": 1784485230.5004082,
-    "ast_hash": "9ab176cd9c61cd0dd349102ce16c752b",
+    "mtime": 1784488933.5073378,
+    "ast_hash": "4c5d3452e5b1513e883614350edc38d0",
     "semantic_hash": ""
   },
   "ikp_platform/core/repository/vector_store.py": {
@@ -140,8 +140,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/validation/boq_validator.py": {
-    "mtime": 1784456807.207802,
-    "ast_hash": "f42605beccf0447564daedf92d173f21",
+    "mtime": 1784489334.7538595,
+    "ast_hash": "44a51d85ebcaa237589c4528789b5578",
     "semantic_hash": ""
   },
   "ikp_platform/core/validation/validator.py": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "ikp_web/src/components/SolutionSynthesis.tsx": {
-    "mtime": 1784470294.2261112,
-    "ast_hash": "439dcabce13db63d9db5c1892023bd19",
+    "mtime": 1784488451.2728858,
+    "ast_hash": "7fcf3177d01b547555e219c7339e51bc",
     "semantic_hash": ""
   },
   "ikp_web/src/components/ValidationPortal.tsx": {
@@ -345,8 +345,8 @@
     "semantic_hash": ""
   },
   "tests/test_reasoning.py": {
-    "mtime": 1784453396.7062361,
-    "ast_hash": "db4df535f6bad5c9c3992201e8b0224c",
+    "mtime": 1784489597.8973794,
+    "ast_hash": "e90335dc6578c18b7cf5f425a65ad4f9",
     "semantic_hash": ""
   },
   "tests/test_topology.py": {
@@ -465,8 +465,8 @@
     "semantic_hash": ""
   },
   "ikp_platform/core/workflow/nodes.py": {
-    "mtime": 1784486508.037774,
-    "ast_hash": "6e2142b25aeb3b01542507e7e79bc7a7",
+    "mtime": 1784488848.6995118,
+    "ast_hash": "abd4e80501d631e3a64c98c868f73143",
     "semantic_hash": ""
   },
   "ikp_platform/core/workflow/state.py": {
@@ -540,8 +540,8 @@
     "semantic_hash": ""
   },
   "tests/integration/test_headless_synthesis.py": {
-    "mtime": 1784485948.5061352,
-    "ast_hash": "ef9c443b9b4c37334ed3282150853444",
+    "mtime": 1784489349.5454366,
+    "ast_hash": "169ed8e99a58f705d2d9fa79d765e27d",
     "semantic_hash": ""
   },
   "tests/integration/test_recovery_boundaries.py": {

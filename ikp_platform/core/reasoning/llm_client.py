@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Tuple
 from google import genai
 from google.genai import types
 from pydantic import BaseModel
+from google.genai.errors import APIError
 from dotenv import load_dotenv
 
 load_dotenv()

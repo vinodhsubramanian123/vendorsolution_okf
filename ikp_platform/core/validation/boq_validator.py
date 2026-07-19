@@ -96,9 +96,25 @@ class BOQValidator(VendorValidator):
                     if cat:
                         categories_found.add(cat.upper())
 
+        # Determine mandatory categories dynamically from the platform node
+        platform_id = None
+        for comp_id in component_ids:
+            if comp_id in self.graph.graph and self.graph.graph.nodes[comp_id].get("type") == EngineeringObjectType.PLATFORM.value:
+                platform_id = comp_id
+                break
+
+        mandatory = ["PLATFORM"] # Always need a platform at minimum
+        if platform_id:
+            plat_data = self.graph.graph.nodes[platform_id]
+            mandatory.extend(plat_data.get("mandatory_categories", []))
+        else:
+            # If no platform was found, we can't determine mandatory categories,
+            # but the lack of a platform will be flagged.
+            pass
+
         missing = []
-        for req in ["PLATFORM", "CPU", "MEMORY"]:
-            if req not in categories_found:
+        for req in mandatory:
+            if req.upper() not in categories_found:
                 missing.append(req)
 
         if missing:

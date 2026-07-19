@@ -33,7 +33,7 @@ REPOSITORY_PATH = PROJECT_ROOT / "repository"
 SOURCES_PATH = PROJECT_ROOT / "sources"
 
 from ikp_platform.core.repository.repo_manager import RepoManager  # noqa: E402
-from ikp_platform.core.ingestion.source_registry import SourceRegistry, ProcessingRegistry  # noqa: E402
+from ikp_platform.core.ingestion.source_registry import SourceRegistry  # noqa: E402
 from ikp_platform.core.ingestion.source_watcher import SourceWatcher  # noqa: E402
 from ikp_platform.core.ingestion.pdf_extractor import PDFExtractor  # noqa: E402
 from ikp_platform.core.ingestion.excel_parser import ExcelExtractor  # noqa: E402
@@ -246,8 +246,7 @@ def cmd_validate(solution_id: str):
 def cmd_learn():
     """Run the continuous learning loop to process pending knowledge deltas."""
     logger.info("=== IKP Learning Loop ===")
-    registry = ProcessingRegistry()
-    repo = RepoManager(registry)
+    repo = RepoManager(str(REPOSITORY_PATH), str(PROJECT_ROOT))
     from ikp_platform.core.learning.learning_engine import LearningEngine
     
     if not hasattr(repo, "learning_engine"):

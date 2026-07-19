@@ -306,6 +306,7 @@ class Platform(BaseEngineeringObject):
     variants: List[str] = Field(default_factory=list)  # IDs of Variant objects
     slot_mapping_ids: List[str] = Field(default_factory=list)  # IDs of SlotMapping objects
     platform_sku: Optional[str] = None  # Master SKU for the platform itself
+    mandatory_categories: List[str] = Field(default_factory=list)
 
 
 class Component(BaseEngineeringObject):
@@ -496,6 +497,7 @@ class ValidationFailure(BaseModel):
     rule_id: Optional[str] = None         # which Rule/CategoryLimit fired, if any
     category: Optional[str] = None        # e.g. "GPU", for category-level failures
     message: str                          # human-readable, for logs/UI -- not for parsing
+    payload: Dict[str, Any] = Field(default_factory=dict) # structured data for programmatic recovery
 
 
 class CustomerRequest(BaseModel):
@@ -512,7 +514,7 @@ class CustomerRequest(BaseModel):
     vendor_preference: Optional[str] = None
     target_platform: Optional[str] = None
     budget: Optional[float] = None
-    previous_errors: List[str] = Field(default_factory=list)
+    previous_errors: List[Any] = Field(default_factory=list)
     excluded_component_ids: List[str] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=_utcnow)
 

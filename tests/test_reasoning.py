@@ -4,8 +4,15 @@ from ikp_platform.core.reasoning.rule_engine import RuleEngine
 from ikp_platform.core.reasoning.solution_generator import SolutionGenerator
 from ikp_platform.core.repository.graph_builder import GraphBuilder
 
+from unittest.mock import patch, MagicMock
 
-def test_intent_parser():
+@patch("ikp_platform.core.reasoning.intent_parser.LLMClient.parse_intent")
+def test_intent_parser(mock_parse_intent):
+    mock_parse_intent.return_value = {
+        "workloads": ["ai"],
+        "requirements": [{"category": "technical", "name": "Accelerator", "value": "GPU"}],
+        "vendor_preference": None
+    }
     parser = IntentParser()
     request = parser.parse_request("I need an AI server with a GPU")
 
@@ -13,11 +20,17 @@ def test_intent_parser():
     assert any(req.value == "GPU" for req in request.requirements)
 
 
-def test_solution_generator():
+@patch("ikp_platform.core.reasoning.intent_parser.LLMClient.parse_intent")
+def test_solution_generator(mock_parse_intent):
+    mock_parse_intent.return_value = {
+        "workloads": ["ai"],
+        "requirements": [{"category": "technical", "name": "Accelerator", "value": "GPU"}],
+        "vendor_preference": None
+    }
     graph = GraphBuilder()
 
     platform = Platform(
-        id="test-platform", type=EngineeringObjectType.PLATFORM, title="Test Server"
+        id="test-platform", type=EngineeringObjectType.PLATFORM, title="Test Server", capabilities=["ai"]
     )
     gpu = Component(
         id="test-gpu",

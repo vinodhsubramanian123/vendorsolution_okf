@@ -46,7 +46,8 @@ class RuleEngine:
                 [ValidationFailure(
                     failure_type=ValidationFailureType.INVALID_SKU,
                     object_id=platform_id,
-                    message=f"Platform {platform_id} not found in repository"
+                    message=f"Platform {platform_id} not found in repository",
+                    payload={"invalid_skus": [platform_id]}
                 )],
             )
 
@@ -101,43 +102,43 @@ class RuleEngine:
                 errors.append(ValidationFailure(
                     failure_type=ValidationFailureType.INVALID_SKU,
                     object_id=comp_id,
-                    message=f"Component not found: {comp_id}"
+                    message=f"Component not found: {comp_id}",
+                    payload={"invalid_skus": [comp_id]}
                 ))
                 continue
 
             comp_data = self.graph.graph.nodes[comp_id]
             comp_domain = str(comp_data.get("solution_domain") or "Unknown").lower()
 
-            # --- STRICT DOMAIN ISOLATION BARRIER ---
-            if comp_domain != platform_domain and comp_domain not in (
-                "networking",
-                "infrastructure",
-                "unknown",
-            ):
-                err_msg = f"CROSS-DOMAIN BLEED DETECTED: Rejected {comp_id} (Domain: {comp_domain}) on Platform {platform_id} (Domain: {platform_domain})"
-                errors.append(ValidationFailure(
-                    failure_type=ValidationFailureType.INCOMPATIBLE,
-                    object_id=comp_id,
-                    message=err_msg
-                ))
-                logger.error(err_msg)
-                continue
-
-            if comp_id not in platform_compatible:
+            # Determine explicit compatibility between component and platform
+            is_explicitly_compatible = comp_id in platform_compatible
+            if not is_explicitly_compatible:
                 comp_outbound = set(self.graph.get_compatible(comp_id))
-                if platform_id not in comp_outbound:
-                    # Both directions, not just outbound: extractors and
-                    # tests don't consistently orient Contains edges the same
-                    # way (platform->component vs component->platform). This
-                    # is the same direction-assumption bug commit a6ef5df
-                    # fixed in _evaluate_constraints below. Hand-rolled loops
-                    # have been replaced with `get_related`.
+                if platform_id in comp_outbound:
+                    is_explicitly_compatible = True
+                else:
                     contains_targets = self.graph.get_related(platform_id, "Contains")
+                    if comp_id in contains_targets:
+                        is_explicitly_compatible = True
 
-                    if comp_id not in contains_targets:
-                        msg = f"Warning: {comp_id} has no explicit compatibility link to {platform_id}"
-                        reasoning_chain.append(msg)
-                        logger.warning(msg)
+            # --- STRICT DOMAIN ISOLATION BARRIER ---
+            # Reject cross-domain selections UNLESS they are explicitly linked via a compatibility edge
+            if comp_domain != platform_domain and comp_domain != "unknown":
+                if not is_explicitly_compatible:
+                    err_msg = f"CROSS-DOMAIN BLEED DETECTED: Rejected {comp_id} (Domain: {comp_domain}) on Platform {platform_id} (Domain: {platform_domain}) due to missing explicit compatibility edge."
+                    errors.append(ValidationFailure(
+                        failure_type=ValidationFailureType.INCOMPATIBLE,
+                        object_id=comp_id,
+                        message=err_msg,
+                        payload={"incompatible": [comp_id], "domain_conflict": True}
+                    ))
+                    logger.error(err_msg)
+                    continue
+
+            if not is_explicitly_compatible:
+                msg = f"Warning: {comp_id} has no explicit compatibility link to {platform_id}"
+                reasoning_chain.append(msg)
+                logger.warning(msg)
             else:
                 msg = f"Validated compatibility: {comp_id} <-> {platform_id}"
                 reasoning_chain.append(msg)
@@ -210,7 +211,8 @@ class RuleEngine:
                             failure_type=ValidationFailureType.CATEGORY_LIMIT_EXCEEDED,
                             rule_id=constraint_id,
                             category=target_cat or target_subcat,
-                            message=f"Constraint violation: {limit_name} (Max: {limit_value}, Requested: {current_qty})"
+                            message=f"Constraint violation: {limit_name} (Max: {limit_value}, Requested: {current_qty})",
+                            payload={"limit_exceeded": {"category": target_cat or target_subcat, "limit": limit_value, "requested": current_qty}}
                         ))
                     else:
                         evidence = (
@@ -253,7 +255,8 @@ class RuleEngine:
                     errors.append(ValidationFailure(
                         failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY,
                         object_id=comp_id,
-                        message=f"Missing dependency: {comp_id} requires {dep_id}"
+                        message=f"Missing dependency: {comp_id} requires {dep_id}",
+                        payload={"missing": [dep_id]}
                     ))
                 else:
                     reasoning_chain.append(
@@ -367,7 +370,8 @@ class RuleEngine:
                         errors.append(ValidationFailure(
                             failure_type=ValidationFailureType.RULE_VIOLATION,
                             rule_id=rule_id,
-                            message=f"Rule Violation: {rule_text}"
+                            message=f"Rule Violation: {rule_text}",
+                            payload={"rule_violation": rule_id}
                         ))
                 else:
                     msg = f"Rule satisfied: {rule_text} [Confidence: {conf}]"

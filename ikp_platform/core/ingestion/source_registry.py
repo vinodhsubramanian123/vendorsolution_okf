@@ -110,19 +110,21 @@ class SourceRegistry:
 
     @staticmethod
     def _infer_vendor(filename: str) -> Optional[str]:
-        """Attempt to infer vendor from filename."""
-        vendors = {
-            "hpe": "HPE",
-            "dell": "Dell",
-            "lenovo": "Lenovo",
-            "cisco": "Cisco",
-            "netapp": "NetApp",
-            "pure": "Pure Storage",
-            "nutanix": "Nutanix",
-        }
+        """Attempt to infer vendor from filename using dynamic config."""
+        try:
+            config_path = Path("config/vendors.json")
+            if config_path.exists():
+                with open(config_path, "r", encoding="utf-8") as f:
+                    vendors = json.load(f)
+            else:
+                vendors = {}
+        except Exception as e:
+            logger.warning(f"Could not load vendor config: {e}")
+            vendors = {}
+
         lower = filename.lower()
         for key, vendor in vendors.items():
-            if key in lower:
+            if key.lower() in lower:
                 return vendor
         return None
 

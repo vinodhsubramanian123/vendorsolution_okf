@@ -6,7 +6,7 @@ Governs: Blueprint 04 §4, Blueprint 07 §3, Implementation Checklist item 2
 
 import os
 from pathlib import Path
-from typing import List, Set
+from typing import List
 import logging
 
 logger = logging.getLogger("ikp.ingestion")

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { Send, CheckCircle2, Component } from 'lucide-react';
+import { Send, CheckCircle2, Component, ShieldAlert } from 'lucide-react';
 import type { SolutionCandidate } from '../types/api';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';

@@ -5,7 +5,7 @@ Governs: LangGraph Orchestrator Pipeline
 """
 
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from ikp_platform.core.workflow.state import WorkflowState
 from ikp_platform.core.repository.graph_builder import GraphBuilder
@@ -40,16 +40,19 @@ class WorkflowNodes:
         last_msg = str(messages[-1].content) if messages and hasattr(messages[-1], "content") else str(messages[-1]) if messages else ""
         parsed_request = self.parser.parse_request(last_msg)
 
-        requirements = [r.model_dump() for r in parsed_request.requirements]
+        req_dict = parsed_request.model_dump()
+
+        requirements = req_dict.get("requirements", [])
+        workloads = req_dict.get("workloads", [])
 
         return {
-            "target_workload": parsed_request.workloads[0]
-            if parsed_request.workloads
+            "target_workload": workloads[0]
+            if workloads
             else "Unknown",
             "customer_requirements": {
                 "parsed": requirements,
-                "request_id": parsed_request.request_id,
-                "vendor_preference": parsed_request.vendor_preference,
+                "request_id": req_dict.get("request_id"),
+                "vendor_preference": req_dict.get("vendor_preference"),
             },
             "current_bom": [],
             "validation_errors": [],
@@ -83,7 +86,7 @@ class WorkflowNodes:
         """Draft a Bill of Materials based on platform compatibility using LLM and constraints."""
         platform_id = state.get("selected_platform")
         reqs = state.get("customer_requirements", {})
-        val_errors = state.get("validation_errors", [])
+        val_failures = state.get("validation_failures", [])
 
         requirements = []
         for r_data in reqs.get("parsed", []):
@@ -97,7 +100,7 @@ class WorkflowNodes:
             if state.get("target_workload") != "Unknown"
             else [],
             requirements=requirements,
-            previous_errors=val_errors,
+            previous_errors=val_failures,
             excluded_component_ids=state.get("excluded_component_ids", []),
         )
 
@@ -147,7 +150,7 @@ class WorkflowNodes:
         
         # Cycle Detection
         import hashlib
-        bom_str = ",".join(sorted([str(c) for c in current_bom]))
+        bom_str = ",".join(sorted(current_bom))
         bom_hash = hashlib.sha256(bom_str.encode()).hexdigest()
         
         visited = state.get("visited_bom_hashes", [])
@@ -192,8 +195,7 @@ class WorkflowNodes:
         if not failed_obj:
             failed_obj = failure.get("category") if isinstance(failure, dict) else getattr(failure, "category", None)
         
-        # 0. Missing requirements means we need to regenerate to fill gaps
-        if failure_type == "missing_required_category" or (hasattr(failure_type, "value") and failure_type.value == "missing_required_category"):
+        if failure_type == "missing_required_category" or getattr(failure_type, "value", None) == "missing_required_category":
             logger.info("Recovery: Missing required categories. Forcing regeneration.")
             audit_trail = state.get("recovery_audit_trail", []) + [{"action": "regenerate_missing_dependencies"}]
             return {"needs_regeneration": True, "recovery_audit_trail": audit_trail}

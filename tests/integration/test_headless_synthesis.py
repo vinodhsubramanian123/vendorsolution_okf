@@ -27,6 +27,7 @@ def test_graph():
         id="hpe-proliant-dl380-gen12",
         title="DL380",
         capabilities=["wl-ai"],
+        mandatory_categories=["CPU", "MEMORY"],
         relationships=[EngineeringRelationship(target_id="wl-ai", relationship_type=RelationshipType.SUPPORTS)]
     )
     graph.add_concept(plat)
@@ -78,16 +79,21 @@ def test_headless_negative_scenario_bad_sku(test_graph):
     def mock_evaluate(platform_id, components):
         errors = []
         if "BAD-SKU-999" in [c.upper() for c in components]:
-            errors.append(ValidationFailure(failure_type=ValidationFailureType.INVALID_SKU, message="Invalid SKU requested: 'BAD-SKU-999'"))
+            errors.append(ValidationFailure(failure_type=ValidationFailureType.INVALID_SKU, message="Invalid SKU requested: 'BAD-SKU-999'", payload={"invalid_skus": ["BAD-SKU-999"]}))
         
         # Missing categories check
         cats = [test_graph.graph.nodes[c].get("attr_component_category", "").upper() if c in test_graph.graph else "" for c in components]
+        
+        # Get mandatory from platform
+        plat_node = test_graph.graph.nodes.get(platform_id, {})
+        mandatory_cats = plat_node.get("mandatory_categories", [])
+        
         missing = []
-        for mandatory in ["CPU", "MEMORY"]:
+        for mandatory in mandatory_cats:
             if mandatory not in cats:
                 missing.append(mandatory)
         if missing:
-            errors.append(ValidationFailure(failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY, message=f"Missing core categories: {','.join(missing)}"))
+            errors.append(ValidationFailure(failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY, message=f"Missing core categories: {','.join(missing)}", payload={"missing": missing}))
             
         is_valid = len(errors) == 0
         return is_valid, ["Mock validation run"], errors
@@ -129,12 +135,16 @@ def test_headless_neutral_scenario_missing_mandatory(test_graph):
     def mock_evaluate(platform_id, components):
         errors = []
         cats = [test_graph.graph.nodes[c].get("attr_component_category", "").upper() if c in test_graph.graph else "" for c in components]
+        
+        plat_node = test_graph.graph.nodes.get(platform_id, {})
+        mandatory_cats = plat_node.get("mandatory_categories", [])
+        
         missing = []
-        for mandatory in ["CPU", "MEMORY"]:
+        for mandatory in mandatory_cats:
             if mandatory not in cats:
                 missing.append(mandatory)
         if missing:
-            errors.append(ValidationFailure(failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY, message=f"Missing core categories: {','.join(missing)}"))
+            errors.append(ValidationFailure(failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY, message=f"Missing core categories: {','.join(missing)}", payload={"missing": missing}))
             
         is_valid = len(errors) == 0
         return is_valid, ["Mock validation run"], errors

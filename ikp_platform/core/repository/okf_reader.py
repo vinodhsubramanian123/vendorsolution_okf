@@ -14,9 +14,8 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import logging
 
-logger = logging.getLogger("ikp.repository.reader")
-
 import logging
+logger = logging.getLogger("ikp.repository.reader")
 
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
@@ -26,9 +25,7 @@ from ikp_platform.core.ontology.models import (
     EngineeringAttribute,
     EvidenceRecord,
     LifecycleStatus,
-    ConfidenceLevel,
     Rule,
-    RuleSeverity,
     Constraint,
     Component,
     Platform,
@@ -39,7 +36,6 @@ from ikp_platform.core.ontology.models import (
     SolutionCategory,
     Variant,
     Configuration,
-    PackagingType,
 )
 
 
@@ -230,7 +226,7 @@ class OKFReader:
                 merged_data["trigger_conditions"] = extracted_triggers
 
         try:
-            return ModelClass.model_validate(merged_data)
+            return getattr(ModelClass, "model_validate")(merged_data)
         except Exception as e:
             logger.error(f"Failed to fully validate {obj_id} as {ModelClass.__name__}, falling back to base object: {e}")
             try:

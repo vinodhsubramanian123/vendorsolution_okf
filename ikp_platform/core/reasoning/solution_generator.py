@@ -80,7 +80,7 @@ class SolutionGenerator:
             return candidates
 
         # For each platform, collect arguments for parallel generation
-        tasks = []
+        tasks: List[Any] = []
         for platform_id in platform_ids:
             p_data = self.graph.graph.nodes[platform_id]
 
@@ -146,25 +146,37 @@ class SolutionGenerator:
             # Process previous validation errors to avoid bad SKUs and add missing categories
             invalid_skus = set()
             missing_categories = []
+            
+            logger.error(f"DEBUG SOLUTION GEN: previous_errors={request.previous_errors}")
+            
             if hasattr(request, "previous_errors") and request.previous_errors:
                 for error in request.previous_errors:
-                    if "Invalid SKU" in error or "auto-corrected" in error.lower():
-                        # Extract SKU from quotes, e.g., "Invalid SKU requested: 'BAD-SKU'"
-                        import re as regex
-                        match = regex.search(r"'([^']+)'", error)
-                        if match:
-                            invalid_skus.add(match.group(1).upper())
-                            reasoning_chain.append(f"Dropped invalid SKU '{match.group(1)}' due to previous validation failure.")
-                    elif "Missing core categories:" in error:
-                        # Extract categories
-                        cats_part = error.split("Missing core categories:")[-1].strip()
-                        cats = [c.strip() for c in cats_part.split(",")]
-                        for cat in cats:
+                    err_dict = error if isinstance(error, dict) else getattr(error, "__dict__", {})
+                    payload = err_dict.get("payload", {})
+                    
+                    if "invalid_skus" in payload:
+                        for sku in payload["invalid_skus"]:
+                            invalid_skus.add(sku.upper())
+                            reasoning_chain.append(f"Dropped invalid SKU '{sku}' due to previous validation failure.")
+                    elif "missing" in payload:
+                        for cat in payload["missing"]:
                             missing_categories.append(cat)
                             reasoning_chain.append(f"Forcing selection of missing mandatory category '{cat}'")
                             # Dynamically add to customer requirements so the LLM/fallback finds it
                             from ikp_platform.core.ontology.models import CustomerRequirement
                             request.requirements.append(CustomerRequirement(category="technical", name=cat, value="Any"))
+                    else:
+                        # Fallback for old string errors
+                        err_msg = str(err_dict.get("message") or error)
+                        if "Invalid SKU" in err_msg or "auto-corrected" in err_msg.lower():
+                            import re as regex
+                            match = regex.search(r"'([^']+)'", err_msg)
+                            if match:
+                                invalid_skus.add(match.group(1).upper())
+                        elif "Missing core categories:" in err_msg:
+                            cats_part = err_msg.split("Missing core categories:")[-1].strip()
+                            for cat in [c.strip() for c in cats_part.split(",")]:
+                                missing_categories.append(cat)
             
             # Filter out known invalid SKUs
             compatible_ids = [cid for cid in compatible_ids if cid.upper() not in invalid_skus and cid.split("/")[-1].upper() not in invalid_skus]
@@ -236,9 +248,13 @@ class SolutionGenerator:
             reqs_dict = [req.model_dump() for req in request.requirements]
 
             # 3. Call LLM to select components
-            selected_ids, llm_reasoning, newly_satisfied = self.llm.select_components(
-                platform_id, available_nodes, reqs_dict, profile
-            )
+            try:
+                selected_ids, llm_reasoning, newly_satisfied = self.llm.select_components(
+                    platform_id, available_nodes, reqs_dict, profile
+                )
+            except Exception as e:
+                logger.error(f"LLM component selection failed: {e}")
+                selected_ids, llm_reasoning, newly_satisfied = ([], [f"LLM failure: {str(e)}"], [])
 
             if selected_ids or (
                 not selected_ids
@@ -287,14 +303,26 @@ class SolutionGenerator:
                                 or cat_term in cat
                             ):
                                 matches.append(cid)
-
+                    
+                    logger.error(f"DEBUG SOLUTION GEN: req.name={req.name} req.value={req.value} matches={matches}")
                     if matches:
-                        selected = matches[0]
+                        selected = None
+                        # Dry-run candidates through Rule Engine to find a valid choice
+                        for candidate_cid in matches:
+                            test_components = components + [candidate_cid]
+                            is_valid, _, _ = self.rule_engine.evaluate_solution(platform_id, test_components)
+                            if is_valid:
+                                selected = candidate_cid
+                                break
+                        
+                        if not selected:
+                            selected = matches[0]
+                            reasoning_chain.append(f"Fallback selection {selected} violates constraints but was chosen as last resort for {req.name}")
+                        else:
+                            reasoning_chain.append(f"Added {selected} to satisfy {req.name} requirement")
+
                         components.append(selected)
                         satisfied_reqs.append(req.name)
-                        reasoning_chain.append(
-                            f"Added {selected} to satisfy {req.name} requirement"
-                        )
                         logger.info(
                             f"Added {selected} via generic fallback for {req.name}"
                         )

@@ -12,7 +12,6 @@ load_dotenv()
 
 from ikp_platform.core.repository.repo_manager import RepoManager
 from ikp_platform.core.repository.repo_watcher import RepositoryWatcher
-from ikp_platform.core.reasoning.intent_parser import IntentParser
 from ikp_platform.core.reasoning.solution_generator import SolutionGenerator
 from ikp_platform.core.reasoning.rule_engine import RuleEngine
 from ikp_platform.core.validation.validator import ManualReviewValidator
@@ -111,7 +110,7 @@ def _infer_platforms_for_components(
 ) -> set[str]:
     """Infer possible platforms from explicit platform IDs and compatibility links."""
     explicit_platforms = set()
-    platform_counts = {}
+    platform_counts: Dict[str, int] = {}
 
     for comp_id in component_ids:
         if comp_id not in repo.graph.graph:
@@ -549,10 +548,10 @@ async def approve_object(request: ApprovalRequest, background_tasks: BackgroundT
         target_obj.history.append(
             HistoryEntry(
                 timestamp=datetime.datetime.now(datetime.timezone.utc),
-                description=msg,
                 change_type=DeltaChangeType.UPDATED_ATTRIBUTE,
-                changes=[{"confidence": "High"}],
-                object_id=request.object_id,
+                field_name="confidence",
+                new_value="High",
+                reason=msg,
             )
         )
 
@@ -571,8 +570,8 @@ async def get_pending_deltas():
     repo = get_repo()
     if not hasattr(repo, "learning_engine"):
         from ikp_platform.core.learning.learning_engine import LearningEngine
-        repo.learning_engine = LearningEngine(repo)
-    deltas = repo.learning_engine.get_pending_reviews()
+        repo.learning_engine = LearningEngine(repo)  # type: ignore
+    deltas = repo.learning_engine.get_pending_reviews()  # type: ignore
     return {"deltas": [d.model_dump(mode="json") for d in deltas]}
 
 @app.post("/api/review-queue/deltas/{delta_id}/approve")
@@ -581,11 +580,11 @@ async def approve_delta(delta_id: str, background_tasks: BackgroundTasks, review
     repo = get_repo()
     if not hasattr(repo, "learning_engine"):
         from ikp_platform.core.learning.learning_engine import LearningEngine
-        repo.learning_engine = LearningEngine(repo)
+        repo.learning_engine = LearningEngine(repo)  # type: ignore
         
-    success = repo.learning_engine.approve_delta(delta_id, reviewer)
+    success = repo.learning_engine.approve_delta(delta_id, reviewer)  # type: ignore
     if success:
-        repo.learning_engine.process_validated_deltas(repo.reader.load_all())
+        repo.learning_engine.process_validated_deltas(repo.reader.load_all())  # type: ignore
         background_tasks.add_task(repo.reindex_vector_store)
         return {"status": "success", "message": f"Approved and merged delta {delta_id}"}
     raise HTTPException(status_code=404, detail="Delta not found or not pending")
@@ -596,9 +595,9 @@ async def reject_delta(delta_id: str, reviewer: str = "Human", reason: str = "")
     repo = get_repo()
     if not hasattr(repo, "learning_engine"):
         from ikp_platform.core.learning.learning_engine import LearningEngine
-        repo.learning_engine = LearningEngine(repo)
+        repo.learning_engine = LearningEngine(repo)  # type: ignore
         
-    success = repo.learning_engine.reject_delta(delta_id, reviewer, reason)
+    success = repo.learning_engine.reject_delta(delta_id, reviewer, reason)  # type: ignore
     if success:
         return {"status": "success", "message": f"Rejected delta {delta_id}"}
     raise HTTPException(status_code=404, detail="Delta not found or not pending")

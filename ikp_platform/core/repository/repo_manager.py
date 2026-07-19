@@ -11,8 +11,10 @@ Responsibilities:
 
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Callable, Any
+from functools import wraps
 import difflib
+import threading
 
 from ikp_platform.core.ontology.models import (
     BaseEngineeringObject,
@@ -24,6 +26,14 @@ from ikp_platform.core.repository.okf_writer import OKFWriter
 from ikp_platform.core.repository.graph_builder import GraphBuilder
 from ikp_platform.core.repository.vector_store import VectorStore
 from ikp_platform.core.repository.mcp_client import ObsidianMCPClient
+
+
+def with_lock(func: Callable) -> Callable:
+    @wraps(func)
+    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
+        with self._lock:
+            return func(self, *args, **kwargs)
+    return wrapper
 
 
 class RepoManager:
@@ -50,11 +60,13 @@ class RepoManager:
         self.mcp_client = ObsidianMCPClient(str(self.repository_path))
         
         self.learning_engine = None
+        self._lock = threading.RLock()
 
     # -------------------------------------------------------------------
     # Bootstrap — load existing repository into graph
     # -------------------------------------------------------------------
 
+    @with_lock
     def bootstrap(self) -> int:
         """
         Load all existing OKF files into the in-memory graph.
@@ -71,6 +83,7 @@ class RepoManager:
     # Add / update concepts
     # -------------------------------------------------------------------
 
+    @with_lock
     def add_concept(self, obj: BaseEngineeringObject) -> str:
         """
         Add a new engineering concept to both layers.
@@ -167,6 +180,7 @@ class RepoManager:
         objects = self.reader.load_all()
         return self.vector_store.index_many(objects, batch_size=batch_size)
 
+    @with_lock
     def apply_delta(
         self, delta: KnowledgeDelta, objects: List[BaseEngineeringObject]
     ) -> None:
@@ -188,6 +202,7 @@ class RepoManager:
     # Managed files — Blueprint 02 §4
     # -------------------------------------------------------------------
 
+    @with_lock
     def _update_state_file(self) -> None:
         """Update STATE.md with current platform statistics."""
         stats = self.graph.get_stats()
@@ -214,6 +229,7 @@ class RepoManager:
         with open(state_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
 
+    @with_lock
     def _append_root_log(self, description: str) -> None:
         """Append an entry to the project root LOG.md."""
         log_path = self.project_root / "LOG.md"
@@ -245,6 +261,7 @@ class RepoManager:
         with open(log_path, "w", encoding="utf-8") as f:
             f.write(updated)
 
+    @with_lock
     def _record_delta(self, delta: KnowledgeDelta) -> None:
         """Record a Knowledge Delta in the history/ directory."""
         history_dir = self.project_root / "history"
@@ -284,6 +301,7 @@ class RepoManager:
         with open(delta_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
 
+    @with_lock
     def update_context(self, domains: List[str], source_count: int) -> None:
         """Update CONTEXT.md with current engineering coverage."""
         context_path = self.project_root / "CONTEXT.md"
