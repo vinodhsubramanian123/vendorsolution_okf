@@ -80,7 +80,7 @@ class SourceRegistry:
             processing_status=ProcessingStatus.REGISTERED,
             title=title,
             file_hash=file_hash,
-            confidence=ConfidenceLevel.UNVERIFIED,
+            confidence=ConfidenceLevel.HIGH if source_type in (SourceType.PDF, SourceType.EXCEL, SourceType.CSV) else ConfidenceLevel.UNVERIFIED,
         )
 
         self.sources.append(source)

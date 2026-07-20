@@ -1,11 +1,6 @@
 # IKP Platform State
 
-**Last Updated**: 2026-07-20 00:35:00 UTC
-
-## Recent Architecture Changes
-* 2026-07-20: Decoupled hardcoded vendor heuristics from `IntentParser` and `SourceRegistry`. 
-* 2026-07-20: Dynamic `mandatory_categories` metadata introduced to `Platform` ontology to support non-compute domains (routers, switches). Fixed Pydantic serialization bug silently dropping fields.
-* 2026-07-20: Hardened LangGraph Orchestrator Recovery Boundaries (`nodes.py`, `executor.py`, `graph.py`). Implemented `visited_bom_hashes` and `cycle_detected` to prevent infinite loops during recovery resolution. Fixed strict schema alignment for `ValidationFailure`. E2E headless tests verified.
+**Last Updated**: 2026-07-20 11:17:17 UTC
 
 ## Knowledge Graph Statistics
 

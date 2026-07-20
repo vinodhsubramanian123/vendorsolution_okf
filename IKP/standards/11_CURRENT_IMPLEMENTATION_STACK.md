@@ -95,6 +95,7 @@ The following are architectural intentions from earlier standards, not current r
 - Keep the boundary clear:
   - Knowledge Graph means static engineering facts from OKF.
   - LangGraph means process flow for a customer request.
+- **Ingestion & Data Sources**: Ensure new extraction logic standardizes naming (SKU vs Component Name) and captures bidirectional compatibility edges, as the recovery logic heavily relies on graph completeness. Always rigorously parse configurations to identify what is truly mandatory versus optional.
 - Do not claim a capability is implemented just because a blueprint describes it. Check code and tests.
 - Update this file whenever implementation choices materially change.
 

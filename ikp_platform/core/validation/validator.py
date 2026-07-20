@@ -32,11 +32,13 @@ import uuid
 class ValidationMessage(BaseModel):
     """A single message from a validation check."""
 
-    severity: str  # "Error", "Warning", "Info", "Recommendation"
+    severity: str  # "Error", "Warning", "Info", "Recommendation", "Success"
     code: Optional[str] = None
     message: str
     affected_object: Optional[str] = None
     recommended_action: Optional[str] = None
+    category: Optional[str] = None
+    subcategory: Optional[str] = None
 
 
 class ValidationResult(BaseModel):

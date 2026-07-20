@@ -187,6 +187,31 @@ class SolutionGenerator:
                 compatible_ids = [cid for cid in compatible_ids if cid not in excluded_set]
             
             # --- END FEEDBACK LOOP FIX ---
+            
+            # --- START PROACTIVE MANDATORY INJECTION ---
+            # Extract mandatory categories from CategoryLimits that have min_qty > 0
+            existing_req_cats = {req.name.lower() for req in request.requirements}
+            
+            platform_constraints = set()
+            for other_id in self.graph.get_related(platform_id, "Contains"):
+                if self.graph.graph.nodes[other_id].get("type") == EngineeringObjectType.CATEGORY_LIMIT.value:
+                    platform_constraints.add(other_id)
+                    
+            for constraint_id in platform_constraints:
+                c_data = self.graph.graph.nodes[constraint_id]
+                min_qty = c_data.get("min_qty")
+                if isinstance(min_qty, int) and min_qty > 0:
+                    target_subcat = c_data.get("attr_target_subcategory")
+                    target_cat = c_data.get("attr_target_category")
+                    target = target_cat or target_subcat
+                    
+                    if target and target.lower() not in existing_req_cats:
+                        from ikp_platform.core.ontology.models import CustomerRequirement
+                        request.requirements.append(CustomerRequirement(category="technical", name=target, value="Any"))
+                        existing_req_cats.add(target.lower())
+                        reasoning_chain.append(f"Proactively injected mandatory category '{target}' based on min_qty={min_qty}")
+                        logger.info(f"Proactively injecting mandatory category: {target}")
+            # --- END PROACTIVE MANDATORY INJECTION ---
 
             # If we have a vector store or MCP client, use semantic/full-text search to massively reduce the search space
             if self.vector_store or self.mcp_client:

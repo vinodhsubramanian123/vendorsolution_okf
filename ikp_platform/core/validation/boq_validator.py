@@ -2,13 +2,14 @@ import difflib
 import logging
 from typing import List, Tuple
 from .validator import VendorValidator, ValidationResult, ValidationMessage
+from ikp_platform.core.validation.pipeline import ValidationStep, ValidationContext
 from ikp_platform.core.repository.graph_builder import GraphBuilder
 from ikp_platform.core.ontology.models import EngineeringObjectType
 
 logger = logging.getLogger("ikp.validation.boq")
 
 
-class BOQValidator(VendorValidator):
+class BOQValidator(VendorValidator, ValidationStep):
     """
     Validates a Bill of Quantities against the canonical catalog,
     using fuzzy matching to auto-correct minor typos.
@@ -158,3 +159,32 @@ class BOQValidator(VendorValidator):
 
         self._check_completeness(corrected_components, result)
         return result
+
+    def execute(self, context: ValidationContext) -> ValidationContext:
+        """
+        Implementation of the ValidationStep interface.
+        """
+        res = self.validate(context.original_components, {"solution_id": "boq-eval"})
+        context.corrected_components = []
+        
+        for requested_sku in context.original_components:
+            matched_id, was_fuzzy, score, algo = self.fuzzy_match_sku(requested_sku)
+            context.corrected_components.append(matched_id)
+            if was_fuzzy:
+                context.messages.append(
+                    ValidationMessage(
+                        severity="Info",
+                        message=f"Auto-corrected requested SKU '{requested_sku}' to '{matched_id}' (algo: {algo}, confidence: {score:.2f})",
+                        affected_object=matched_id,
+                    )
+                )
+            elif matched_id == requested_sku and matched_id not in self.graph.graph:
+                context.messages.append(
+                    ValidationMessage(
+                        severity="Error",
+                        message=f"Invalid SKU requested: '{requested_sku}'. Could not find a match.",
+                    )
+                )
+                context.is_valid = False
+                
+        return context

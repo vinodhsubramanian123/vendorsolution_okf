@@ -971,8 +971,8 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
             elif sev_str == "ERROR":
                 severity = RuleSeverity.ERROR
 
-            conf_str = r_dict.get("confidence", "Medium").upper()
-            confidence = ConfidenceLevel.MEDIUM
+            conf_str = r_dict.get("confidence", "High").upper()
+            confidence = ConfidenceLevel.HIGH
             if conf_str == "HIGH":
                 confidence = ConfidenceLevel.HIGH
             elif conf_str == "LOW":

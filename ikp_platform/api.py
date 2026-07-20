@@ -14,8 +14,10 @@ from ikp_platform.core.repository.repo_manager import RepoManager
 from ikp_platform.core.repository.repo_watcher import RepositoryWatcher
 from ikp_platform.core.reasoning.solution_generator import SolutionGenerator
 from ikp_platform.core.reasoning.rule_engine import RuleEngine
+from ikp_platform.core.reasoning.remediation_engine import RemediationEngine
 from ikp_platform.core.validation.validator import ManualReviewValidator
 from ikp_platform.core.validation.boq_validator import BOQValidator
+from ikp_platform.core.validation.pipeline import ValidationPipeline, ValidationContext
 from ikp_platform.core.ontology.models import EngineeringObjectType
 from ikp_platform.core.observability import telemetry_trace
 from ikp_platform.core.learning.learning_engine import LearningEngine
@@ -271,13 +273,58 @@ async def validate_solution(request: ValidationRequest):
 @telemetry_trace
 async def validate_boq(request: BOQValidationRequest, background_tasks: BackgroundTasks):
     repo = get_repo()
+    
+    # 1. Setup Pipeline and Context
+    initial_context = ValidationContext(
+        platform_id=request.platform_id,
+        original_components=request.components,
+    )
+    
+    pipeline = ValidationPipeline([
+        BOQValidator(repo.graph, repo.vector_store),
+        RuleEngine(repo.graph),
+        RemediationEngine(repo.graph)
+    ])
+    
+    # 2. Infer platform if necessary
+    platform_id = request.platform_id
+    if not platform_id:
+        boq_val = BOQValidator(repo.graph, repo.vector_store)
+        corrected = []
+        for requested_sku in request.components:
+            matched_id, _, _, _ = boq_val.fuzzy_match_sku(requested_sku)
+            corrected.append(matched_id)
+            
+        found_platforms = _infer_platforms_for_components(repo, corrected)
 
-    # 1. Fuzzy match and correct SKUs
-    boq_validator = BOQValidator(repo.graph, repo.vector_store)
-    boq_result = boq_validator.validate(request.components, {})
+        if len(found_platforms) > 1:
+            return {
+                "status": "error",
+                "is_valid": False,
+                "fuzzy_matches": [],
+                "invalid_skus": [{"severity": "Error", "message": "Multiple platforms detected in BOQ. Please explicitly specify platform_id."}],
+                "corrected_components": corrected,
+                "rule_evaluations": [],
+                "alternatives": [],
+            }
+        elif len(found_platforms) == 1:
+            initial_context.platform_id = found_platforms.pop()
+        else:
+            return {
+                "status": "error",
+                "is_valid": False,
+                "fuzzy_matches": [],
+                "invalid_skus": [{"severity": "Error", "message": "No platform specified and could not infer platform from components. Please explicitly specify platform_id."}],
+                "corrected_components": corrected,
+                "rule_evaluations": [],
+                "alternatives": [],
+            }
+            
+    # 3. Execute Pipeline
+    context = pipeline.execute(initial_context)
 
-    # Record any fuzzy match corrections as a KnowledgeDelta to "learn" typos
-    corrections = [m for m in boq_result.messages if m.severity == "Info"]
+    # 4. Record any fuzzy match corrections as a KnowledgeDelta to "learn" typos
+    corrections = [m for m in context.messages if m.severity == "Info"]
     if corrections:
         from ikp_platform.core.ontology.models import (
             KnowledgeDelta,
@@ -287,7 +334,6 @@ async def validate_boq(request: BOQValidationRequest, background_tasks: Backgrou
             ConfidenceLevel,
         )
         import uuid
-
         changes = []
         for msg in corrections:
             import re
@@ -334,62 +380,40 @@ async def validate_boq(request: BOQValidationRequest, background_tasks: Backgrou
         learning_engine.process_validated_deltas(objects_to_update)
         background_tasks.add_task(repo.reindex_vector_store)
 
-    # Extract the corrected component IDs
-    corrected_components = []
-    for comp in request.components:
-        matched_id, _, _, _ = boq_validator.fuzzy_match_sku(comp)
-        corrected_components.append(matched_id)
-
-    # 2. Run rule engine
-    engine = RuleEngine(repo.graph)
-
-    platform_id = request.platform_id
-    if not platform_id:
-        found_platforms = _infer_platforms_for_components(repo, corrected_components)
-
-        if len(found_platforms) > 1:
-            return {
-                "status": "error",
-                "is_valid": False,
-                "fuzzy_matches": [],
-                "invalid_skus": [{"severity": "Error", "message": "Multiple platforms detected in BOQ. Please explicitly specify platform_id."}],
-                "corrected_components": corrected_components,
-                "rule_evaluations": [],
-                "alternatives": [],
-            }
-        elif len(found_platforms) == 1:
-            platform_id = found_platforms.pop()
-        else:
-            return {
-                "status": "error",
-                "is_valid": False,
-                "fuzzy_matches": [],
-                "invalid_skus": [{"severity": "Error", "message": "No platform specified and could not infer platform from components. Please explicitly specify platform_id."}],
-                "corrected_components": corrected_components,
-                "rule_evaluations": [],
-                "alternatives": [],
-            }
-
-    engine_valid, reasoning_chain, errors = engine.evaluate_solution(
-        platform_id, corrected_components
-    )
-
-    # 3. Format results for UI
+    # 5. Format results for UI
     formatted_rules = []
 
-    # Add reasoning chain items as Info
-    for step in reasoning_chain:
+    # Add passed rules from metadata
+    passed_rules = context.metadata.get("passed_rules", [])
+    for rule in passed_rules:
         formatted_rules.append(
-            {"title": step, "status": "PASS", "severity": "Info", "message": ""}
+            {
+                "title": rule.get("title", ""),
+                "status": "PASS",
+                "severity": "Info",
+                "message": "",
+                "category": rule.get("category", "General"),
+                "subcategory": rule.get("subcategory", "General")
+            }
         )
 
     # Add errors as failures
-    for err in errors:
+    for err in context.errors:
+        remedies = getattr(err, "remediations", [])
+        payload = getattr(err, "payload", {})
         formatted_rules.append(
-            {"title": err.message if hasattr(err, "message") else str(err), "status": "FAIL", "severity": "Error", "message": ""}
+            {
+                "title": err.message if hasattr(err, "message") else str(err),
+                "status": "FAIL",
+                "severity": "Error",
+                "message": "",
+                "remediations": remedies,
+                "category": payload.get("category", "General"),
+                "subcategory": payload.get("subcategory", "General")
+            }
         )
 
-    is_valid = engine_valid and boq_result.is_valid
+    is_valid = context.is_valid
 
     alternatives = []
     if request.num_options > 0:
@@ -403,7 +427,7 @@ async def validate_boq(request: BOQValidationRequest, background_tasks: Backgrou
         generator = SolutionGenerator(repo.graph, repo.vector_store, repo.mcp_client)
         cust_req = CustomerRequest(
             request_id=f"req-{str(uuid.uuid4())[:8]}",
-            target_platform=platform_id,
+            target_platform=context.platform_id,
             workloads=request.workloads,
             requirements=[
                 CustomerRequirement(
@@ -414,7 +438,7 @@ async def validate_boq(request: BOQValidationRequest, background_tasks: Backgrou
 
         candidates = generator.generate(cust_req)
 
-        # Placeholder cost estimates by profile (vendor portal integration pending — ADR-003)
+        # Placeholder cost estimates by profile
         _PROFILE_COST_MAP = {
             "Lowest Cost": 5000,
             "Balanced": 12000,
@@ -428,7 +452,7 @@ async def validate_boq(request: BOQValidationRequest, background_tasks: Backgrou
             alt_dict["estimated_cost"] = c_cost
             alternatives.append(alt_dict)
 
-        # Rank by cost and slice to requested configurable number of options
+        # Rank by cost and slice
         alternatives = sorted(alternatives, key=lambda x: x["estimated_cost"])[
             : request.num_options
         ]
@@ -437,12 +461,12 @@ async def validate_boq(request: BOQValidationRequest, background_tasks: Backgrou
         "status": "success",
         "is_valid": is_valid,
         "fuzzy_matches": [
-            m.model_dump() for m in boq_result.messages if m.severity == "Info"
+            m.model_dump() for m in context.messages if m.severity == "Info"
         ],
         "invalid_skus": [
-            m.model_dump() for m in boq_result.messages if m.severity == "Error"
+            m.model_dump() for m in context.messages if m.severity == "Error"
         ],
-        "corrected_components": corrected_components,
+        "corrected_components": context.corrected_components,
         "rule_evaluations": formatted_rules,
         "alternatives": alternatives,
     }

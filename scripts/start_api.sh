@@ -57,3 +57,8 @@ done
 
 echo "Server is UP and healthy at http://127.0.0.1:${PORT}/api (PID: ${API_PID})"
 echo "${API_PID}" > "${PID_FILE}"
+
+if [[ "${1:-}" == "--foreground" || "${2:-}" == "--foreground" ]]; then
+    echo "Running in foreground mode. Press Ctrl+C to stop."
+    wait "${API_PID}"
+fi

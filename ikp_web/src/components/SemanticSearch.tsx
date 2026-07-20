@@ -61,35 +61,39 @@ export function SemanticSearch() {
           <h3 style={{ fontSize: '1.1rem', margin: 0, color: 'var(--text-main)' }}>Filters</h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Category</label>
-            <input type="text" className="glass-input" placeholder="e.g. Memory" value={filterCategory} onChange={e => setFilterCategory(e.target.value)} />
+            <label htmlFor="filter-category" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Category</label>
+            <input id="filter-category" type="text" className="glass-input" placeholder="e.g. Memory" value={filterCategory} onChange={e => setFilterCategory(e.target.value)} />
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Vendor</label>
-            <input type="text" className="glass-input" placeholder="e.g. HPE" value={filterVendor} onChange={e => setFilterVendor(e.target.value)} />
+            <label htmlFor="filter-vendor" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Vendor</label>
+            <input id="filter-vendor" type="text" className="glass-input" placeholder="e.g. HPE" value={filterVendor} onChange={e => setFilterVendor(e.target.value)} />
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Generation</label>
-            <input type="text" className="glass-input" placeholder="e.g. Gen11" value={filterGeneration} onChange={e => setFilterGeneration(e.target.value)} />
+            <label htmlFor="filter-generation" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Generation</label>
+            <input id="filter-generation" type="text" className="glass-input" placeholder="e.g. Gen11" value={filterGeneration} onChange={e => setFilterGeneration(e.target.value)} />
           </div>
         </div>
         
         {/* Main Content */}
         <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '12px' }}>
-            <input
-              type="text"
-              className="glass-input"
-              placeholder="e.g. Memory configuration rules for DL380"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              disabled={isSearchLoading}
-            />
-            <button type="submit" className="btn-primary" disabled={isSearchLoading || !searchQuery.trim()}>
-              <Database size={18} /> Search
-            </button>
+          <form onSubmit={handleSearch} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label htmlFor="semantic-query" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>Search Query</label>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <input
+                id="semantic-query"
+                type="text"
+                className="glass-input"
+                placeholder="e.g. Memory configuration rules for DL380"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                disabled={isSearchLoading}
+              />
+              <button type="submit" className="btn-primary" disabled={isSearchLoading || !searchQuery.trim()}>
+                <Database size={18} /> Search
+              </button>
+            </div>
           </form>
 
         {searchError && (

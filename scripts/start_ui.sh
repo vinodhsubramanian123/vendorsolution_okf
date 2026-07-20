@@ -51,3 +51,8 @@ done
 
 echo "UI Server is UP at http://127.0.0.1:${PORT} (PID: ${UI_PID})"
 echo "${UI_PID}" > "../${PID_FILE}"
+
+if [[ "${1:-}" == "--foreground" || "${2:-}" == "--foreground" || "${3:-}" == "--foreground" ]]; then
+    echo "Running in foreground mode. Press Ctrl+C to stop."
+    wait "${UI_PID}"
+fi

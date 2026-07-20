@@ -12,14 +12,15 @@ from typing import List, Tuple, Dict
 
 from ikp_platform.core.repository.graph_builder import GraphBuilder
 from ikp_platform.core.ontology.models import RuleSeverity, EngineeringObjectType, ValidationFailure, ValidationFailureType
+from ikp_platform.core.reasoning.remediation_engine import RemediationEngine
+from ikp_platform.core.validation.pipeline import ValidationStep, ValidationContext
 
 logger = logging.getLogger("ikp.reasoning.rule_engine")
 
 
-class RuleEngine:
+class RuleEngine(ValidationStep):
     """
-    Evaluates a set of component IDs against the canonical graph to ensure
-    all constraints, dependencies, and rules are satisfied.
+    Evaluates business rules, constraints, and dependencies against a proposed configuration.
     """
 
     def __init__(self, graph: GraphBuilder):
@@ -87,6 +88,24 @@ class RuleEngine:
 
         return is_valid, reasoning_chain, errors
 
+    def execute(self, context: ValidationContext) -> ValidationContext:
+        is_valid, reasoning, errors = self.evaluate_solution(
+            context.platform_id or "",
+            context.corrected_components or context.original_components
+        )
+        
+        context.is_valid = context.is_valid and is_valid
+        context.reasoning_chain.extend(reasoning)
+        context.errors.extend(errors)
+        
+        if hasattr(self, "_temp_pass_rules"):
+            if "passed_rules" not in context.metadata:
+                context.metadata["passed_rules"] = []
+            context.metadata["passed_rules"].extend(self._temp_pass_rules)
+            self._temp_pass_rules = []
+            
+        return context
+
     def _check_compatibility(
         self, platform_id: str, component_ids: List[str], reasoning_chain: List[str]
     ) -> List[ValidationFailure]:
@@ -143,6 +162,28 @@ class RuleEngine:
                 msg = f"Validated compatibility: {comp_id} <-> {platform_id}"
                 reasoning_chain.append(msg)
                 logger.debug(msg)
+                
+            # Check for mutual exclusions among components in the BOQ
+            for other_id in component_ids:
+                if comp_id != other_id and other_id in self.graph.graph:
+                    incompatible = False
+                    # Check edges in both directions
+                    if self.graph.graph.has_edge(comp_id, other_id) and self.graph.graph[comp_id][other_id].get("relationship_type") == "Incompatible With":
+                        incompatible = True
+                    if self.graph.graph.has_edge(other_id, comp_id) and self.graph.graph[other_id][comp_id].get("relationship_type") == "Incompatible With":
+                        incompatible = True
+                        
+                    if incompatible:
+                        err_msg = f"{comp_id} is incompatible with {other_id}"
+                        # avoid duplicate errors for the same pair
+                        if not any(e.message == err_msg for e in errors) and not any(e.message == f"{other_id} is incompatible with {comp_id}" for e in errors):
+                            errors.append(ValidationFailure(
+                                failure_type=ValidationFailureType.INCOMPATIBLE,
+                                object_id=comp_id,
+                                message=err_msg,
+                                payload={"incompatible_pair": [comp_id, other_id]}
+                            ))
+                            logger.error(err_msg)
 
         return errors
 
@@ -173,6 +214,71 @@ class RuleEngine:
         # Aggregate components by type and subcategory for limit checking
         comp_categories: Dict[str, int] = {}
         comp_subcategories: Dict[str, int] = {}
+        # Evaluate static constraints and limits...
+        # We will also evaluate mathematical dynamic resource consumption.
+        provided_resources = {"pcie_slots": 0.0} # Base platform often provides some, but let's calculate from components.
+        consumed_resources: Dict[str, float] = {}
+
+        for comp_id in component_ids:
+            if comp_id not in self.graph.graph: continue
+            data = self.graph.graph.nodes[comp_id]
+            provided = data.get("provided_resources", {})
+            consumed = data.get("consumed_resources", {})
+            
+            for res, val in provided.items():
+                provided_resources[res] = provided_resources.get(res, 0.0) + val
+            for res, val in consumed.items():
+                consumed_resources[res] = consumed_resources.get(res, 0.0) + val
+
+        # Calculate Absolute Maximum Theoretical Capacity for resources consumed
+        max_theoretical_resources = {}
+        for res in consumed_resources.keys():
+            # Base provided by the platform itself (not the current BOM)
+            platform_node = self.graph.graph.nodes[platform_id] if platform_id in self.graph.graph else {}
+            max_res = platform_node.get("provided_resources", {}).get(res, 0.0)
+            
+            # Check all category limits for providers
+            for constraint_id in platform_constraints:
+                c_data = self.graph.graph.nodes[constraint_id]
+                if c_data.get("type") == EngineeringObjectType.CATEGORY_LIMIT.value:
+                    limit_val = c_data.get("limit_value")
+                    target_subcat = c_data.get("attr_target_subcategory")
+                    target_cat = c_data.get("attr_target_category")
+                    
+                    if isinstance(limit_val, int) and limit_val > 0 and (target_subcat or target_cat):
+                        # Find max provision rate among compatible components for this category
+                        max_provider_rate = 0.0
+                        for comp_id in self.graph.get_related(platform_id, "Compatible With"):
+                            if comp_id in self.graph.graph:
+                                node = self.graph.graph.nodes[comp_id]
+                                n_cat = node.get("attr_component_category")
+                                n_subcat = node.get("attr_component_subcategory")
+                                if (target_subcat and n_subcat == target_subcat) or (target_cat and n_cat == target_cat):
+                                    prov = node.get("provided_resources", {}).get(res, 0.0)
+                                    if prov > max_provider_rate:
+                                        max_provider_rate = prov
+                        
+                        if max_provider_rate > 0:
+                            max_res += max_provider_rate * limit_val
+                            
+            max_theoretical_resources[res] = max_res
+
+        for res, consumed_val in consumed_resources.items():
+            provided_val = provided_resources.get(res, 0.0)
+            max_theoretical = max_theoretical_resources.get(res, 0.0)
+            if consumed_val > provided_val:
+                msg = f"Resource Exhausted: Solution requires {consumed_val} {res}, but only {provided_val} {res} are currently provided. (Absolute Maximum Theoretical Capacity: {max_theoretical} {res})"
+                errors.append(ValidationFailure(
+                    failure_type=ValidationFailureType.CATEGORY_LIMIT_EXCEEDED,
+                    object_id=platform_id,
+                    message=msg,
+                    payload={"resource": res, "consumed": consumed_val, "provided": provided_val}
+                ))
+                reasoning_chain.append(f"Failed Math Validation: {msg}")
+                logger.error(msg)
+            else:
+                reasoning_chain.append(f"Math Validation Passed: {consumed_val}/{provided_val} {res} utilized.")
+
         for comp_id in component_ids:
             if comp_id in self.graph.graph:
                 node = self.graph.graph.nodes[comp_id]
@@ -205,14 +311,23 @@ class RuleEngine:
                 elif target_cat and target_cat in comp_categories:
                     current_qty = comp_categories[target_cat]
 
-                if (target_subcat or target_cat) and isinstance(limit_value, int):
-                    if current_qty > limit_value:
+                min_qty = c_data.get("min_qty")
+                if (target_subcat or target_cat):
+                    if isinstance(limit_value, int) and current_qty > limit_value:
                         errors.append(ValidationFailure(
                             failure_type=ValidationFailureType.CATEGORY_LIMIT_EXCEEDED,
                             rule_id=constraint_id,
                             category=target_cat or target_subcat,
                             message=f"Constraint violation: {limit_name} (Max: {limit_value}, Requested: {current_qty})",
                             payload={"limit_exceeded": {"category": target_cat or target_subcat, "limit": limit_value, "requested": current_qty}}
+                        ))
+                    elif isinstance(min_qty, int) and current_qty < min_qty:
+                        errors.append(ValidationFailure(
+                            failure_type=ValidationFailureType.MISSING_REQUIRED_CATEGORY,
+                            rule_id=constraint_id,
+                            category=target_cat or target_subcat,
+                            message=f"Constraint violation: {limit_name} (Min: {min_qty}, Requested: {current_qty})",
+                            payload={"missing": [target_cat or target_subcat]}
                         ))
                     else:
                         evidence = (
@@ -282,6 +397,7 @@ class RuleEngine:
 
             # Check if any applicable object matches component ID exactly or as a URI suffix
             applies = False
+            matched_comp_id = None
             for app_obj in applicable_objects:
                 app_obj_clean = app_obj.lower().strip()
                 for comp_id in component_ids:
@@ -290,6 +406,7 @@ class RuleEngine:
                         f"/{app_obj_clean}"
                     ):
                         applies = True
+                        matched_comp_id = comp_id
                         break
                 if applies:
                     break
@@ -363,6 +480,13 @@ class RuleEngine:
                     reasoning_chain.append(msg)
                     continue
 
+                category = "General"
+                subcategory = "General"
+                if matched_comp_id and matched_comp_id in self.graph.graph:
+                    c_data = self.graph.graph.nodes[matched_comp_id]
+                    category = c_data.get("attr_component_category", "General")
+                    subcategory = c_data.get("attr_component_subcategory", "General")
+
                 if violation:
                     msg = f"Rule Violation: {rule_text} [{severity}] [Confidence: {conf}] | Trace: '{snippet}'"
                     reasoning_chain.append(msg)
@@ -371,13 +495,19 @@ class RuleEngine:
                             failure_type=ValidationFailureType.RULE_VIOLATION,
                             rule_id=rule_id,
                             message=f"Rule Violation: {rule_text}",
-                            payload={"rule_violation": rule_id}
+                            payload={"rule_violation": rule_id, "category": category, "subcategory": subcategory}
                         ))
                 else:
                     msg = f"Rule satisfied: {rule_text} [Confidence: {conf}]"
                     reasoning_chain.append(msg)
+                    # Use a new context attribute to store passing validations structured
+                    if not hasattr(self, "_temp_pass_rules"):
+                        self._temp_pass_rules = []
+                    self._temp_pass_rules.append({
+                        "title": msg,
+                        "category": category,
+                        "subcategory": subcategory
+                    })
 
-        reasoning_chain.append(
-            f"Evaluated {applicable_count} applicable engineering rules."
-        )
+        # Removed KPI reporting
         return errors

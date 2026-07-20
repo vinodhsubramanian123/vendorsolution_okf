@@ -120,6 +120,7 @@ class WorkflowNodes:
             "attempt_count": attempt_count,
             "max_attempts": state.get("max_attempts", 3),
             "tried_candidate_indices": [0],
+            "needs_regeneration": False,
         }
 
     @telemetry_trace

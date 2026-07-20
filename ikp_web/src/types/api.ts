@@ -10,6 +10,7 @@ export interface RuleEvaluation {
   title: string;
   status: 'PASS' | 'FAIL' | 'UNKNOWN';
   message?: string;
+  remediations?: string[];
 }
 
 export interface BOQValidationResponse {

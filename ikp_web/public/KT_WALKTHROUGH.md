@@ -6,6 +6,9 @@ This guide explains `vendorsolution_okf` from first principles. It is written fo
 
 ## 1. Mental Model
 
+> [!WARNING]
+> This platform has no authentication and no rate limiting. It is not currently production-ready and is designed for internal engineering use.
+
 IKP turns vendor engineering documents into a structured knowledge system for hardware solution design.
 
 The system has three layers:
@@ -88,8 +91,9 @@ The scripts normalize accidental leading-`1` ports. If an agent passes `15173`, 
 | `ikp_platform/core/validation/` | BOQ validator and manual review validator |
 | `ikp_platform/core/workflow/` | LangGraph state, nodes, executor, and graph wiring |
 | `ikp_platform/core/learning/` | Knowledge delta application loop |
+| `ikp_platform/scripts/` | Internal Python scripts (`ingest_catalog.py`, `reindex.py`) |
 | `ikp_web/src/` | React UI |
-| `scripts/` | Bootstrap and start helpers |
+| `scripts/` | Top-level bash shell scripts for bootstrap and start helpers |
 | `tests/` | Backend tests |
 | `IKP/standards/` | Architecture standards and current implementation truth |
 | `IKP/references/` | External OKF format reference |
@@ -130,7 +134,7 @@ Important relationships:
 
 ## 6. Data Lifecycle & Ingestion
 
-1. **Source Registration & Fingerprinting**: A source file is registered by `SourceRegistry`. A cryptographic SHA-256 hash (`hashlib.sha256`) is computed on the file contents. This fingerprint ensures that duplicate sources are rejected, saving redundant processing.
+1. **Source Registration & Fingerprinting**: A source file is registered by `SourceRegistry`. A cryptographic SHA-256 hash (`hashlib.sha256`) is computed on the file contents. This fingerprint ensures that duplicate sources are rejected, saving redundant processing. Separately, a background `source_watcher.py` daemon independently tracks file hashes to monitor changes in the `sources/` tree.
 2. **Parsing & Extraction boundaries**: 
    - PDFs use `BasePDFAdapter` for extraction, with vendor-specific implementations like `HPEQuickSpecsAdapter` extracting hardware topologies, limits, and rules.
    - Excel sheets use `ExcelExtractor` for parsing structured `Components` and `SKUs` tabs.
@@ -178,7 +182,15 @@ If multiple platforms are detected, the API asks for an explicit `platform_id`.
 
 ### Review Queue
 
-The UI calls `/api/review-queue` to list low/medium/unverified objects. `/api/review-queue/approve` can mark an object high confidence. The broader reject/resume lifecycle is still partial.
+The UI calls `/api/review-queue` to list low/medium/unverified objects. `/api/review-queue/approve` can mark an object high confidence. 
+The broader reject/resume lifecycle is still partial, but the following experimental endpoints exist for it:
+- `/api/review-queue/deltas`: List knowledge deltas waiting for review.
+- `/api/review-queue/deltas/{id}/approve`: Approve a specific delta.
+- `/api/review-queue/deltas/{id}/reject`: Reject a specific delta.
+
+### Other Endpoints
+- `/api/validate`: Manual validation endpoint (distinct from `/api/boq/validate`).
+- `/api/status/integrations`: Shows availability of external integrations (LLM, vector index, MCP).
 
 ## 8. Observability & Telemetry (Langfuse)
 
@@ -212,7 +224,34 @@ Use this engine for hard technical validation. Use the LLM only for interpretati
 
 LangGraph governs the dynamic process flow (the "How") over the static Knowledge Graph (the "What"), implemented in `ikp_platform/core/workflow/`.
 
+### Understanding Retries in IKP
+The term "retry" means three completely different things in this codebase. They must not be conflated:
+1. **LLM Retry**: HTTP-429 API key rotation for Gemini via `LLMClient` (transient, no business logic).
+2. **Attempt Retry**: The business logic draft/validate loop (bounded at 3 max attempts).
+3. **Recovery Strategy**: The 4-tier fallback cascade selected dynamically by `select_recovery_strategy` when validation fails.
+
 ### The Bounded Draft/Validate Loop
+
+The state machine for generating and validating a BOM is legitimately non-trivial. Below is the orchestration diagram for this loop:
+
+```mermaid
+flowchart TD
+    Parse[parse_intent] --> SelectPlatform[select_platform]
+    SelectPlatform --> Draft[draft_bom]
+    Draft --> Validate[validate_bom]
+    
+    Validate --> |Cycle Detected| HumanInt[human_intervention]
+    Validate --> |Validation Failed| Strategy[select_recovery_strategy]
+    Validate --> |Validation Passed| LiveValidation[live_portal_validation]
+    
+    Strategy --> |Recovery Attempt| Draft
+    Strategy --> |Max Attempts Exhausted| HumanInt
+    
+    LiveValidation --> Rank[rank_solutions]
+    LiveValidation --> |Temp Error| Draft
+    LiveValidation --> |Permanent Error| HumanInt
+```
+
 The workflow state machine follows a strict sequence:
 1. **`parse_intent`**: LLM interprets the customer request into `CustomerRequirement` Pydantic models.
 2. **`select_platform`**: Traverses the Knowledge Graph to select a platform supporting the target workload.
@@ -266,7 +305,10 @@ Planned or placeholder:
 - persistent graph database
 - production deployment/security/observability work
 
-## 12. Development Rules For Agents
+## 12. Development Rules For Agents & Humans
+
+> [!TIP]
+> **For Humans:** If you have architecture questions, use the `graphify` tool! Run `graphify query "<question>"` to search the knowledge graph in `graphify-out/`. There are also critical operational landmines (e.g. `.gitignore` rules) defined in `.agents/rules/agent-gotchas.md` and `.agents/rules/architecture_state.md`. You should read these agent rules to understand how the system is wired.
 
 - Read `IKP/standards/11_CURRENT_IMPLEMENTATION_STACK.md` before changing architecture docs.
 - Use `./scripts/start_api.sh` and `./scripts/start_ui.sh` for local servers.
@@ -282,11 +324,14 @@ Planned or placeholder:
 ```bash
 uv run pytest -q
 make lint
+make typecheck
 npm run build --prefix ikp_web
 git diff --check
+npx playwright test --config=ikp_web/playwright.config.ts  # E2E Tests
+locust -f tests/performance/locustfile.py                 # Load Tests
 ```
 
-`make typecheck` is intentionally separate because the current codebase still has a mypy backlog.
+`make typecheck` (mypy/pyright checks) are completely clean and strictly enforced.
 
 ## 14. Troubleshooting
 

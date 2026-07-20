@@ -14,7 +14,7 @@ Markdown persistence layer, and the LLM extraction pipeline.
 
 from typing import List, Optional, Dict, Any
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime, timezone
 import uuid
 
@@ -268,6 +268,8 @@ class BaseEngineeringObject(BaseModel):
     capabilities: List[str] = Field(default_factory=list)
     tags: List[str] = Field(default_factory=list)
     aliases: List[str] = Field(default_factory=list)
+    provided_resources: Dict[str, float] = Field(default_factory=dict)
+    consumed_resources: Dict[str, float] = Field(default_factory=dict)
 
     relationships: List[EngineeringRelationship] = Field(default_factory=list)
     evidence: List[EvidenceRecord] = Field(default_factory=list)
@@ -492,12 +494,15 @@ class CustomerRequirement(BaseModel):
 
 
 class ValidationFailure(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     failure_type: ValidationFailureType
     object_id: Optional[str] = None       # the specific component/SKU at fault, if any
     rule_id: Optional[str] = None         # which Rule/CategoryLimit fired, if any
     category: Optional[str] = None        # e.g. "GPU", for category-level failures
     message: str                          # human-readable, for logs/UI -- not for parsing
     payload: Dict[str, Any] = Field(default_factory=dict) # structured data for programmatic recovery
+    remediations: List[str] = Field(default_factory=list) # Recommended solutions (e.g. "Add Controller", "Use Direct NVMe")
 
 
 class CustomerRequest(BaseModel):

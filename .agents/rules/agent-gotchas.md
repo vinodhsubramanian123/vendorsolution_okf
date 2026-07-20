@@ -37,3 +37,7 @@ This applies equally to library APIs: if you're not certain a method/kwarg
 exists on a dependency (chromadb, networkx, pydantic, fastapi, mcp), check
 the installed version's actual signature rather than assuming it matches an
 API you remember from training data or from a different version.
+
+## 5. Background Processes and Browser Testing
+When starting the local API or UI servers (`start_api.sh`, `start_ui.sh`) for browser testing, standard background tasks will automatically terminate all their child processes when the task finishes, causing the servers to crash instantly.
+**Rule:** You MUST use a Persistent Terminal (`RunPersistent: true` in `run_command`) when starting the application servers. Furthermore, always verify the port is bound and responding (e.g., via `curl` or `lsof`) before launching a `browser_subagent` to avoid wasting time on `ERR_CONNECTION_REFUSED` failures.

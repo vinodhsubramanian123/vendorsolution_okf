@@ -27,6 +27,11 @@ LangGraph represents the dynamic orchestration pipeline that queries the Knowled
 
 *Rule of thumb: The LangGraph Workflow dictates what is OPTIMAL.*
 
+### Testing Rules for LangGraph Mocks
+When testing LangGraph Workflows and patching nodes, always adhere to these rules to avoid confusing state injection errors:
+1. **Use `*args, **kwargs`**: When mocking nodes (e.g., `draft_bom`), use a lambda or function with `*args, **kwargs` and defensively extract the `state` since LangGraph injects state dynamically, which often drops the `self` parameter in mocked class methods.
+2. **Patch the Generator, not the Node**: Instead of mocking the entire workflow node, patch the underlying `SolutionGenerator` or `RuleEngine`. This preserves internal state management (like `attempt_count` increments and clearing flags) while controlling business logic output.
+
 ---
 
 ## 3. Current Implementation Status

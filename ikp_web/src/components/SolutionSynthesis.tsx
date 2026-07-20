@@ -184,18 +184,22 @@ export function SolutionSynthesis() {
           <div ref={messagesEndRef} />
         </div>
         
-        <form onSubmit={handleQuery} style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-          <input
-            type="text"
-            className="glass-input"
-            placeholder="e.g. I need an AI server with a GPU and 1TB of NVMe..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isLoading}
-          />
-          <button type="submit" className="btn-primary" disabled={isLoading || !input.trim()}>
-            <Send size={18} />
-          </button>
+        <form onSubmit={handleQuery} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
+          <label htmlFor="synthesis-query" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>Describe your infrastructure needs</label>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <input
+              id="synthesis-query"
+              type="text"
+              className="glass-input"
+              placeholder="e.g. I need an AI server with a GPU and 1TB of NVMe..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isLoading}
+            />
+            <button type="submit" className="btn-primary" disabled={isLoading || !input.trim()}>
+              <Send size={18} />
+            </button>
+          </div>
         </form>
       </div>
     </>
