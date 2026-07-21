@@ -1,8 +1,8 @@
-import { Database, Server, Cpu, LayoutTemplate, CheckCircle2, BookOpen, Search } from 'lucide-react';
+import { Database, Server, Cpu, LayoutTemplate, CheckCircle2, BookOpen, Search, Component } from 'lucide-react';
 
 interface SidebarProps {
-  activeTab: 'query' | 'dashboard' | 'boq' | 'search' | 'review' | 'kt';
-  setActiveTab: (tab: 'query' | 'dashboard' | 'boq' | 'search' | 'review' | 'kt') => void;
+  activeTab: 'query' | 'dashboard' | 'bom' | 'boq' | 'search' | 'review' | 'kt';
+  setActiveTab: (tab: 'query' | 'dashboard' | 'bom' | 'boq' | 'search' | 'review' | 'kt') => void;
 }
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
@@ -55,6 +55,25 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           onClick={() => setActiveTab('dashboard')}
         >
           <LayoutTemplate size={20} /> Graph Dashboard
+        </button>
+
+        <button 
+          style={{
+            background: activeTab === 'bom' ? 'rgba(255,255,255,0.1)' : 'transparent',
+            border: 'none',
+            color: 'var(--text-main)',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            textAlign: 'left',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '1rem'
+          }}
+          onClick={() => setActiveTab('bom')}
+        >
+          <Component size={20} /> Bill of Materials
         </button>
         
         <button 

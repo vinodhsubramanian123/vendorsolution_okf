@@ -36,6 +36,7 @@ from ikp_platform.core.ontology.models import (
     DeltaChangeType,
     SlotMapping,
     PackagingType,
+    Variant,
 )
 
 
@@ -92,6 +93,19 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
 
         psus = self._extract_power(text, platform)
         self.extracted_objects.extend(psus)
+
+        # Phase 1: New extractors — controllers, risers, cables, chassis variants
+        controllers = self._extract_controllers(text, platform)
+        self.extracted_objects.extend(controllers)
+
+        risers = self._extract_riser_cards(text, platform)
+        self.extracted_objects.extend(risers)
+
+        cables = self._extract_cables(text, platform)
+        self.extracted_objects.extend(cables)
+
+        chassis_variants = self._extract_chassis_variants(text, platform)
+        self.extracted_objects.extend(chassis_variants)
         
         self._post_process_limits(platform)
         
@@ -1753,3 +1767,240 @@ class HPEQuickSpecsAdapter(BasePDFAdapter):
             if re.search(pattern, text):
                 found.append(tag)
         return found
+
+    # ---------------------------------------------------------------------------
+    # Phase 1 — Missing Extractors: Controllers, Risers, Cables, Chassis Variants
+    # ---------------------------------------------------------------------------
+
+    def _extract_controllers(
+        self, text: str, platform: Optional[Platform]
+    ) -> List[Component]:
+        """Extract storage controller specifications (MR416i, MR216i, NS204i, etc.)."""
+        components: List[Component] = []
+        platform_id = platform.id if platform else "unknown"
+
+        controller_patterns = [
+            # HPE Smart Array / MR patterns
+            (r"(MR\d+i[-\w]*)", "Storage Controller"),
+            (r"(NS\d+i[-\w]*)", "NVMe Controller"),
+            (r"HPE\s+(Smart\s+Array\s+\w+)", "Storage Controller"),
+            (r"(SR\d+i[-\w]*)", "Storage Controller"),
+        ]
+
+        seen: set = set()
+        for pattern, category in controller_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                model = match.group(1).strip()
+                cid = f"{platform_id}/components/ctrl-{model.lower().replace(' ', '-')}"
+                if cid in seen:
+                    continue
+                seen.add(cid)
+
+                ctrl = Component(
+                    id=cid,
+                    title=f"HPE {model}",
+                    description=f"Storage controller {model} for {platform.title if platform else platform_id}",
+                    vendor=platform.vendor if platform else "HPE",
+                    solution_domain=platform.solution_domain if platform else "Compute",
+                    product_family=platform.product_family if platform else None,
+                    generation=platform.generation if platform else None,
+                    platform_id=platform_id,
+                    component_category="Storage Controller",
+                    relationships=[
+                        EngineeringRelationship(
+                            target_id=platform_id,
+                            relationship_type=RelationshipType.COMPATIBLE_WITH,
+                        )
+                    ],
+                    evidence=[
+                        EvidenceRecord(
+                            source_id=self.source.source_id,
+                            confidence=ConfidenceLevel.HIGH,
+                            original_text_snippet=match.group(0),
+                        )
+                    ],
+                )
+                components.append(ctrl)
+                self.delta_changes.append(
+                    DeltaChange(change_type=DeltaChangeType.NEW_OBJECT, object_id=cid, new_value=model)
+                )
+
+        logger.info(f"[Phase 1] Extracted {len(components)} storage controllers for {platform_id}")
+        return components
+
+    def _extract_riser_cards(
+        self, text: str, platform: Optional[Platform]
+    ) -> List[Component]:
+        """Extract PCIe riser card configurations."""
+        components: List[Component] = []
+        platform_id = platform.id if platform else "unknown"
+
+        riser_patterns = [
+            r"(Primary\s+Riser\s+[\w\s]+)",
+            r"(Secondary\s+Riser\s+[\w\s]+)",
+            r"([Tt]ertiary\s+Riser\s+[\w\s]+)",
+            r"(PCIe\s+Riser\s+[\w\s]+)",
+            r"(Riser\s+Kit\s+[\w\s]+)",
+        ]
+
+        seen: set = set()
+        for pattern in riser_patterns:
+            for match in re.finditer(pattern, text):
+                title = match.group(1).strip()[:60]  # Cap length
+                cid = f"{platform_id}/components/riser-{len(seen)}"
+                if title in seen:
+                    continue
+                seen.add(title)
+
+                riser = Component(
+                    id=cid,
+                    title=title,
+                    description=f"PCIe riser card: {title}",
+                    vendor=platform.vendor if platform else "HPE",
+                    solution_domain=platform.solution_domain if platform else "Compute",
+                    product_family=platform.product_family if platform else None,
+                    generation=platform.generation if platform else None,
+                    platform_id=platform_id,
+                    component_category="Riser Card",
+                    relationships=[
+                        EngineeringRelationship(
+                            target_id=platform_id,
+                            relationship_type=RelationshipType.COMPATIBLE_WITH,
+                        )
+                    ],
+                    evidence=[
+                        EvidenceRecord(
+                            source_id=self.source.source_id,
+                            confidence=ConfidenceLevel.HIGH,
+                            original_text_snippet=match.group(0),
+                        )
+                    ],
+                )
+                components.append(riser)
+                self.delta_changes.append(
+                    DeltaChange(change_type=DeltaChangeType.NEW_OBJECT, object_id=cid, new_value=title)
+                )
+
+        logger.info(f"[Phase 1] Extracted {len(components)} riser cards for {platform_id}")
+        return components
+
+    def _extract_cables(
+        self, text: str, platform: Optional[Platform]
+    ) -> List[Component]:
+        """Extract internal cable specifications (SAS, power, signal cables)."""
+        components: List[Component] = []
+        platform_id = platform.id if platform else "unknown"
+
+        cable_patterns = [
+            (r"(Mini-SAS\s+HD\s+Cable[\w\s-]*)", "SAS Cable"),
+            (r"(SAS\s+Cable[\w\s-]*)", "SAS Cable"),
+            (r"(Internal\s+USB\s+Cable[\w\s-]*)", "USB Cable"),
+            (r"(Power\s+Cable[\w\s-]*)", "Power Cable"),
+            (r"(Signal\s+Cable[\w\s-]*)", "Signal Cable"),
+            (r"(Enablement\s+Kit[\w\s-]*)", "Enablement Kit"),
+        ]
+
+        seen: set = set()
+        for pattern, category in cable_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                title = match.group(1).strip()[:80]
+                cid = f"{platform_id}/components/cable-{len(seen)}"
+                if title in seen:
+                    continue
+                seen.add(title)
+
+                cable = Component(
+                    id=cid,
+                    title=title,
+                    description=f"Internal cable: {title}",
+                    vendor=platform.vendor if platform else "HPE",
+                    solution_domain=platform.solution_domain if platform else "Compute",
+                    product_family=platform.product_family if platform else None,
+                    generation=platform.generation if platform else None,
+                    platform_id=platform_id,
+                    component_category="Cable",
+                    relationships=[
+                        EngineeringRelationship(
+                            target_id=platform_id,
+                            relationship_type=RelationshipType.COMPATIBLE_WITH,
+                        )
+                    ],
+                    evidence=[
+                        EvidenceRecord(
+                            source_id=self.source.source_id,
+                            confidence=ConfidenceLevel.MEDIUM,
+                            original_text_snippet=match.group(0),
+                        )
+                    ],
+                )
+                components.append(cable)
+                self.delta_changes.append(
+                    DeltaChange(change_type=DeltaChangeType.NEW_OBJECT, object_id=cid, new_value=title)
+                )
+
+        logger.info(f"[Phase 1] Extracted {len(components)} cables for {platform_id}")
+        return components
+
+    def _extract_chassis_variants(
+        self, text: str, platform: Optional[Platform]
+    ) -> List[Variant]:
+        """
+        Extract chassis variants as proper Variant objects.
+        User note: variants use the same PDF because all SKUs for a given chassis
+        are documented within a single QuickSpecs doc — no separate PDFs per variant.
+        Each variant (4SFF, 8SFF, 12SFF, 24SFF, EDSFF) maps to chassis configurations
+        that determine compatible drive cages, riser cards, and cables.
+        """
+        variants: List[Variant] = []
+        platform_id = platform.id if platform else "unknown"
+
+        variant_patterns = [
+            (r"(\d+SFF)\s+CTO", "{n}SFF Small Form Factor chassis"),
+            (r"(\d+LFF)\s+CTO", "{n}LFF Large Form Factor chassis"),
+            (r"(EDSFF)\s+CTO", "EDSFF E3.S chassis"),
+            (r"(SFF)\s+CTO", "SFF chassis"),
+        ]
+
+        seen: set = set()
+        for pattern, desc_template in variant_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                label = match.group(1).upper()
+                if label in seen:
+                    continue
+                seen.add(label)
+
+                vid = f"{platform_id}/variants/{label.lower()}-cto"
+                description = desc_template.replace("{n}", label)
+
+                variant = Variant(
+                    id=vid,
+                    title=f"{platform.title if platform else platform_id} — {label} CTO",
+                    description=description,
+                    vendor=platform.vendor if platform else "HPE",
+                    solution_domain=platform.solution_domain if platform else "Compute",
+                    product_family=platform.product_family if platform else None,
+                    generation=platform.generation if platform else None,
+                    platform_id=platform_id,
+                    base_platform_id=platform_id,
+                    differentiators=[label, "CTO"],
+                    relationships=[
+                        EngineeringRelationship(
+                            target_id=platform_id,
+                            relationship_type=RelationshipType.VARIANT_OF,
+                        )
+                    ],
+                    evidence=[
+                        EvidenceRecord(
+                            source_id=self.source.source_id,
+                            confidence=ConfidenceLevel.HIGH,
+                            original_text_snippet=match.group(0),
+                        )
+                    ],
+                )
+                variants.append(variant)
+                self.delta_changes.append(
+                    DeltaChange(change_type=DeltaChangeType.NEW_OBJECT, object_id=vid, new_value=variant.title)
+                )
+
+        logger.info(f"[Phase 1] Extracted {len(variants)} chassis variants for {platform_id}")
+        return variants

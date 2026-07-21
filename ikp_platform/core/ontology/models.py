@@ -445,6 +445,7 @@ class Source(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     file_hash: Optional[str] = None  # For duplicate detection
+    extraction_fingerprint: Optional[str] = None  # Phase 5: SHA-256 of all extracted object IDs+attributes for version tracking
 
 
 # ---------------------------------------------------------------------------
@@ -535,6 +536,8 @@ class SolutionCandidate(BaseModel):
     request_id: str
     profile: str  # "Lowest Cost", "Balanced", "Performance Optimized", etc.
     components: List[str] = Field(default_factory=list)  # IDs of engineering objects in the solution
+    grouped_components: Dict[str, List[str]] = Field(default_factory=dict) # Components grouped by category (Phase 4)
+    closeness_score: float = Field(0.0, description="Score (0-1) indicating how well the solution matches BOQ requirements") # Phase 4
     reasoning_chain: List[str] = Field(default_factory=list)  # Step-by-step reasoning
     requirements_satisfied: List[str] = Field(default_factory=list)
     rules_applied: List[str] = Field(default_factory=list)

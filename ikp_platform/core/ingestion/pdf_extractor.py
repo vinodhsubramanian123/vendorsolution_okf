@@ -22,15 +22,55 @@ class TableParser:
         pass
 
     def parse_document(self, file_path: str) -> List[Dict[str, Any]]:
-        # Keep it simple, pass it to adapter which already knows how to process it
+        # Extract components with SKUs and Descriptions
         structured = []
+        sku_pattern = re.compile(r"^[A-Z0-9]{6}-[A-Z0-9]{3}$|^[A-Z0-9]{6,8}$", re.IGNORECASE)
+        
         with pdfplumber.open(file_path) as pdf:
             for page in pdf.pages:
                 tables = page.extract_tables()
                 for table in tables:
                     for row in table:
-                        row = [str(c).strip() if c else "" for c in row]
-                        structured.append({"raw_row": row})
+                        if not row:
+                            continue
+                            
+                        clean_row = [str(c).strip() if c else "" for c in row]
+                        
+                        sku = None
+                        description = None
+                        
+                        # Find the SKU (usually a short alphanumeric code)
+                        for cell in clean_row:
+                            for word in cell.split():
+                                if sku_pattern.match(word):
+                                    sku = word.upper()
+                                    break
+                            if sku:
+                                break
+                                
+                        if not sku:
+                            # Also check if it's a raw row with a SKU in it, occasionally joined
+                            continue
+                            
+                        # Find the description (usually the longest cell that is not the SKU)
+                        desc_candidates = [c.replace("\n", " ") for c in clean_row if c and c.upper() != sku]
+                        if desc_candidates:
+                            description = max(desc_candidates, key=len)
+                            
+                        if not description:
+                            continue
+                            
+                        # Extract bracketed text as tags/capabilities
+                        brackets = re.findall(r"\[(.*?)\]|\((.*?)\)", description)
+                        brackets_flat = [b[0] or b[1] for b in brackets if (b[0] or b[1])]
+                        
+                        structured.append({
+                            "sku": sku,
+                            "description": description,
+                            "brackets": brackets_flat,
+                            "default_qty": 1,
+                            "raw_row": clean_row
+                        })
         return structured
 
 

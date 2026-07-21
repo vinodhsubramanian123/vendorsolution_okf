@@ -344,3 +344,67 @@ class GraphBuilder:
             "total_edges": self.graph.number_of_edges(),
             "type_counts": type_counts,
         }
+
+    # -------------------------------------------------------------------
+    # Structured queries — Phase 3: Search & Ranking
+    # -------------------------------------------------------------------
+
+    def filter_by_category(
+        self,
+        platform_id=None,
+        category=None,
+        subcategory=None,
+        obj_type="Component",
+    ):
+        """Return all nodes matching the given platform/category/subcategory filters.
+        Returns list of dicts with node_id and full node attributes.
+        """
+        results = []
+        for node_id, attrs in self.graph.nodes(data=True):
+            if attrs.get("type") != obj_type:
+                continue
+            if platform_id:
+                node_platform = attrs.get("platform_id") or ""
+                if platform_id.lower() not in node_platform.lower() and not node_id.startswith(platform_id):
+                    continue
+            if category:
+                node_cat = (attrs.get("component_category") or attrs.get("attr_component_category") or "").lower()
+                if category.lower() not in node_cat:
+                    continue
+            if subcategory:
+                node_subcat = (attrs.get("component_subcategory") or attrs.get("attr_component_subcategory") or "").lower()
+                if subcategory.lower() not in node_subcat:
+                    continue
+            results.append({"id": node_id, **attrs})
+        return results
+
+    def get_platform_bill_of_materials(self, platform_id):
+        """Return all components and SKUs for a platform, grouped by category."""
+        bom = {}
+        for node_id, attrs in self.graph.nodes(data=True):
+            node_type = attrs.get("type")
+            if node_type not in ("Component", "SKU"):
+                continue
+            node_platform = attrs.get("platform_id") or ""
+            if platform_id.lower() not in node_platform.lower() and not node_id.startswith(platform_id):
+                continue
+            category = (
+                attrs.get("component_category")
+                or attrs.get("attr_component_category")
+                or "Uncategorized"
+            )
+            if category not in bom:
+                bom[category] = []
+            bom[category].append({
+                "id": node_id,
+                "title": attrs.get("title", node_id),
+                "description": attrs.get("description", ""),
+                "subcategory": attrs.get("component_subcategory") or attrs.get("attr_component_subcategory"),
+                "part_number": attrs.get("part_number") or attrs.get("attr_part_number"),
+                "confidence": attrs.get("confidence"),
+                "lifecycle_status": attrs.get("lifecycle_status"),
+                "type": node_type,
+            })
+        for cat in bom:
+            bom[cat] = sorted(bom[cat], key=lambda x: x["title"] or "")
+        return bom

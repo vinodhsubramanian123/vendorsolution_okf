@@ -42,6 +42,21 @@ async def lifespan(app: FastAPI):
             "seed the repository before using the API.",
             REPOSITORY_PATH,
         )
+    else:
+        # Always sync vector store with graph on startup.
+        # We run it in a background thread so the API becomes available
+        # immediately; search degrades gracefully while indexing completes.
+        import threading
+        def _bg_reindex():
+            vec_count_before = repo.vector_store.collection.count()
+            indexed = repo.reindex_vector_store(batch_size=25)
+            logger.info(
+                f"[startup] Vector store sync: graph={loaded} objects, "
+                f"pre-existing={vec_count_before}, newly-indexed={indexed}, "
+                f"total={repo.vector_store.collection.count()}"
+            )
+        threading.Thread(target=_bg_reindex, daemon=True, name="startup-reindex").start()
+
     _repo_instance = repo
     
     # Start the repository watcher to track external Obsidian edits
@@ -483,31 +498,89 @@ async def semantic_search(request: SearchRequest):
         f"SEMANTIC_SEARCH|query='{request.query}'|limit={request.limit}|filter={request.filter_metadata}"
     )
 
-    # Search vector store (Gap 3.2: Passing filter_metadata to where clause)
-    results = repo.vector_store.semantic_search(
-        request.query, n_results=request.limit, filter_metadata=request.filter_metadata
+    # Use Hybrid Search via RepoManager
+    formatted_results = repo.search(
+        query=request.query, limit=request.limit, filter_metadata=request.filter_metadata
     )
 
-    formatted_results = []
-    for res_id, score in results:
-        node_data = {}
-        if res_id in repo.graph.graph:
-            node_data = repo.graph.graph.nodes[res_id]
+    # Phase 3: Faceted search — compute category/subcategory counts alongside results
+    facets: dict = {"category": {}, "subcategory": {}, "vendor": {}, "type": {}}
+    for r in formatted_results:
+        cat = r.get("category") or "Unknown"
+        subcat = r.get("subcategory") or "Unknown"
+        vendor = r.get("vendor") or "Unknown"
+        obj_type = r.get("type") or "Unknown"
+        facets["category"][cat] = facets["category"].get(cat, 0) + 1
+        facets["subcategory"][subcat] = facets["subcategory"].get(subcat, 0) + 1
+        facets["vendor"][vendor] = facets["vendor"].get(vendor, 0) + 1
+        facets["type"][obj_type] = facets["type"].get(obj_type, 0) + 1
 
-        description = node_data.get("description") or node_data.get("title") or res_id
-        formatted_results.append(
-            {
-                "id": res_id,
-                "score": round(score, 4),
-                "text": description,
-                "title": node_data.get("title", res_id),
-                "type": node_data.get("type", "unknown"),
-                "vendor": node_data.get("vendor"),
-                "product_family": node_data.get("product_family"),
-            }
-        )
+    return {"query": request.query, "total": len(formatted_results), "facets": facets, "results": formatted_results}
 
-    return {"query": request.query, "results": formatted_results}
+@app.get("/api/components")
+@telemetry_trace
+async def get_components(
+    platform_id: Optional[str] = None,
+    category: Optional[str] = None,
+    subcategory: Optional[str] = None,
+    obj_type: str = "Component",
+    limit: int = 100,
+):
+    """Structured query for components — no semantic search required.
+    
+    Filters:
+    - platform_id: e.g. 'hpe-proliant-dl380-gen12'
+    - category: e.g. 'Memory', 'Storage', 'CPU', 'GPU'
+    - subcategory: e.g. 'DIMM', 'Drive', 'NVMe'
+    - obj_type: 'Component', 'SKU', 'Rule', 'Category Limit'
+    """
+    repo = get_repo()
+    results = repo.graph.filter_by_category(
+        platform_id=platform_id,
+        category=category,
+        subcategory=subcategory,
+        obj_type=obj_type,
+    )
+    formatted = []
+    for item in results[:limit]:
+        formatted.append({
+            "id": item.get("id"),
+            "title": item.get("title"),
+            "description": item.get("description"),
+            "category": item.get("component_category") or item.get("attr_component_category"),
+            "subcategory": item.get("component_subcategory") or item.get("attr_component_subcategory"),
+            "platform_id": item.get("platform_id"),
+            "part_number": item.get("part_number") or item.get("attr_part_number"),
+            "confidence": item.get("confidence"),
+            "lifecycle_status": item.get("lifecycle_status"),
+            "vendor": item.get("vendor"),
+            "generation": item.get("generation"),
+        })
+    return {"count": len(formatted), "components": formatted}
+
+
+@app.get("/api/platforms/{platform_id}/bom")
+@telemetry_trace
+async def get_platform_bom(platform_id: str):
+    """Return full Bill of Materials for a platform, grouped by component category."""
+    repo = get_repo()
+    if platform_id not in repo.graph.graph:
+        all_platforms = repo.graph.filter_by_type("Platform")
+        matches = [p for p in all_platforms if platform_id.lower() in p.lower()]
+        if not matches:
+            return {"error": f"Platform '{platform_id}' not found", "platforms": all_platforms}
+        platform_id = matches[0]
+
+    bom = repo.graph.get_platform_bill_of_materials(platform_id)
+    platform_data = repo.graph.graph.nodes.get(platform_id, {})
+    return {
+        "platform_id": platform_id,
+        "platform_title": platform_data.get("title", platform_id),
+        "category_count": len(bom),
+        "total_components": sum(len(v) for v in bom.values()),
+        "bom": bom,
+    }
+
 
 
 class ApprovalRequest(BaseModel):
@@ -625,6 +698,66 @@ async def reject_delta(delta_id: str, reviewer: str = "Human", reason: str = "")
     if success:
         return {"status": "success", "message": f"Rejected delta {delta_id}"}
     raise HTTPException(status_code=404, detail="Delta not found or not pending")
+
+
+# ---------------------------------------------------------------------------
+# Phase 6f — Human-in-the-Loop Feedback Endpoint
+# ---------------------------------------------------------------------------
+
+@app.post("/api/feedback")
+@telemetry_trace
+async def submit_feedback(payload: dict, background_tasks: BackgroundTasks):
+    """
+    Phase 6: Human-in-the-loop feedback endpoint.
+    Partners / reviewers submit corrections here.
+    The feedback is transformed into a KnowledgeDelta and routed to the learning engine.
+
+    Example body:
+    {
+      "component_id": "hpe-proliant-dl380-gen12/components/memory-ddr5",
+      "platform_id": "hpe-proliant-dl380-gen12",
+      "correction_type": "AttributeFix",
+      "corrected_value": "32GB DDR5 RDIMM 4800 MT/s",
+      "field_name": "description",
+      "evidence_source": "HPE QuickSpecs DL380 Gen12 Page 42",
+      "reviewer_notes": "Wrong description - updated to match vendor spec"
+    }
+    """
+    from ikp_platform.core.learning.feedback_template import HumanFeedback, apply_feedback, CorrectionType
+
+    try:
+        # Validate payload
+        correction_type_raw = payload.get("correction_type", "AttributeFix")
+        try:
+            correction_type = CorrectionType(correction_type_raw)
+        except ValueError:
+            correction_type = CorrectionType.ATTRIBUTE_FIX
+
+        feedback = HumanFeedback(
+            component_id=payload.get("component_id"),
+            platform_id=payload.get("platform_id"),
+            correction_type=correction_type,
+            corrected_value=payload.get("corrected_value"),
+            field_name=payload.get("field_name"),
+            evidence_source=payload.get("evidence_source", "Human reviewer"),
+            reviewer_notes=payload.get("reviewer_notes", ""),
+        )
+
+        repo = get_repo()
+        apply_feedback(feedback, repo)
+
+        # Trigger background reindex so the correction is reflected immediately
+        background_tasks.add_task(repo.reindex_vector_store)
+
+        logger.info(f"[Phase 6] Feedback {feedback.feedback_id} submitted: {feedback.correction_type} on {feedback.component_id or feedback.platform_id}")
+        return {
+            "status": "accepted",
+            "feedback_id": feedback.feedback_id,
+            "message": "Feedback received and queued as a Knowledge Delta for review",
+        }
+    except Exception as e:
+        logger.error(f"[Phase 6] Feedback submission failed: {e}", exc_info=True)
+        raise HTTPException(status_code=422, detail=f"Feedback processing failed: {str(e)}")
 
 
 if __name__ == "__main__":

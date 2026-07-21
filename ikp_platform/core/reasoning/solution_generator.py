@@ -122,6 +122,66 @@ class SolutionGenerator:
 
         return candidates
 
+    def _select_chassis_variant(
+        self, platform_id: str, request: "CustomerRequest", reasoning_chain: List[str]
+    ) -> Optional[str]:
+        """
+        Phase 4a & 4b: Given storage requirements, pick the smallest chassis variant
+        that accommodates the needed drive slots.
+
+        Chassis tiers (drives supported):
+          4SFF  → ≤4 SFF drives
+          8SFF  → 5–8 SFF drives
+          12SFF → 9–12 SFF drives
+          24SFF → 13–24 SFF drives
+          EDSFF → Any EDSFF drives requested
+
+        Since variants live in the same QuickSpecs PDF as the base platform,
+        all variant nodes should already be in the graph after ingestion.
+        """
+        # Determine drive count requested
+        drive_count = 0
+        wants_edsff = False
+        for req in (request.requirements or []):
+            req_name = req.name.lower()
+            if "edsff" in req_name:
+                wants_edsff = True
+            if any(k in req_name for k in ["sff", "drive", "storage", "nvme"]):
+                try:
+                    val = int(str(req.value).split()[0])
+                    drive_count = max(drive_count, val)
+                except (ValueError, IndexError):
+                    pass
+
+        # Choose the tier
+        if wants_edsff:
+            variant_label = "edsff"
+        elif drive_count <= 4:
+            variant_label = "4sff"
+        elif drive_count <= 8:
+            variant_label = "8sff"
+        elif drive_count <= 12:
+            variant_label = "12sff"
+        else:
+            variant_label = "24sff"
+
+        candidate_id = f"{platform_id}/variants/{variant_label}-cto"
+
+        if candidate_id in self.graph.graph:
+            reasoning_chain.append(
+                f"[Chassis CSP] drive_count={drive_count}, wants_edsff={wants_edsff} → selected {variant_label.upper()} chassis"
+            )
+            return candidate_id
+
+        # Fallback: any variant node for this platform
+        for node_id in self.graph.graph.nodes:
+            if node_id.startswith(f"{platform_id}/variants/"):
+                reasoning_chain.append(f"[Chassis CSP] Exact variant not found; falling back to {node_id}")
+                return node_id
+
+        reasoning_chain.append(f"[Chassis CSP] No chassis variant nodes found in graph for {platform_id}")
+        return None
+
     def _build_candidate(
         self, platform_id: str, request: CustomerRequest, profile: str
     ) -> Optional[SolutionCandidate]:
@@ -141,6 +201,15 @@ class SolutionGenerator:
         if request.requirements or request.previous_errors:
             # 1. Fetch all components compatible with platform
             compatible_ids = self.graph.get_compatible(platform_id)
+
+            # Phase 4a & 4b: Chassis variant selection — pick the right chassis based on storage needs
+            # All SKUs for a given chassis variant live inside the same QuickSpecs PDF, so we
+            # look at Variant nodes in the graph and select the smallest chassis that fits requirements.
+            chassis_variant_id = self._select_chassis_variant(platform_id, request, reasoning_chain)
+            if chassis_variant_id:
+                components.append(chassis_variant_id)
+                reasoning_chain.append(f"[Phase 4] Selected chassis variant {chassis_variant_id} based on storage requirements")
+
             
             # --- START FEEDBACK LOOP FIX ---
             # Process previous validation errors to avoid bad SKUs and add missing categories
@@ -365,10 +434,27 @@ class SolutionGenerator:
 
         confidence = ConfidenceLevel.HIGH if is_valid else ConfidenceLevel.LOW
 
+        # Phase 4c: Group solution output by category
+        grouped_components = {}
+        for cid in [platform_id] + components:
+            if cid in self.graph.graph:
+                cat = self.graph.graph.nodes[cid].get("attr_component_category", "Platform")
+                if not cat:
+                    cat = self.graph.graph.nodes[cid].get("type", "Unknown")
+                if cat not in grouped_components:
+                    grouped_components[cat] = []
+                grouped_components[cat].append(cid)
+                
+        # Phase 4d: Add closeness scoring vs BOQ
+        total_reqs = len(request.requirements) if request.requirements else 1
+        closeness_score = len(satisfied_reqs) / total_reqs if total_reqs > 0 else 1.0
+
         candidate = SolutionCandidate(
             request_id=request.request_id,
             profile=profile,
             components=[platform_id] + components,
+            grouped_components=grouped_components,
+            closeness_score=closeness_score,
             reasoning_chain=reasoning_chain,
             requirements_satisfied=satisfied_reqs,
             confidence=confidence,

@@ -32,7 +32,9 @@ Topology Map for: vendorsolution_okf
     ├── .ruff_cache/
     │   ├── 0.15.22/
     │   │   ├── 10330758746850303983
+    │   │   ├── 11921270086468753943
     │   │   ├── 1192202457577296009
+    │   │   ├── 12394097429209206231
     │   │   ├── 1279227645329768446
     │   │   ├── 15178928050856309406
     │   │   ├── 16080184044873561041
@@ -49,6 +51,8 @@ Topology Map for: vendorsolution_okf
     │   │   ├── 5009808684541312405
     │   │   ├── 5600116351807463130
     │   │   ├── 626817049282455965
+    │   │   ├── 9354574234089881972
+    │   │   ├── 9831988042166880323
     │   │   └── 9861636657967264020
     │   ├── .gitignore
     │   └── CACHEDIR.TAG
@@ -102,7 +106,9 @@ Topology Map for: vendorsolution_okf
     │   ├── 2026-07-18_DELTA-b4c240de.md
     │   ├── 2026-07-18_DELTA-baa74406.md
     │   ├── 2026-07-18_DELTA-c44ceed6.md
-    │   └── 2026-07-18_DELTA-d94a780a.md
+    │   ├── 2026-07-18_DELTA-d94a780a.md
+    │   ├── 2026-07-20_DELTA-82f16330.md
+    │   └── 2026-07-20_DELTA-c35ce114.md
     ├── IKP/
     │   ├── references/
     │   │   └── OKF_SPECIFICATION.md
@@ -182,14 +188,12 @@ Topology Map for: vendorsolution_okf
     │   │   │   │   ├── ♦ def _infer_vendor(filename):
     │   │   │   │   ├── ♦ def _load_manifest(self):
     │   │   │   │   └── ♦ def _save_manifest(self):
-    │   │   │   ├── source_watcher.py
-    │   │   │   │   ├── ♦ class SourceWatcher:
-    │   │   │   │   ├── ♦ def __init__(self, sources_path):
-    │   │   │   │   └── ♦ def scan(self):
-    │   │   │   └── table_parser.py
-    │   │   │       ├── ♦ class TableParser:
-    │   │   │       ├── ♦ def __init__(self):
-    │   │   │       └── ♦ def parse_document(self, pdf_path):
+    │   │   │   └── source_watcher.py
+    │   │   │       ├── ♦ class SourceWatcher:
+    │   │   │       ├── ♦ def __init__(self, sources_path):
+    │   │   │       ├── ♦ def _load_state(self):
+    │   │   │       ├── ♦ def _save_state(self):
+    │   │   │       └── ♦ def scan(self):
     │   │   ├── learning/
     │   │   │   ├── __init__.py
     │   │   │   └── learning_engine.py
@@ -224,6 +228,7 @@ Topology Map for: vendorsolution_okf
     │   │   │       ├── ♦ class DeltaStatus:
     │   │   │       ├── ♦ class DeltaChangeType:
     │   │   │       ├── ♦ class RuleSeverity:
+    │   │   │       ├── ♦ class ValidationFailureType:
     │   │   │       ├── ♦ class ConfidenceLevel:
     │   │   │       ├── ♦ class PackagingType:
     │   │   │       ├── ♦ class EvidenceRecord:
@@ -246,6 +251,7 @@ Topology Map for: vendorsolution_okf
     │   │   │       ├── ♦ class DeltaChange:
     │   │   │       ├── ♦ class KnowledgeDelta:
     │   │   │       ├── ♦ class CustomerRequirement:
+    │   │   │       ├── ♦ class ValidationFailure:
     │   │   │       ├── ♦ class CustomerRequest:
     │   │   │       └── ♦ class SolutionCandidate:
     │   │   ├── reasoning/
@@ -253,9 +259,7 @@ Topology Map for: vendorsolution_okf
     │   │   │   ├── intent_parser.py
     │   │   │   │   ├── ♦ class IntentParser:
     │   │   │   │   ├── ♦ def __init__(self):
-    │   │   │   │   ├── ♦ def parse_request(self, raw_text):
-    │   │   │   │   ├── ♦ def _extract_workloads(self, text_lower):
-    │   │   │   │   └── ♦ def _extract_requirements(self, text_lower):
+    │   │   │   │   └── ♦ def parse_request(self, raw_text):
     │   │   │   ├── llm_client.py
     │   │   │   │   ├── ♦ class KeyManager:
     │   │   │   │   ├── ♦ def retry_with_key_rotation(max_retries):
@@ -274,10 +278,19 @@ Topology Map for: vendorsolution_okf
     │   │   │   │   ├── ♦ def extract_rules(self, text_chunk):
     │   │   │   │   ├── ♦ def critic_review_rules(self, text_chunk):
     │   │   │   │   └── ♦ def wrapper(self):
+    │   │   │   ├── remediation_engine.py
+    │   │   │   │   ├── ♦ class RemediationEngine:
+    │   │   │   │   ├── ♦ def __init__(self, graph):
+    │   │   │   │   ├── ♦ def generate_remediations(self, platform_id, errors):
+    │   │   │   │   ├── ♦ def execute(self, context):
+    │   │   │   │   ├── ♦ def _remediate_category_limit(self, platform_id, error):
+    │   │   │   │   ├── ♦ def _remediate_missing_category(self, platform_id, error):
+    │   │   │   │   └── ♦ def _remediate_incompatible(self, platform_id, error):
     │   │   │   ├── rule_engine.py
     │   │   │   │   ├── ♦ class RuleEngine:
     │   │   │   │   ├── ♦ def __init__(self, graph):
     │   │   │   │   ├── ♦ def evaluate_solution(self, platform_id, component_ids):
+    │   │   │   │   ├── ♦ def execute(self, context):
     │   │   │   │   ├── ♦ def _check_compatibility(self, platform_id, component_ids, reasoning_chain):
     │   │   │   │   ├── ♦ def _evaluate_constraints(self, platform_id, component_ids, reasoning_chain):
     │   │   │   │   ├── ♦ def _check_dependencies(self, component_ids, reasoning_chain):
@@ -289,6 +302,14 @@ Topology Map for: vendorsolution_okf
     │   │   │       └── ♦ def _build_candidate(self, platform_id, request, profile):
     │   │   ├── repository/
     │   │   │   ├── __init__.py
+    │   │   │   ├── graph_analytics.py
+    │   │   │   │   ├── ♦ class GraphAnalyticsEngine:
+    │   │   │   │   ├── ♦ def __init__(self, graph_builder):
+    │   │   │   │   ├── ♦ def get_articulation_points(self):
+    │   │   │   │   ├── ♦ def get_fragility_report(self):
+    │   │   │   │   ├── ♦ def check_subgraph_isomorphism(self, boq_graph, bom_graph):
+    │   │   │   │   ├── ♦ def compute_vendor_solution_score(self, boq_nodes, bom_nodes):
+    │   │   │   │   └── ♦ def node_match(n1, n2):
     │   │   │   ├── graph_builder.py
     │   │   │   │   ├── ♦ class GraphBuilder:
     │   │   │   │   ├── ♦ def __init__(self):
@@ -335,7 +356,9 @@ Topology Map for: vendorsolution_okf
     │   │   │   │   ├── ♦ def append_log_entry(self, action, description, concept_path, directory):
     │   │   │   │   └── ♦ def _read_frontmatter(file_path):
     │   │   │   ├── repo_manager.py
+    │   │   │   │   ├── ♦ def with_lock(func):
     │   │   │   │   ├── ♦ class RepoManager:
+    │   │   │   │   ├── ♦ def wrapper(self):
     │   │   │   │   ├── ♦ def __init__(self, repository_path, project_root):
     │   │   │   │   ├── ♦ def bootstrap(self):
     │   │   │   │   ├── ♦ def add_concept(self, obj):
@@ -367,7 +390,15 @@ Topology Map for: vendorsolution_okf
     │   │   │   │   ├── ♦ def __init__(self, graph, vector_store):
     │   │   │   │   ├── ♦ def fuzzy_match_sku(self, requested_sku, threshold):
     │   │   │   │   ├── ♦ def _check_completeness(self, component_ids, result):
-    │   │   │   │   └── ♦ def validate(self, solution_components, context):
+    │   │   │   │   ├── ♦ def validate(self, solution_components, context):
+    │   │   │   │   └── ♦ def execute(self, context):
+    │   │   │   ├── pipeline.py
+    │   │   │   │   ├── ♦ class ValidationContext:
+    │   │   │   │   ├── ♦ class ValidationStep:
+    │   │   │   │   ├── ♦ class ValidationPipeline:
+    │   │   │   │   ├── ♦ def execute(self, context):
+    │   │   │   │   ├── ♦ def __init__(self, steps):
+    │   │   │   │   └── ♦ def execute(self, initial_context):
     │   │   │   └── validator.py
     │   │   │       ├── ♦ class ValidationMessage:
     │   │   │       ├── ♦ class ValidationResult:
@@ -384,6 +415,7 @@ Topology Map for: vendorsolution_okf
     │   │   │   │   └── ♦ def execute_query(self, query):
     │   │   │   ├── graph.py
     │   │   │   │   ├── ♦ def should_loop_bom(state):
+    │   │   │   │   ├── ♦ def route_recovery(state):
     │   │   │   │   ├── ♦ def should_human_intervene(state):
     │   │   │   │   └── ♦ def build_workflow_graph(knowledge_graph, parser, generator, rule_engine):
     │   │   │   ├── nodes.py
@@ -393,6 +425,7 @@ Topology Map for: vendorsolution_okf
     │   │   │   │   ├── ♦ def select_platform(self, state):
     │   │   │   │   ├── ♦ def draft_bom(self, state):
     │   │   │   │   ├── ♦ def validate_bom(self, state):
+    │   │   │   │   ├── ♦ def select_recovery_strategy(self, state):
     │   │   │   │   ├── ♦ def live_portal_validation(self, state):
     │   │   │   │   ├── ♦ def update_knowledge_base(self, state):
     │   │   │   │   ├── ♦ def human_intervention(self, state):
@@ -406,6 +439,18 @@ Topology Map for: vendorsolution_okf
     │   │   │   └── ♦ def ingest_all():
     │   │   └── reindex.py
     │   │       └── ♦ def main():
+    │   ├── tests/
+    │   │   ├── test_dynamic_math_and_dependencies.py
+    │   │   │   ├── ♦ def mock_graph():
+    │   │   │   ├── ♦ def test_dynamic_math_exhaustion(mock_graph):
+    │   │   │   └── ♦ def test_missing_dependency_failure(mock_graph):
+    │   │   └── test_rule_engine_negative.py
+    │   │       ├── ♦ def negative_test_graph():
+    │   │       ├── ♦ def test_incompatible_components(negative_test_graph):
+    │   │       ├── ♦ def test_subcategory_limit_exceeded(negative_test_graph):
+    │   │       ├── ♦ def test_resource_ceiling_broken(negative_test_graph):
+    │   │       ├── ♦ def test_missing_minimum_quantity(negative_test_graph):
+    │   │       └── ♦ def test_remediation_engine(negative_test_graph):
     │   ├── utils/
     │   │   └── logger.py
     │   │       ├── ♦ def setup_logger(name, log_file, level):
@@ -467,6 +512,7 @@ Topology Map for: vendorsolution_okf
     │   │   ├── components/
     │   │   │   ├── BoqValidation.tsx
     │   │   │   │   ├── ♦ function BoqValidation()
+    │   │   │   │   ├── ♦ const fetchPlatforms = () =>
     │   │   │   │   ├── ♦ const handleBoqValidation = () =>
     │   │   │   │   └── ♦ const handleFileUpload = () =>
     │   │   │   ├── KnowledgeTransfer.tsx
@@ -497,10 +543,13 @@ Topology Map for: vendorsolution_okf
     │   ├── test-results/
     │   │   └── .last-run.json
     │   ├── tests/
-    │   │   └── e2e/
-    │   │       ├── boq-combinations.spec.ts
-    │   │       ├── search.spec.ts
-    │   │       └── validation.spec.ts
+    │   │   ├── e2e/
+    │   │   │   ├── boq-combinations.spec.ts
+    │   │   │   ├── search.spec.ts
+    │   │   │   └── validation.spec.ts
+    │   │   └── unit/
+    │   │       ├── setup.ts
+    │   │       └── Sidebar.test.tsx
     │   ├── .gitignore
     │   ├── .oxlintrc.json
     │   ├── index.html
@@ -510,7 +559,8 @@ Topology Map for: vendorsolution_okf
     │   ├── tsconfig.app.json
     │   ├── tsconfig.json
     │   ├── tsconfig.node.json
-    │   └── vite.config.ts
+    │   ├── vite.config.ts
+    │   └── vitest.config.ts
     ├── repository/
     │   ├── compute/
     │   │   ├── proliant/
@@ -796,6 +846,7 @@ Topology Map for: vendorsolution_okf
     │   │       ├── workload-analytics.md
     │   │       ├── workload-database.md
     │   │       └── workload-virtualization.md
+    │   ├── deltas/
     │   ├── storage/
     │   │   ├── alletra/
     │   │   │   └── unknown/
@@ -838,6 +889,7 @@ Topology Map for: vendorsolution_okf
     │   │       ├── workload-analytics.md
     │   │       ├── workload-database.md
     │   │       └── workload-storage.md
+    │   ├── index.md
     │   └── log.md
     ├── scripts/
     │   ├── debug/
@@ -848,7 +900,9 @@ Topology Map for: vendorsolution_okf
     │   │   └── debug_platform_dump.py
     │   ├── bootstrap.sh
     │   ├── start_api.sh
-    │   └── start_ui.sh
+    │   ├── start_ui.sh
+    │   ├── stop_api.sh
+    │   └── stop_ui.sh
     ├── sources/
     │   ├── boqs/
     │   ├── excel/
@@ -868,7 +922,32 @@ Topology Map for: vendorsolution_okf
     │   │   │   └── ♦ def main():
     │   │   ├── manual_test_storage_ingestion.py
     │   │   │   └── ♦ def main():
-    │   │   └── README.md
+    │   │   ├── README.md
+    │   │   ├── test_headless_synthesis.py
+    │   │   │   ├── ♦ def test_graph():
+    │   │   │   ├── ♦ def test_headless_negative_scenario_bad_sku(test_graph):
+    │   │   │   ├── ♦ def test_headless_neutral_scenario_missing_mandatory(test_graph):
+    │   │   │   ├── ♦ def test_headless_positive_scenario(test_graph):
+    │   │   │   ├── ♦ def mock_evaluate(platform_id, components):
+    │   │   │   ├── ♦ def mock_evaluate(platform_id, components):
+    │   │   │   └── ♦ def mock_evaluate(platform_id, components):
+    │   │   ├── test_llm_chaos.py
+    │   │   │   ├── ♦ def test_graph():
+    │   │   │   └── ♦ def test_llm_complete_outage_fallback(test_graph):
+    │   │   └── test_recovery_boundaries.py
+    │   │       ├── ♦ def test_graph():
+    │   │       ├── ♦ def test_infinite_oscillation_prevention(test_graph):
+    │   │       ├── ♦ def test_exhaustion_limits(test_graph):
+    │   │       ├── ♦ def mock_generate(self, request):
+    │   │       ├── ♦ def _mock_draft_fn():
+    │   │       ├── ♦ def mock_evaluate(platform_id, components):
+    │   │       ├── ♦ def debug_invoke(state):
+    │   │       └── ♦ def mock_evaluate(platform_id, components):
+    │   ├── performance/
+    │   │   └── locustfile.py
+    │   │       ├── ♦ class IKPPlatformUser:
+    │   │       ├── ♦ def check_health(self):
+    │   │       └── ♦ def generate_boq(self):
     │   ├── __init__.py
     │   ├── conftest.py
     │   │   ├── ♦ def shared_temp_dir():
@@ -877,7 +956,8 @@ Topology Map for: vendorsolution_okf
     │   │   └── ♦ def api_client(temp_repo, monkeypatch):
     │   ├── test_api_endpoints.py
     │   │   ├── ♦ def test_query_endpoint(api_client):
-    │   │   └── ♦ def test_health_endpoint(api_client):
+    │   │   ├── ♦ def test_health_endpoint(api_client):
+    │   │   └── ♦ def test_review_queue_approve(api_client):
     │   ├── test_category_limits.py
     │   │   ├── ♦ class TestCategoryLimits:
     │   │   ├── ♦ def setUp(self):
@@ -924,6 +1004,11 @@ Topology Map for: vendorsolution_okf
     │   │   ├── ♦ def test_exact_match(self):
     │   │   ├── ♦ def test_fuzzy_match(self):
     │   │   └── ♦ def test_invalid_match(self):
+    │   ├── test_graph_analytics.py
+    │   │   ├── ♦ def test_articulation_points():
+    │   │   ├── ♦ def test_subgraph_isomorphism():
+    │   │   ├── ♦ def test_compute_vendor_solution_score():
+    │   │   └── ♦ def test_tough_subgraph_isomorphism():
     │   ├── test_graph_field_parity.py
     │   │   ├── ♦ def _assert_every_field_reachable(obj, node_attrs):
     │   │   ├── ♦ def test_rule_fields_all_reach_graph(empty_graph):
@@ -949,8 +1034,8 @@ Topology Map for: vendorsolution_okf
     │   │   ├── ♦ def test_mcp_server_parameters():
     │   │   └── ♦ def test_mcp_client_init(mocker):
     │   ├── test_reasoning.py
-    │   │   ├── ♦ def test_intent_parser():
-    │   │   ├── ♦ def test_solution_generator():
+    │   │   ├── ♦ def test_intent_parser(mock_parse_intent):
+    │   │   ├── ♦ def test_solution_generator(mock_parse_intent):
     │   │   ├── ♦ def test_rule_engine():
     │   │   └── ♦ def test_repo_graph_integration(temp_repo):
     │   ├── test_restart_persistence.py
@@ -973,14 +1058,22 @@ Topology Map for: vendorsolution_okf
     │   └── tmp/
     │       ├── extracted_components.json
     │       └── extracted_rules.json
+    ├── .api_pid
     ├── .env
     ├── .env.example
     ├── .gitignore
+    ├── .repo_map
+    ├── .ui_pid
     ├── AGENTS.md
+    ├── api_server.log
     ├── CONTEXT.md
+    ├── debug_test.py
+    │   └── ♦ def mock_evaluate(platform_id, components):
     ├── LOG.md
     ├── Makefile
     ├── pyproject.toml
     ├── README.md
+    ├── ROADMAP.md
     ├── SETUP.md
-    └── STATE.md
+    ├── STATE.md
+    └── ui_server.log

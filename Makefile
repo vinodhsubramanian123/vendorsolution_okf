@@ -1,4 +1,4 @@
-.PHONY: install test lint typecheck clean run ui-install ui-test ui-dev
+.PHONY: install test lint typecheck clean run ui-install ui-test ui-dev ingest reindex
 
 install:
 	uv sync --extra dev
@@ -29,3 +29,9 @@ ui-test:
 
 ui-dev:
 	cd ikp_web && npm run dev
+
+ingest:
+	uv run --python 3.11 python3 -m ikp_platform.scripts.ingest_catalog
+
+reindex:
+	uv run --python 3.11 python3 -m ikp_platform.scripts.reindex_vector_store

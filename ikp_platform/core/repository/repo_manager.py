@@ -11,7 +11,7 @@ Responsibilities:
 
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import List, Callable, Any
+from typing import List, Callable, Any, Optional, Dict
 from functools import wraps
 import difflib
 import threading
@@ -106,7 +106,7 @@ class RepoManager:
                     data.get("type") == "Rule"
                     and data.get("platform_id") == obj.platform_id
                 ):
-                    existing_desc = data.get("description", "")
+                    existing_desc = data.get("description") or ""
                     if (
                         existing_desc
                         and difflib.SequenceMatcher(
@@ -322,3 +322,69 @@ class RepoManager:
 
         with open(context_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
+
+    def search(self, query: str, limit: int = 10, filter_metadata: Optional[dict] = None) -> List[Dict]:
+        """Hybrid search combining Graph structure and Vector semantic similarity."""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # 1. Start with semantic search
+        try:
+            semantic_results = self.vector_store.semantic_search(query, n_results=limit * 2, filter_metadata=filter_metadata)
+        except Exception as e:
+            logger.warning(f"Vector search failed: {e}. Falling back to graph search.")
+            semantic_results = []
+            
+        # Fallback to simple text matching on the graph if semantic search returned nothing (e.g., rate limit)
+        if not semantic_results:
+            for node, data in self.graph.graph.nodes(data=True):
+                title = data.get("title") or ""
+                desc = data.get("description") or ""
+                if query.lower() in title.lower() or query.lower() in desc.lower():
+                    semantic_results.append((node, 0.5)) # default fallback score
+        
+        # 2. Extract specific metadata if searching within a platform
+        platform_id = filter_metadata.get("platform_id") if filter_metadata else None
+        target_category = filter_metadata.get("component_category") if filter_metadata else None
+        
+        hybrid_results = []
+        
+        for res_id, score in semantic_results:
+            node_data = {}
+            if res_id in self.graph.graph:
+                node_data = self.graph.graph.nodes[res_id]
+                
+            # Apply Graph-based score boosting
+            boost = 0.0
+            
+            # Boost if it actually connects to the requested platform in the graph
+            if platform_id and res_id in self.graph.graph:
+                if self.graph.graph.has_edge(platform_id, res_id) or self.graph.graph.has_edge(res_id, platform_id):
+                    boost += 0.2
+                    
+            # Boost if the category explicitly matches the graph node's exact property
+            if target_category and node_data.get("component_category") == target_category:
+                boost += 0.3
+                
+            hybrid_score = score + boost
+            
+            description = node_data.get("description") or node_data.get("title") or res_id
+            
+            hybrid_results.append({
+                "id": res_id,
+                "score": round(hybrid_score, 4),
+                "semantic_score": round(score, 4),
+                "graph_boost": round(boost, 4),
+                "text": description,
+                "title": node_data.get("title", res_id),
+                "type": node_data.get("type", "unknown"),
+                "vendor": node_data.get("vendor"),
+                "category": node_data.get("component_category"),
+                "subcategory": node_data.get("subcategory"),
+                "price": node_data.get("price", "TBD"), # Placeholder for pricing
+                "metadata": node_data
+            })
+            
+        # Sort by the new hybrid score descending
+        hybrid_results.sort(key=lambda x: x["score"], reverse=True)
+        return hybrid_results[:limit]

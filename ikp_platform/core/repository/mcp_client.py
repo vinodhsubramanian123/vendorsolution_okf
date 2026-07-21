@@ -101,6 +101,28 @@ class ObsidianMCPClient:
         Synchronous wrapper to execute a search against the vault.
         Returns a list of relative paths matching the search.
         """
+        # Phase 6: Local cache layer with TTL
+        if not hasattr(self, '_cache'):
+            self._cache = {}
+            self._cache_ttl = 300 # 5 minutes TTL
+            
+        import time
+        now = time.time()
+        
+        # Phase 6: Fallback logic - Use cached results if portal is down or skip network
+        if query in self._cache:
+            cache_time, cached_result = self._cache[query]
+            if now - cache_time < self._cache_ttl:
+                logger.debug(f"Returning cached MCP result for: {query}")
+                return cached_result
+        
+        if not self.check_health():
+            logger.warning(f"Vendor portal down. Using stale cache or static rules for: {query}")
+            if query in self._cache:
+                return self._cache[query][1]
+            return []
+            
+
         if not self.is_available():
             logger.debug("seekstone binary not found on PATH; skipping MCP search.")
             return []
@@ -123,6 +145,71 @@ class ObsidianMCPClient:
             t = threading.Thread(target=_run)
             t.start()
             t.join()
-            return result[0]
+            final_result = result[0]
         else:
-            return asyncio.run(self._search_async(query))
+            final_result = asyncio.run(self._search_async(query))
+            
+        if hasattr(self, '_cache'):
+            self._cache[query] = (time.time(), final_result)
+        return final_result
+
+    # -------------------------------------------------------------------------
+    # Phase 6: Vendor Portal Integration & Fallback
+    # -------------------------------------------------------------------------
+
+    def check_health(self) -> bool:
+        """
+        Check health of the vendor portal / MCP connection.
+        Returns True if reachable, False otherwise.
+        """
+        if not self.is_available():
+            return False
+            
+        try:
+            # Quick health check using asyncio/MCP ping (simulated via search)
+            _ = self.search("health_check_ping")
+            return True
+        except Exception as e:
+            logger.warning(f"Vendor Portal health check failed: {e}")
+            return False
+
+    def update_from_portal(self, platform_id: str, repo_manager) -> None:
+        """
+        Scrapes the latest data from the vendor portal and creates deltas.
+        """
+        if not self.check_health():
+            logger.error("Vendor Portal down. Cannot update from portal.")
+            return
+            
+        logger.info(f"Syncing latest rules and components for {platform_id} from Vendor Portal...")
+        
+        # Here we would do a targeted MCP call to get latest metadata, simulated:
+        recent_updates = self.search(f"latest {platform_id}")
+        
+        if recent_updates:
+            from ikp_platform.core.ontology.models import KnowledgeDelta, DeltaStatus, DeltaChange, ChangeType
+            import uuid
+            from datetime import datetime
+            
+            changes = []
+            for item in recent_updates:
+                changes.append(DeltaChange(
+                    object_id=item,
+                    change_type=ChangeType.MODIFY,
+                    field_name="vendor_portal_sync",
+                    old_value=None,
+                    new_value=datetime.utcnow().isoformat(),
+                    reason="Vendor Portal Sync update"
+                ))
+                
+            delta = KnowledgeDelta(
+                delta_id=str(uuid.uuid4()),
+                source_id="vendor_portal",
+                changes=changes,
+                timestamp=datetime.utcnow(),
+                status=DeltaStatus.PENDING,
+                review_notes="Automated sync from Vendor Portal MCP"
+            )
+            
+            repo_manager._record_delta(delta)
+            logger.info(f"Created Knowledge Delta {delta.delta_id} with {len(changes)} sync updates.")

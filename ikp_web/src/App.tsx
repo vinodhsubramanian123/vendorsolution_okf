@@ -7,13 +7,14 @@ import { BoqValidation } from './components/BoqValidation';
 import { SemanticSearch } from './components/SemanticSearch';
 import { ValidationPortal } from './components/ValidationPortal';
 import { KnowledgeTransfer } from './components/KnowledgeTransfer';
+import { ComponentBrowser } from './components/ComponentBrowser';
 
 import type { StatusResponse, IntegrationsResponse } from './types/api';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'query' | 'dashboard' | 'boq' | 'search' | 'review' | 'kt'>('query');
+  const [activeTab, setActiveTab] = useState<'query' | 'dashboard' | 'bom' | 'boq' | 'search' | 'review' | 'kt'>('query');
   const [status, setStatus] = useState<StatusResponse | any>(null);
   const [integrations, setIntegrations] = useState<IntegrationsResponse | null>(null);
   const [appError, setAppError] = useState<string | null>(null);
@@ -70,6 +71,7 @@ export default function App() {
         )}
         {activeTab === 'query' && <SolutionSynthesis />}
         {activeTab === 'dashboard' && <PlatformDashboard status={status} integrations={integrations} />}
+        {activeTab === 'bom' && <ComponentBrowser />}
         {activeTab === 'boq' && <BoqValidation />}
         {activeTab === 'search' && <SemanticSearch />}
         {activeTab === 'review' && <ValidationPortal />}
