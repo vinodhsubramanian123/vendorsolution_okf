@@ -47,18 +47,17 @@ class VersionTracker:
             
         logger.warning(f"Source {source_id} fingerprint changed! Generating targeted deltas.")
         
-        from ikp_platform.core.ontology.models import DeltaChange, ChangeType
+        from ikp_platform.core.ontology.models import DeltaChange, DeltaChangeType
         
         changes = []
         # In a full implementation we would diff the old objects vs new objects.
         # For now, we simply create a bulk MODIFY delta indicating a new version was published.
         changes.append(DeltaChange(
             object_id="source_version_bump",
-            change_type=ChangeType.MODIFY,
+            change_type=DeltaChangeType.UPDATED_ATTRIBUTE,
             field_name="fingerprint",
             old_value=old_fingerprint,
             new_value=new_fingerprint,
-            reason=f"Fingerprint changed for {source_id}. PDF was updated."
         ))
         
         return changes

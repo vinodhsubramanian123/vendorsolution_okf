@@ -70,6 +70,7 @@ class RelationshipType(str, Enum):
     HOSTED_BY = "Hosted By"  # VM hosted by physical server
     HAS_SKU = "Has SKU"  # Component has a commercial SKU
     BELONGS_TO = "Belongs To"  # Component belongs to a solution category
+    VARIANT_OF = "Variant Of"  # Chassis variant is a configuration of a base platform
 
 
 class SourceType(str, Enum):
