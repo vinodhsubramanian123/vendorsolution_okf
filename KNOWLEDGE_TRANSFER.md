@@ -23,7 +23,40 @@ The following table explicitly defines the roles, technologies, and actors acros
 
 ---
 
-## 2. Clarifying Current Confusions
+## 2. Step-by-Step Execution Sequence (Code Flow)
+
+To eliminate any ambiguity on *how* things happen, here is the exact chronological sequence of operations as written in the codebase.
+
+### Flow A: Ingestion & Fingerprinting (Triggered via `scripts/ingest_catalog.py`)
+This process runs *asynchronously in the background* or at startup. It does **not** run during search.
+1.  **PDF Read:** `ingest_catalog.py` finds a PDF in `sources/pdfs/`.
+2.  **LLM Extraction:** `PDFExtractor` invokes the `HPEQuickSpecsAdapter`. The adapter uses the Gemini API to parse the PDF text and generate structured JSON representing components and rules.
+3.  **Object Creation:** The JSON is converted into `BaseEngineeringObject` Python models (e.g., `Component`, `Variant`, `Rule`).
+4.  **Fingerprinting (Delta Check):** `VersionTracker.compute_fingerprint()` calculates a SHA-256 hash of the extracted objects and compares it to the last run (stored in `repository/manifest.json`).
+5.  **Markdown Persist:** `RepoManager.add_concept()` calls `OKFWriter`, writing the objects to the disk as physical `.md` files inside the `repository/` folder.
+6.  **Graph Sync:** The object is simultaneously loaded into the `NetworkX` in-memory graph (inside `repo_manager.py`).
+7.  **Delta Generation:** If the fingerprint changed in step 4, a `KnowledgeDelta` is generated and saved to `history/`.
+8.  **Vector Indexing:** Once all PDFs are processed, `repo_manager.reindex_vector_store()` is called. This reads all `.md` files and pushes them to **ChromaDB** to generate the final semantic embeddings.
+
+### Flow B: Search & Retrieval (Triggered via `POST /api/search`)
+This process happens at runtime when a Client queries the API. It is lightning-fast because it never reads the original PDFs.
+1.  **Client Request:** A Client (e.g., Google AI Studio, Antigravity CLI) sends a search string to the `/api/search` endpoint.
+2.  **Semantic Search (ChromaDB):** `repo_manager.search()` asks ChromaDB for the closest vector matches based on the query string, returning a list of `node_ids` and a base `semantic_score`.
+3.  **Structural Graph Boost (NetworkX):** The script iterates through the ChromaDB results. For each result, it checks the in-memory `NetworkX` graph.
+    *   If the result is explicitly connected to the queried `platform_id` via a graph edge, it adds `+0.2` to the score.
+    *   If the category metadata exactly matches, it adds `+0.3`.
+4.  **JSON Return:** The combined Hybrid Scores are sorted descending, and the resulting component JSON is returned to the Client.
+
+### Flow C: Human-in-the-Loop Feedback & Recovery (Triggered via `POST /api/feedback`)
+This process happens when a human identifies a hallucination or error in the catalog.
+1.  **Submission:** A human uses the Web UI to submit a correction (e.g., fixing a RAM capacity).
+2.  **Delta Creation:** The `apply_feedback()` function (in `feedback_template.py`) intercepts the request and creates a `KnowledgeDelta` with a `DeltaChangeType` (e.g., `UPDATED_ATTRIBUTE`).
+3.  **Validation:** Because a human submitted it, the Delta is immediately marked as `VALIDATED`.
+4.  **Auto-Reindex:** The API pushes the change into the graph and triggers a background task (`repo_manager.reindex_vector_store()`) to instantly update ChromaDB, fixing the search index for all future queries.
+
+---
+
+## 3. Clarifying Current Confusions
 
 To ensure project schemas and Agent instructions are fully aligned, here are explicit clarifications regarding recent questions:
 
