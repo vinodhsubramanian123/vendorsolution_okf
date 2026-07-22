@@ -1,99 +1,101 @@
 # Knowledge Transfer (KT) & Architectural Decisions
 
-This document outlines the current strategies, technologies, and future roadmap considerations for the IKP (Intelligent Knowledge Platform). It serves as a definitive reference for how the platform handles ingestion, search, fingerprinting, and complex reasoning.
+This document outlines the current strategies, technologies, and future roadmap considerations for the IKP (Intelligent Knowledge Platform). It explicitly clarifies *who* is doing *what* across ingestion, search, and recovery workflows to eliminate all ambiguity.
 
 ---
 
-## 1. Indexing & Fingerprinting Strategy
+## 1. Responsibility Matrix (Who Does What & How)
 
-### Current Strategy (What we are using)
-We are **not** using LlamaIndex for our core ingestion and indexing pipeline. Instead, we use a bespoke, dual-layer architecture tailored for strict engineering governance:
-1.  **Canonical Repository (Source of Truth):** When PDFs are ingested (via `HPEQuickSpecsAdapter` leveraging Google Gemini models for structured extraction), the extracted entities are mapped to `BaseEngineeringObject` models and written as **Markdown files** (`.md`) inside the `repository/` folder. This is our Canonical OKF (Open Knowledge Format).
-2.  **Fingerprinting:** We do not use ambiguous tracking mechanisms. Fingerprinting is deterministic. `version_tracker.py` computes an MD5 checksum of the source PDF, and a SHA-256 hash of the extracted canonical JSON objects. If a PDF is re-ingested and the extracted data changes, a `KnowledgeDelta` is explicitly generated and recorded in the `manifest.json`.
-3.  **Vector Indexing:** The canonical Markdown objects are parsed by `OKFReader` and ingested into **ChromaDB** directly (via our `VectorStore` class in `vector_store.py`). We use ChromaDB to generate embeddings (e.g., via `all-MiniLM-L6-v2`) for fast semantic retrieval.
+The following table explicitly defines the roles, technologies, and actors across the three main phases of the platform lifecycle:
 
-*In short: We use a custom pipeline (Gemini extraction → Canonical Markdown OKF → ChromaDB), completely bypassing LlamaIndex for indexing to maintain absolute control over the data lifecycle and versioning.*
+| Lifecycle Phase | Component / Actor | Role & Mechanism (How it works) | Technology Used (Current) | Future Recommendation |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Source Ingestion** | **Google Gemini (LLM)** | Extracts structured components and rules from raw PDFs *at start time*. | Gemini API (`pdf_extractor.py`) | *No change* |
+| **1. Source Ingestion** | **Fingerprinter** | Computes MD5/SHA256 of extracted objects. If they change, it generates a `KnowledgeDelta`. | Python `hashlib` (`version_tracker.py`) | *No change* |
+| **1. Source Ingestion** | **Canonical Storage** | Saves extracted components as Markdown (`.md`) files on disk. | Local Filesystem (`OKFWriter`) | *No change* |
+| **1. Source Ingestion** | **Indexer** | Embeds the Markdown files and saves them into the vector database. | **ChromaDB** (`VectorStore`) | *No change* |
+| **2. Search (API)** | **Semantic Search Engine** | Looks up the query in the vector DB to find fuzzy/conceptual matches. | **ChromaDB** (Internal) | *No change* |
+| **2. Search (API)** | **Graph Search Engine** | Looks up explicit relationships (e.g., "Compatible With") to boost search scores. | **NetworkX** (In-Memory Python Graph) | Migrate to **Neo4j** |
+| **2. Search (Actors)** | **Google AI Studio / CLI** | **Clients** that call our `/api/search` endpoint to retrieve data. They *consume* search; they do not *index*. | REST API / HTTP Clients | *No change* |
+| **3. Recovery / Sync** | **Obsidian MCP Client** | Acts as a client to an *external* Partner Portal MCP Server to fetch missing rules or alternative SKUs. | MCP Protocol (`mcp_client.py`) | *No change* |
+| **3. Recovery / Sync** | **Human Reviewer** | Validates delta changes or submits explicit corrections via `/api/feedback`. | REST API (`feedback_template.py`) | *No change* |
+| **3. Recovery / Sync** | **Error Resolution Agent** | Diagnoses obscure Partner Portal errors (e.g., "PCI Bandwidth Exceeded"). | *None currently (manual)* | Build orchestrator using **LlamaIndex** |
 
 ---
 
-## 2. Search & Retrieval Architecture (Who & How)
+## 2. Clarifying Current Confusions
 
-There is a critical distinction between our **Internal Canonical Search** and our **External Fallback Search**.
+To ensure project schemas and Agent instructions are fully aligned, here are explicit clarifications regarding recent questions:
 
-### A. How Internal Search Works on our `.md` files
-Our core intelligence lives in the generated Markdown (`.md`) files inside the `repository/` folder. 
-1. **Indexing:** `VectorStore` (using ChromaDB) automatically ingests the content and metadata of these `.md` files, generating vector embeddings (e.g., via `all-MiniLM-L6-v2`) for fast semantic retrieval.
-2. **Hybrid Execution:** When a query hits `/api/search`, `repo_manager.py` executes a **Hybrid Search**. It first queries ChromaDB for semantic similarity, and then applies a graph boost using the `NetworkX` in-memory graph (e.g., boosting scores by `+0.2` or `+0.3` if there's an exact platform/category match).
+### A. Is Google AI Studio or Antigravity CLI helping in search?
+**NO.** Google AI Studio (acting as a reasoning agent) and the Antigravity CLI are **Clients**. They do not power the search indexing or execution. They simply send an HTTP `POST` request to our `/api/search` endpoint, and our internal backend (FastAPI + ChromaDB + NetworkX) does the actual searching.
 
-### B. Who is doing the Search? (The Actors)
-The internal Hybrid Search is exposed via our REST API (`/api/search`). The following actors query it:
-1. **Google AI Studio / Reasoning LLMs:** Our internal agentic pipelines query this endpoint to find compatible components when building a Bill of Materials (BOM) in `solution_generator.py`.
-2. **Antigravity CLI & Web UI:** Human engineers and operators querying the catalog directly.
+### B. How does the "In-Memory NetworkX Graph" work? Is it Semantic or Normal Search?
+*   **What it is:** NetworkX is a standard Python library running in the RAM of our FastAPI server. It is **NOT** a database and it is **NOT** semantic.
+*   **How it works (Normal/Structural Search):** It stores explicit, hard-coded relationships (e.g., `Node A` is connected to `Node B` via a `COMPATIBLE_WITH` edge).
+*   **Who does it:** The `repo_manager.py` (specifically the `search()` function) queries this graph.
+*   **Role in Search:** After ChromaDB returns semantic results, `repo_manager.py` looks at the NetworkX graph. If it sees that a semantic result is *structurally* connected to the platform the user is querying, it artificially boosts the search score (`+0.2`).
 
-### C. The Obsidian MCP Server (External Integration)
-**We DO NOT use Obsidian MCP for our internal catalog search.** 
-Instead, we implemented an **Obsidian MCP Client** (`mcp_client.py` using the `seekstone` binary) as part of our **Phase 6 Vendor Portal Integration**. 
-- **What it does:** Our platform acts as a *client* connecting to an *external* Obsidian MCP server (representing a vendor's or partner's external knowledge base). 
-- **Why we use it:** If our internal search fails or a component is flagged as incompatible by the Partner Portal, we query the Obsidian MCP server to retrieve the latest rules or alternative SKUs from the vendor's markdown vault, turning the results into `KnowledgeDelta` feedback loops.
+### C. Are we reading PDFs during search time?
+**ABSOLUTELY NOT.** 
+Reading PDFs at search time (runtime) is far too slow. 
+*   During **Ingestion (Start Time)**: We read the PDFs, use LLMs to extract data, save that data as lightweight `.md` files, and index them into ChromaDB.
+*   During **Search (Run Time)**: We *only* query ChromaDB and the NetworkX graph. The original PDFs are never touched during a search query.
 
-### Search Architecture Schema
-
-```mermaid
-graph TD
-    %% Internal Pipeline
-    subgraph IKP Internal Platform
-        MD[Canonical .md Files] -->|Parsed & Embedded| VDB[(ChromaDB Vector Store)]
-        MD -->|Parsed| G[(NetworkX In-Memory Graph)]
-        VDB -->|Semantic Score| RM[RepoManager Hybrid Search]
-        G -->|Graph Boost| RM
-        RM -->|JSON Results| API[/api/search Endpoint]
-    end
-
-    %% The Actors querying our API
-    subgraph The Actors
-        AI[AI Reasoning / Solution Gen] -->|Queries| API
-        UI[Human / CLI / Web UI] -->|Queries| API
-    end
-
-    %% External MCP Integration
-    subgraph Phase 6 Vendor Portal
-        MCPClient[Obsidian MCP Client mcp_client.py]
-        API -.->|Fallback / Health Check| MCPClient
-        MCPClient -->|MCP Protocol| ExtObsidian[External Obsidian MCP Server seekstone]
-        ExtObsidian -->|Queries| ExtVault[Vendor Markdown Vault]
-    end
-```
-
-#### Hybrid Ranking & Reciprocal Rank Fusion (RRF)
-Currently, our search algorithm uses a **weighted linear combination** (a simplified form of hybrid fusion), not strict RRF, but the conceptual goal is identical:
-- **Semantic Score (Base Weight):** ChromaDB returns a semantic distance score based on fuzzy/conceptual matching. This gets the highest initial weight.
-- **Graph Boost (Contextual Weight):** If the retrieved node shares an explicit structural relationship in the in-memory graph (e.g., `Connected To` or `Compatible With` a requested `platform_id`), it receives a static score boost (`+0.2`).
-- **Exact Metadata Match (SKU / Category Weight):** If the query has structured metadata requirements (e.g., `category="Storage"`), exact matches in the node attributes provide a heavy boost (`+0.3`) to ensure precision over fuzzy semantics.
-
-*Future Enhancement:* We should transition from simple linear boosting to true **Reciprocal Rank Fusion (RRF)**. RRF will rank semantic results (ChromaDB) and exact SKU matches (Elasticsearch/SQL) in isolated lists, then fuse them using `score = 1 / (k + rank)`, eliminating the need to manually tune arbitrary boost constants (`+0.2`, `+0.3`).
+### D. Does LlamaIndex help during search or ingestion?
+**Currently, we DO NOT use LlamaIndex anywhere in the platform.** 
+My previous notes about LlamaIndex were **Future Recommendations** for the *Recovery Workflow*. We do not maintain a LlamaIndex table during ingestion. All vector embedding and searching is currently handled natively by **ChromaDB**.
 
 ---
 
 ## 3. Future Roadmap: Neo4j & LlamaIndex for Recovery Workflows
 
-The platform currently uses an in-memory `NetworkX` graph. However, for solving the **Recovery Workflow** (understanding partner portal errors, finding alternative SKUs, dropping/adding components dynamically, validating entire BOMs against compatibility constraints), we need more powerful reasoning engines.
+When the Partner Portal rejects our generated BOM (Bill of Materials) with complex errors, we enter the **Recovery Flow**. This is where our current in-memory architecture (NetworkX) will struggle to scale, and where we must upgrade.
 
-### My Architectural Views & Recommendations
+### A. Neo4j for Graph Constraints & Pathfinding (The SKU Matcher)
+*   **Role in Recovery:** Neo4j is an enterprise Graph Database. If the partner portal rejects a SKU, we query Neo4j using Cypher (`MATCH (failed_sku)-[:COMPATIBLE_WITH]-(alternative_sku) RETURN alternative_sku`) to mathematically guarantee a compatible replacement.
+*   **Why it replaces NetworkX:** NetworkX cannot handle tens of thousands of complex traversal queries efficiently. Neo4j acts as the strict, deterministic "SKU Matcher".
 
-#### A. Neo4j for Graph Constraints & Pathfinding
-**Recommendation: HIGHLY RECOMMENDED**
-- **Why:** `NetworkX` is an in-memory toy. When the catalog scales to tens of thousands of inter-dependent SKUs with complex rules (e.g., "If Chassis is 24SFF, Storage Controller must support 24 NVMe lanes"), we need an enterprise graph database.
-- **Recovery Workflow:** Neo4j allows us to write Cypher queries for pathfinding. If a SKU fails in the partner portal, we can query Neo4j: `MATCH (failed_sku)-[:COMPATIBLE_WITH]-(alternative_sku) RETURN alternative_sku`. This provides deterministic, mathematically verifiable alternatives rather than relying on LLM hallucinations.
-- **Validation:** Neo4j enables ACID-compliant constraint validation *before* we push a BOM to the partner portal.
+### B. LlamaIndex for RAG-based Error Resolution (The Fuzzy Matcher)
+*   **Role in Recovery:** When the Partner Portal returns an unstructured, obscure error (e.g., `ERR_PCI_BNDW_EXCEEDED`), we cannot use Neo4j because it's not a graph issue—it's a knowledge interpretation issue. 
+*   **How it would work:** We would deploy LlamaIndex *as a dedicated RAG agent*. It would read the existing `.md` files (not the PDFs) to find the specific PCI lane limit documentation and synthesize a plain-English explanation of why the error occurred.
 
-#### B. LlamaIndex for RAG-based Error Resolution
-**Recommendation: RECOMMENDED FOR SPECIFIC WORKFLOWS**
-- **Why:** While we don't need LlamaIndex for basic ingestion, it excels at orchestrating complex RAG (Retrieval-Augmented Generation) pipelines.
-- **Recovery Workflow:** When the Partner Portal returns an obscure error string (e.g., `ERR_PCI_BNDW_EXCEEDED`), LlamaIndex can be deployed to semantically search our corpus of ingested engineering manuals, retrieve the specific PCI lane limit documentation, and synthesize a resolution plan.
-- **Feedback Loop Weighting:** If we adopt LlamaIndex, we should use it as an "Agentic Orchestrator". In the hybrid search model, the Neo4j Graph traversal should have the **highest weight** (because it is deterministic truth), while LlamaIndex semantic suggestions should serve as a **fallback weight** for fuzzy reasoning. 
+### Summary of Future Weighting Strategy (Hybrid RRF)
+When resolving a Partner Portal conflict, our system must weigh conflicting information using **Reciprocal Rank Fusion (RRF)**:
+1.  **Human Feedback Deltas (100% Weight):** An explicit correction submitted via `/api/feedback` is absolute truth.
+2.  **SKU Match via Graph / Neo4j (80% Weight):** Structural compatibility bounds. If the graph says it fits, it gets a massive ranking priority.
+3.  **Semantic / Fuzzy Match via ChromaDB / LlamaIndex (20% Weight):** Used primarily as a fallback to interpret unstructured error messages when the exact SKU match isn't obvious.
 
-### Summary of Future Weighting Strategy
-When resolving a Partner Portal conflict:
-1.  **SKU Match (Graph / Neo4j):** Weight = 80% (Deterministic truth, strict compatibility bounds).
-2.  **Human Feedback Deltas:** Weight = 100% (Absolute override, applied immediately via our Phase 6 `/api/feedback` loop).
-3.  **Semantic / Fuzzy Match (Vector / LlamaIndex):** Weight = 20% (Used only when the graph is sparse or for interpreting unstructured error messages).
+---
+
+## 4. Search Architecture Schema
+
+```mermaid
+graph TD
+    %% 1. Ingestion Phase (Start Time)
+    subgraph Ingestion Phase
+        PDF[Raw PDFs] -->|Extracted by Gemini| MD[Canonical .md Files]
+        MD -->|Embedded| VDB[(ChromaDB Vector Store)]
+        MD -->|Parsed| G[(NetworkX In-Memory Graph)]
+    end
+
+    %% 2. Execution Phase (Search Time)
+    subgraph Internal Search Engine
+        VDB -->|Semantic Score| RM[RepoManager Hybrid Search]
+        G -->|Structural Boost| RM
+        RM -->|JSON Results| API[/api/search Endpoint]
+    end
+
+    %% 3. The Clients (Consumers)
+    subgraph The Clients
+        AI[Google AI Studio / Solution Gen] -->|HTTP GET/POST| API
+        UI[Antigravity CLI / Human User] -->|HTTP GET/POST| API
+    end
+
+    %% 4. Recovery & Sync Phase
+    subgraph Phase 6 Vendor Portal
+        MCPClient[Obsidian MCP Client mcp_client.py]
+        API -.->|Fallback Sync| MCPClient
+        MCPClient -->|Queries| ExtVault[Vendor Markdown Vault]
+    end
+```
